@@ -51,7 +51,8 @@ contract GSR is Ownable {
         _;
     }
 
-    constructor() public {
+    constructor(address geoAddress) public {
+        geo = GEO(geoAddress);
         epochTimeLimit = 7 days;
         currentEpoch = 0;
         restartEpochTime();
