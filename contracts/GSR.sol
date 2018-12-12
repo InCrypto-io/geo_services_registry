@@ -16,6 +16,9 @@ contract GSR is Ownable {
     mapping(address => uint256) public stake;
     mapping(address => uint256) public stakeLockup;
 
+    mapping(bytes32 => mapping(uint16 => address[])) public candidatesListInRegistries;
+    // (keccak256(registry name)) => (epoch) => (candidate address) => (is candidate)
+    mapping(bytes32 => mapping(uint16 => mapping(address => bool))) private isCandidateInCurrentEpoch;
     // (keccak256(registry name)) => (epoch) => (candidate address) => (total votes amount)
     mapping(bytes32 => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
     // (keccak256(registry name)) => (epoch) => (voter address) => (vote amount)
@@ -156,6 +159,23 @@ contract GSR is Ownable {
         }
         stake[msg.sender] = 0;
         stakeLockup[msg.sender] = 0;
+    }
+
+    function getCandidatesList(string _registryName, uint16 _epoch)
+    view
+    returns (address[])
+    {
+        return candidatesListInRegistries[keccak256(_registryName)][_epoch];
+    }
+
+    function getTotalTokensVotedForCandidate(
+        string _registryName,
+        uint16 _epoch,
+        address _candidate)
+    view
+    returns (uint256)
+    {
+        return totalTokensForCandidate[keccak256(_registryName)][_epoch][_candidate];
     }
 
     /**
