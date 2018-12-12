@@ -59,8 +59,8 @@ contract GSR is Ownable {
         votesForRegistryName[registryHashName][msg.sender] = stake[msg.sender];
         if (totalVotesForRegistryName[registryHashName] >= geo.totalSupply() / 10) {
             registryName[registryHashName] = true;
-//            delete totalVotesForRegistryName[registryHashName];
-//            delete votesForRegistryName[registryHashName]; can't delete this
+            //            delete totalVotesForRegistryName[registryHashName];
+            //            delete votesForRegistryName[registryHashName]; can't delete this
         }
     }
 
@@ -68,10 +68,10 @@ contract GSR is Ownable {
     private
     {
         bytes32[] memory hashesForRegistryNames = haveVotesForRegistryNames[msg.sender];
-        for(int v = 0; v<hashesForRegistryNames.length; v++){
-            if(!registryName[hashesForRegistryNames[v]]){
-                totalVotesForRegistryName[registryHashName] -= votesForRegistryName[registryHashName][msg.sender];
-                votesForRegistryName[registryHashName][msg.sender] = 0;
+        for (uint256 v = 0; v < hashesForRegistryNames.length; v++) {
+            if (!registryName[hashesForRegistryNames[v]]) {
+                totalVotesForRegistryName[hashesForRegistryNames[v]] -= votesForRegistryName[hashesForRegistryNames[v]][msg.sender];
+                votesForRegistryName[hashesForRegistryNames[v]][msg.sender] = 0;
             }
         }
     }
