@@ -17,10 +17,11 @@ contract GSR is Ownable {
     mapping(bytes32 => mapping(uint16 => mapping(address => uint256))) private registry;
     mapping(address => uint256) public stake;
     mapping(address => uint256) public stakeLockup;
-    // (keccak256(registry name)) => (valid registry)
+    // bytes32 << keccak256(registry name)
     mapping(bytes32 => bool) public registryName;
-    // (keccak256(registry name)) => (amount votes for registry)
-    mapping(bytes32 => uint256) public votesForRegistryName;
+    mapping(bytes32 => uint256) public totalVotesForRegistryName;
+    mapping(bytes32 => mapping(address => uint256)) public votesForRegistryName;
+    mapping(address => bytes32[]) public haveVotesForRegistryNames;
 
     uint16 public currentEpoch;
     uint256 private epochTimeLimit;
@@ -32,6 +33,12 @@ contract GSR is Ownable {
         _;
     }
 
+    modifier haveStake()
+    {
+        require(stake[msg.sender] > 0);
+        _;
+    }
+
     constructor() public {
         epochTimeLimit = 7 days;
         currentEpoch = 0;
@@ -39,13 +46,21 @@ contract GSR is Ownable {
     }
 
     function voteForRegistry(string _name)
+    haveStake()
     public
     {
         require(registryName[keccak256(_name)] == false);
-        votesForRegistryName[keccak256(_name)] = votesForRegistryName[keccak256(_name)] + stake[msg.sender];
-        if (votesForRegistryName[keccak256(_name)] >= geo.totalSupply() / 10) {
-            registryName[keccak256(_name)] = true;
-            delete votesForRegistryName[keccak256(_name)];
+        bytes32 registryHashName = keccak256(_name);
+        if (votesForRegistryName[registryHashName][msg.sender] == 0) {
+            haveVotesForRegistryNames[msg.sender].push(registryHashName);
+        }
+        totalVotesForRegistryName[registryHashName] -= votesForRegistryName[registryHashName][msg.sender];
+        totalVotesForRegistryName[registryHashName] += stake[msg.sender];
+        votesForRegistryName[registryHashName][msg.sender] = stake[msg.sender];
+        if (totalVotesForRegistryName[registryHashName] >= geo.totalSupply() / 10) {
+            registryName[registryHashName] = true;
+//            delete totalVotesForRegistryName[registryHashName];
+//            delete votesForRegistryName[registryHashName]; can't delete this
         }
     }
 
