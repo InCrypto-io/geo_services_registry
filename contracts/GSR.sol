@@ -17,18 +17,23 @@ contract GSR is Ownable {
     mapping (string => mapping(uint16 => mapping(address => uint256))) private registry;
     mapping (address => uint256) public stake;
 
-    uint16 public currentEpoch = 0;
+    uint16 public currentEpoch;
 
 
-    function addRegistry(string _name)
-    onlyOwner
-    public
+    constructor() public {
+        epochTimeLimit = 7 days;
+        currentEpoch = 0;
+        restartEpochTime();
+    }
+
+
+    function _addRegistry(string _name)
+    private
     {
 
     }
 
-    function removeRegistry(string _name)
-    onlyOwner
+    function voteForRegistry(sting name)
     public
     {
 
