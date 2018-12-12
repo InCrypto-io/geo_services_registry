@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "./IERC20.sol";
-import "./SafeMath.sol";
+import "./math/SafeMath.sol";
 
 /**
  * @title Standard ERC20 token
@@ -14,7 +14,7 @@ import "./SafeMath.sol";
  * all accounts just by listening to said events. Note that this isn't required by the specification, and other
  * compliant implementations may not do it.
  */
-contract ERC20 is IERC20 {
+contract GEO is IERC20 {
     using SafeMath for uint256;
 
     mapping (address => uint256) private _balances;
@@ -22,6 +22,8 @@ contract ERC20 is IERC20 {
     mapping (address => mapping (address => uint256)) private _allowed;
 
     uint256 private _totalSupply;
+
+    uint256 public lockupExpired;
 
     /**
     * @dev Total number of tokens in existence
