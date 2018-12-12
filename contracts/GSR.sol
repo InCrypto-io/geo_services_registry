@@ -102,7 +102,12 @@ contract GSR is Ownable {
     registryExist(_registryName)
     public
     {
-
+        checkEpoch();
+        bytes32 registryHashName = keccak256(_registryName);
+        address candidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
+        totalTokensForCandidate[registryHashName][currentEpoch][candidate] -= amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
+        amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender] = 0;
+        candidateForVoter[registryHashName][currentEpoch][msg.sender] = 0;
     }
 
     function voteService(uint256 _amount)
