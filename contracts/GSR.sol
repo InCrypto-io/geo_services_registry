@@ -28,6 +28,7 @@ contract GSR is Ownable {
     mapping(bytes32 => uint256) private totalVotesForNewRegistry;
     mapping(bytes32 => mapping(address => uint256)) private votesForNewRegistry;
     mapping(address => bytes32[]) private haveVotesForNewRegistry;
+    string[] public registryList;
 
     uint16 public currentEpoch;
     uint256 private epochTimeLimit;
@@ -105,9 +106,21 @@ contract GSR is Ownable {
         checkEpoch();
         bytes32 registryHashName = keccak256(_registryName);
         address candidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
-        totalTokensForCandidate[registryHashName][currentEpoch][candidate] -= amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
-        amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender] = 0;
-        candidateForVoter[registryHashName][currentEpoch][msg.sender] = 0;
+        uint256 amountTokens = amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
+        if (amountTokens > 0) {
+            totalTokensForCandidate[registryHashName][currentEpoch][candidate] -= amountTokens;
+            amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender] = 0;
+            candidateForVoter[registryHashName][currentEpoch][msg.sender] = 0;
+        }
+    }
+
+    function cancelVotes()
+    public
+    {
+        checkEpoch();
+        for (uint256 i = 0; i < registryList.length; i++) {
+            cancelVote(registryList[i]);
+        }
     }
 
     function voteService(uint256 _amount)
@@ -137,6 +150,7 @@ contract GSR is Ownable {
     public
     {
         cancelVoteForNewRegistry();
+        cancelVotes();
         if (stakeLockup[msg.sender] == 0) {
             geo.transfer(msg.sender, stake[msg.sender]);
         }
