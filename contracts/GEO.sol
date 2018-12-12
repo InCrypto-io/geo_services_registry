@@ -21,16 +21,18 @@ contract GEO is IERC20 {
 
     mapping(address => mapping(address => uint256)) private _allowed;
 
-    uint256 private _totalSupply;
+    uint256 private _totalSupply = 10000000000000000;
+    string public symbol = 'GEO';
+    uint8 public decimals = 8;
 
     uint256 public lockupExpired;
 
-    address private _owner;
+    address private _sellerInLockupPeriod;
 
     constructor()
     {
         lockupExpired = now + (1 years);
-        _owner = msg.sender;
+        _sellerInLockupPeriod = msg.sender;
     }
 
     /**
@@ -84,7 +86,7 @@ contract GEO is IERC20 {
     public
     returns (bool)
     {
-        require(lockupExpired < now || msg.sender == _owner);
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         _transfer(msg.sender, to, value);
         return true;
     }
@@ -104,7 +106,7 @@ contract GEO is IERC20 {
     public
     returns (bool)
     {
-        require(lockupExpired < now || msg.sender == _owner);
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = value;
@@ -127,7 +129,7 @@ contract GEO is IERC20 {
     public
     returns (bool)
     {
-        require(lockupExpired < now || msg.sender == _owner);
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
         emit Approval(from, msg.sender, _allowed[from][msg.sender]);
@@ -150,7 +152,7 @@ contract GEO is IERC20 {
     public
     returns (bool)
     {
-        require(lockupExpired < now || msg.sender == _owner);
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = _allowed[msg.sender][spender].add(addedValue);
@@ -174,7 +176,7 @@ contract GEO is IERC20 {
     public
     returns (bool)
     {
-        require(lockupExpired < now || msg.sender == _owner);
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = _allowed[msg.sender][spender].sub(subtractedValue);
@@ -194,7 +196,7 @@ contract GEO is IERC20 {
         uint256 value)
     internal
     {
-        require(lockupExpired < now || msg.sender == _owner);
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         require(to != address(0));
 
         _balances[from] = _balances[from].sub(value);
