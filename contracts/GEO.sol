@@ -17,18 +17,32 @@ import "./math/SafeMath.sol";
 contract GEO is IERC20 {
     using SafeMath for uint256;
 
-    mapping (address => uint256) private _balances;
+    mapping(address => uint256) private _balances;
 
-    mapping (address => mapping (address => uint256)) private _allowed;
+    mapping(address => mapping(address => uint256)) private _allowed;
 
-    uint256 private _totalSupply;
+    uint256 private _totalSupply = 10000000000000000;
+    string public symbol = 'GEO';
+    uint8 public decimals = 8;
 
     uint256 public lockupExpired;
+
+    address private _sellerInLockupPeriod;
+
+    constructor()
+    {
+        lockupExpired = now + (1 years);
+        _sellerInLockupPeriod = msg.sender;
+    }
 
     /**
     * @dev Total number of tokens in existence
     */
-    function totalSupply() public view returns (uint256) {
+    function totalSupply()
+    public
+    view
+    returns (uint256)
+    {
         return _totalSupply;
     }
 
@@ -37,7 +51,11 @@ contract GEO is IERC20 {
     * @param owner The address to query the balance of.
     * @return An uint256 representing the amount owned by the passed address.
     */
-    function balanceOf(address owner) public view returns (uint256) {
+    function balanceOf(address owner)
+    public
+    view
+    returns (uint256)
+    {
         return _balances[owner];
     }
 
@@ -47,7 +65,13 @@ contract GEO is IERC20 {
      * @param spender address The address which will spend the funds.
      * @return A uint256 specifying the amount of tokens still available for the spender.
      */
-    function allowance(address owner, address spender) public view returns (uint256) {
+    function allowance(
+        address owner,
+        address spender)
+    public
+    view
+    returns (uint256)
+    {
         return _allowed[owner][spender];
     }
 
@@ -56,7 +80,13 @@ contract GEO is IERC20 {
     * @param to The address to transfer to.
     * @param value The amount to be transferred.
     */
-    function transfer(address to, uint256 value) public returns (bool) {
+    function transfer(
+        address to,
+        uint256 value)
+    public
+    returns (bool)
+    {
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         _transfer(msg.sender, to, value);
         return true;
     }
@@ -70,7 +100,13 @@ contract GEO is IERC20 {
      * @param spender The address which will spend the funds.
      * @param value The amount of tokens to be spent.
      */
-    function approve(address spender, uint256 value) public returns (bool) {
+    function approve(
+        address spender,
+        uint256 value)
+    public
+    returns (bool)
+    {
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = value;
@@ -86,7 +122,14 @@ contract GEO is IERC20 {
      * @param to address The address which you want to transfer to
      * @param value uint256 the amount of tokens to be transferred
      */
-    function transferFrom(address from, address to, uint256 value) public returns (bool) {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value)
+    public
+    returns (bool)
+    {
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
         emit Approval(from, msg.sender, _allowed[from][msg.sender]);
@@ -103,7 +146,13 @@ contract GEO is IERC20 {
      * @param spender The address which will spend the funds.
      * @param addedValue The amount of tokens to increase the allowance by.
      */
-    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+    function increaseAllowance(
+        address spender,
+        uint256 addedValue)
+    public
+    returns (bool)
+    {
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = _allowed[msg.sender][spender].add(addedValue);
@@ -121,7 +170,13 @@ contract GEO is IERC20 {
      * @param spender The address which will spend the funds.
      * @param subtractedValue The amount of tokens to decrease the allowance by.
      */
-    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
+    function decreaseAllowance(
+        address spender,
+        uint256 subtractedValue)
+    public
+    returns (bool)
+    {
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = _allowed[msg.sender][spender].sub(subtractedValue);
@@ -135,7 +190,13 @@ contract GEO is IERC20 {
     * @param to The address to transfer to.
     * @param value The amount to be transferred.
     */
-    function _transfer(address from, address to, uint256 value) internal {
+    function _transfer(
+        address from,
+        address to,
+        uint256 value)
+    internal
+    {
+        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
         require(to != address(0));
 
         _balances[from] = _balances[from].sub(value);
@@ -150,7 +211,12 @@ contract GEO is IERC20 {
      * @param account The account that will receive the created tokens.
      * @param value The amount that will be created.
      */
-    function _mint(address account, uint256 value) internal {
+    function _mint(
+        address account,
+        uint256 value)
+    internal
+    {
+        require(false);
         require(account != address(0));
 
         _totalSupply = _totalSupply.add(value);
@@ -164,7 +230,12 @@ contract GEO is IERC20 {
      * @param account The account whose tokens will be burnt.
      * @param value The amount that will be burnt.
      */
-    function _burn(address account, uint256 value) internal {
+    function _burn(
+        address account,
+        uint256 value)
+    internal
+    {
+        require(false);
         require(account != address(0));
 
         _totalSupply = _totalSupply.sub(value);
@@ -180,7 +251,12 @@ contract GEO is IERC20 {
      * @param account The account whose tokens will be burnt.
      * @param value The amount that will be burnt.
      */
-    function _burnFrom(address account, uint256 value) internal {
+    function _burnFrom(
+        address account,
+        uint256 value)
+    internal
+    {
+        require(false);
         _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(value);
         _burn(account, value);
         emit Approval(account, msg.sender, _allowed[account][msg.sender]);
