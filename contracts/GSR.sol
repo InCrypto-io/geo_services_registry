@@ -129,6 +129,7 @@ contract GSR is Ownable {
     function voteService(uint256 _amount)
     public
     {
+        checkEpoch();
         require(geo.lockupExpired() < now);
         if (stakeLockup[msg.sender] > 0) {
             stakeLockup[msg.sender] = 0;
@@ -141,6 +142,7 @@ contract GSR is Ownable {
     function voteServiceLockup(uint256 _amount)
     public
     {
+        checkEpoch();
         require(geo.lockupExpired() > now);
         stake[msg.sender] = stake[msg.sender].add(_amount);
         if (stake[msg.sender] > geo.balanceOf(msg.sender)) {
@@ -152,6 +154,7 @@ contract GSR is Ownable {
     function withdraw()
     public
     {
+        checkEpoch();
         cancelVoteForNewRegistry();
         cancelVotes();
         if (stakeLockup[msg.sender] == 0) {
