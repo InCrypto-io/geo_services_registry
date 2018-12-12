@@ -13,10 +13,16 @@ contract GSR is Ownable {
 
     GEO public geo;
 
-    // (sha3(registry name)) => (epoch) => (address) => (vote token amount)
-    mapping(bytes32 => mapping(uint16 => mapping(address => uint256))) private registry;
     mapping(address => uint256) public stake;
     mapping(address => uint256) public stakeLockup;
+
+    // (keccak256(registry name)) => (epoch) => (candidate address) => (total votes amount)
+    mapping(bytes32 => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
+    // (keccak256(registry name)) => (epoch) => (voter address) => (vote amount)
+    mapping(bytes32 => mapping(uint16 => mapping(address => uint256))) private amountTokenForCandidateFromVoter;
+    // (keccak256(registry name)) => (epoch) => (voter address) => (candidate address)
+    mapping(bytes32 => mapping(uint16 => mapping(address => address))) private candidateForVoter;
+
     // bytes32 << keccak256(registry name)
     mapping(bytes32 => bool) public registryName;
     mapping(bytes32 => uint256) private totalVotesForNewRegistry;
@@ -83,6 +89,13 @@ contract GSR is Ownable {
     haveStake()
     public
     {
+        checkEpoch();
+        bytes32 registryHashName = keccak256(_registryName);
+        address oldCandidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
+        totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate] -= amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
+        totalTokensForCandidate[registryHashName][currentEpoch][_candidate] += stake[msg.sender];
+        amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender] = stake[msg.sender];
+        candidateForVoter[registryHashName][currentEpoch][msg.sender] = _candidate;
     }
 
     function cancelVote(string _registryName)
@@ -130,7 +143,7 @@ contract GSR is Ownable {
     * @dev Check and change number of current epoch
     */
     function checkEpoch()
-    private
+    public
     returns (uint16)
     {
         if (epochTime < now) {
