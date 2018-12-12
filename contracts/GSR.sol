@@ -13,19 +13,24 @@ contract GSR is Ownable {
 
     GEO public geo;
 
-    // (keccak(registry name)) => (epoch) => (address) => (vote token amount)
-    mapping (bytes32 => mapping(uint16 => mapping(address => uint256))) private registry;
-    mapping (address => uint256) public stake;
-    mapping (address => uint256) public stakeLockup;
-    // (keccak(registry name)) => (valid registry)
-    mapping (bytes32 => bool) public registryName;
-    // (keccak(registry name)) => (amount votes for registry)
-    mapping (bytes32 => uint256) public votesForRegistryName;
+    // (sha3(registry name)) => (epoch) => (address) => (vote token amount)
+    mapping(bytes32 => mapping(uint16 => mapping(address => uint256))) private registry;
+    mapping(address => uint256) public stake;
+    mapping(address => uint256) public stakeLockup;
+    // (keccak256(registry name)) => (valid registry)
+    mapping(bytes32 => bool) public registryName;
+    // (keccak256(registry name)) => (amount votes for registry)
+    mapping(bytes32 => uint256) public votesForRegistryName;
 
     uint16 public currentEpoch;
     uint256 private epochTimeLimit;
     uint256 private epochTime;
 
+    modifier registryExist(string _name)
+    {
+        require(registryName[keccak256(_name)]);
+        _;
+    }
 
     constructor() public {
         epochTimeLimit = 7 days;
@@ -33,26 +38,26 @@ contract GSR is Ownable {
         restartEpochTime();
     }
 
-
-    function _addRegistry(string _name)
-    private
-    {
-
-    }
-
-    function voteForRegistry(string name)
+    function voteForRegistry(string _name)
     public
     {
-
+        require(registryName[keccak256(_name)] == false);
+        votesForRegistryName[keccak256(_name)] = votesForRegistryName[keccak256(_name)] + stake[msg.sender];
+        if (votesForRegistryName[keccak256(_name)] >= geo.totalSupply() / 10) {
+            registryName[keccak256(_name)] = true;
+            delete votesForRegistryName[keccak256(_name)];
+        }
     }
 
     function vote(string _registryName)
+    registryExist(_registryName)
     public
     {
 
     }
 
     function cancelVote(string _registryName)
+    registryExist(_registryName)
     public
     {
 
@@ -81,7 +86,7 @@ contract GSR is Ownable {
     */
     function checkEpoch()
     private
-    returns(uint16)
+    returns (uint16)
     {
         if (epochTime < now) {
             return increaseEpoch();
@@ -93,7 +98,7 @@ contract GSR is Ownable {
     */
     function increaseEpoch()
     private
-    returns(uint16)
+    returns (uint16)
     {
         restartEpochTime();
         currentEpoch = uint16(currentEpoch.add(1));
