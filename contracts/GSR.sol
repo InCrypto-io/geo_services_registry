@@ -19,9 +19,9 @@ contract GSR is Ownable {
     mapping(address => uint256) public stakeLockup;
     // bytes32 << keccak256(registry name)
     mapping(bytes32 => bool) public registryName;
-    mapping(bytes32 => uint256) private totalVotesForRegistryName;
-    mapping(bytes32 => mapping(address => uint256)) private votesForRegistryName;
-    mapping(address => bytes32[]) private haveVotesForRegistryNames;
+    mapping(bytes32 => uint256) private totalVotesForNewRegistry;
+    mapping(bytes32 => mapping(address => uint256)) private votesForNewRegistry;
+    mapping(address => bytes32[]) private haveVotesForNewRegistry;
 
     uint16 public currentEpoch;
     uint256 private epochTimeLimit;
@@ -35,7 +35,7 @@ contract GSR is Ownable {
 
     modifier haveStake()
     {
-        require(stake[msg.sender]);
+        require(stake[msg.sender] > 0);
         if (stakeLockup[msg.sender] > 0)
             require(geo.lockupExpired() > now);
         _;
@@ -47,38 +47,38 @@ contract GSR is Ownable {
         restartEpochTime();
     }
 
-    function voteForRegistry(string _name)
+    function voteForNewRegistry(string _name)
     haveStake()
     public
     {
         require(registryName[keccak256(_name)] == false);
         bytes32 registryHashName = keccak256(_name);
-        if (votesForRegistryName[registryHashName][msg.sender] == 0) {
-            haveVotesForRegistryNames[msg.sender].push(registryHashName);
+        if (votesForNewRegistry[registryHashName][msg.sender] == 0) {
+            haveVotesForNewRegistry[msg.sender].push(registryHashName);
         }
-        totalVotesForRegistryName[registryHashName] -= votesForRegistryName[registryHashName][msg.sender];
-        totalVotesForRegistryName[registryHashName] += stake[msg.sender];
-        votesForRegistryName[registryHashName][msg.sender] = stake[msg.sender];
-        if (totalVotesForRegistryName[registryHashName] >= geo.totalSupply() / 10) {
+        totalVotesForNewRegistry[registryHashName] -= votesForNewRegistry[registryHashName][msg.sender];
+        totalVotesForNewRegistry[registryHashName] += stake[msg.sender];
+        votesForNewRegistry[registryHashName][msg.sender] = stake[msg.sender];
+        if (totalVotesForNewRegistry[registryHashName] >= geo.totalSupply() / 10) {
             registryName[registryHashName] = true;
             //            delete totalVotesForRegistryName[registryHashName];
             //            delete votesForRegistryName[registryHashName]; can't delete this
         }
     }
 
-    function cancelVoteForRegistry()
+    function cancelVoteForNewRegistry()
     private
     {
-        bytes32[] memory hashesForRegistryNames = haveVotesForRegistryNames[msg.sender];
+        bytes32[] memory hashesForRegistryNames = haveVotesForNewRegistry[msg.sender];
         for (uint256 v = 0; v < hashesForRegistryNames.length; v++) {
             if (!registryName[hashesForRegistryNames[v]]) {
-                totalVotesForRegistryName[hashesForRegistryNames[v]] -= votesForRegistryName[hashesForRegistryNames[v]][msg.sender];
-                votesForRegistryName[hashesForRegistryNames[v]][msg.sender] = 0;
+                totalVotesForNewRegistry[hashesForRegistryNames[v]] -= votesForNewRegistry[hashesForRegistryNames[v]][msg.sender];
+                votesForNewRegistry[hashesForRegistryNames[v]][msg.sender] = 0;
             }
         }
     }
 
-    function vote(string _registryName)
+    function vote(string _registryName, address _candidate)
     registryExist(_registryName)
     haveStake()
     public
@@ -112,12 +112,18 @@ contract GSR is Ownable {
         if (stake[msg.sender] > geo.balanceOf(msg.sender)) {
             stake[msg.sender] = geo.balanceOf(msg.sender);
         }
+        stakeLockup[msg.sender] = stake[msg.sender];
     }
 
     function withdraw()
     public
     {
-        cancelVoteForRegistry();
+        cancelVoteForNewRegistry();
+        if (stakeLockup[msg.sender] == 0) {
+            geo.transfer(msg.sender, stake[msg.sender]);
+        }
+        stake[msg.sender] = 0;
+        stakeLockup[msg.sender] = 0;
     }
 
     /**
