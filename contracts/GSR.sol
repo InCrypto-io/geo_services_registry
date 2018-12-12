@@ -19,9 +19,9 @@ contract GSR is Ownable {
     mapping(address => uint256) public stakeLockup;
     // bytes32 << keccak256(registry name)
     mapping(bytes32 => bool) public registryName;
-    mapping(bytes32 => uint256) public totalVotesForRegistryName;
-    mapping(bytes32 => mapping(address => uint256)) public votesForRegistryName;
-    mapping(address => bytes32[]) public haveVotesForRegistryNames;
+    mapping(bytes32 => uint256) private totalVotesForRegistryName;
+    mapping(bytes32 => mapping(address => uint256)) private votesForRegistryName;
+    mapping(address => bytes32[]) private haveVotesForRegistryNames;
 
     uint16 public currentEpoch;
     uint256 private epochTimeLimit;
@@ -64,6 +64,18 @@ contract GSR is Ownable {
         }
     }
 
+    function cancelVoteForRegistry()
+    private
+    {
+        bytes32[] memory hashesForRegistryNames = haveVotesForRegistryNames[msg.sender];
+        for(int v = 0; v<hashesForRegistryNames.length; v++){
+            if(!registryName[hashesForRegistryNames[v]]){
+                totalVotesForRegistryName[registryHashName] -= votesForRegistryName[registryHashName][msg.sender];
+                votesForRegistryName[registryHashName][msg.sender] = 0;
+            }
+        }
+    }
+
     function vote(string _registryName)
     registryExist(_registryName)
     public
@@ -93,7 +105,7 @@ contract GSR is Ownable {
     function withdraw()
     public
     {
-
+        cancelVoteForRegistry();
     }
 
     /**
