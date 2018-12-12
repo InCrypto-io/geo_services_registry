@@ -35,7 +35,9 @@ contract GSR is Ownable {
 
     modifier haveStake()
     {
-        require(stake[msg.sender] > 0);
+        require(stake[msg.sender]);
+        if (stakeLockup[msg.sender] > 0)
+            require(geo.lockupExpired() > now);
         _;
     }
 
@@ -78,9 +80,9 @@ contract GSR is Ownable {
 
     function vote(string _registryName)
     registryExist(_registryName)
+    haveStake()
     public
     {
-
     }
 
     function cancelVote(string _registryName)
@@ -93,13 +95,23 @@ contract GSR is Ownable {
     function voteService(uint256 _amount)
     public
     {
-
+        require(geo.lockupExpired() < now);
+        if (stakeLockup[msg.sender] > 0) {
+            stakeLockup[msg.sender] = 0;
+            stake[msg.sender] = 0;
+        }
+        stake[msg.sender] = stake[msg.sender].add(_amount);
+        geo.transferFrom(msg.sender, address(this), _amount);
     }
 
     function voteServiceLockup(uint256 _amount)
     public
     {
-
+        require(geo.lockupExpired() > now);
+        stake[msg.sender] = stake[msg.sender].add(_amount);
+        if (stake[msg.sender] > geo.balanceOf(msg.sender)) {
+            stake[msg.sender] = geo.balanceOf(msg.sender);
+        }
     }
 
     function withdraw()

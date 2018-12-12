@@ -23,6 +23,8 @@ contract GEO is IERC20 {
 
     uint256 private _totalSupply;
 
+    uint256 public lockupExpired;
+
     /**
     * @dev Total number of tokens in existence
     */
