@@ -2,9 +2,9 @@ pragma solidity ^0.4.24;
 
 import "./Ownable.sol";
 import "./GEO.sol";
-import "../math/SafeMath8.sol";
-import "../math/SafeMath.sol";
-import "../math/SafeMath16.sol";
+import "./math/SafeMath8.sol";
+import "./math/SafeMath.sol";
+import "./math/SafeMath16.sol";
 
 contract GSR is Ownable {
     using SafeMath8 for uint8;
@@ -13,11 +13,18 @@ contract GSR is Ownable {
 
     GEO public geo;
 
-    // (registry name) => (epoch) => (address) => (vote token amount)
-    mapping (string => mapping(uint16 => mapping(address => uint256))) private registry;
+    // (keccak(registry name)) => (epoch) => (address) => (vote token amount)
+    mapping (bytes32 => mapping(uint16 => mapping(address => uint256))) private registry;
     mapping (address => uint256) public stake;
+    mapping (address => uint256) public stakeLockup;
+    // (keccak(registry name)) => (valid registry)
+    mapping (bytes32 => bool) public registryName;
+    // (keccak(registry name)) => (amount votes for registry)
+    mapping (bytes32 => uint256) public votesForRegistryName;
 
     uint16 public currentEpoch;
+    uint256 private epochTimeLimit;
+    uint256 private epochTime;
 
 
     constructor() public {
@@ -33,7 +40,7 @@ contract GSR is Ownable {
 
     }
 
-    function voteForRegistry(sting name)
+    function voteForRegistry(string name)
     public
     {
 
@@ -58,12 +65,6 @@ contract GSR is Ownable {
     }
 
     function voteServiceLockup(uint256 _amount)
-    public
-    {
-
-    }
-
-    function withdraw()
     public
     {
 
