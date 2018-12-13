@@ -46,6 +46,16 @@ contract('GSR', accounts => {
             await gsr.withdraw({from: user1});
             assert.equal(await gsr.getTotalVotesForNewRegistry(name),0,"Unexpected votes for registry");
         });
+
+        it('Vote for new registry, create registry', async () => {
+            const name = "registry0";
+            const who = owner;
+            await assertRevert(gsr.voteForNewRegistry("new registry", {from: who}));
+            const howMany = await geo.totalSupply() / 10;
+            await gsr.voteServiceLockup(howMany, {from: who});
+            await gsr.voteForNewRegistry(name, {from: who});
+            assert.equal(await gsr.isRegistryExist(name),true,"Can't create new registry");
+        });
     });
 
 });
