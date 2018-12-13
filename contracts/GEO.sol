@@ -33,6 +33,7 @@ contract GEO is IERC20 {
     {
         lockupExpired = now + (1 years);
         _sellerInLockupPeriod = msg.sender;
+        _balances[msg.sender] = _totalSupply;
     }
 
     /**
