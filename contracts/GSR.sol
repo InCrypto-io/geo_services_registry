@@ -51,8 +51,8 @@ contract GSR is Ownable {
         _;
     }
 
-    constructor(address geoAddress) public {
-        geo = GEO(geoAddress);
+    constructor(address _geoAddress) public {
+        geo = GEO(_geoAddress);
         epochTimeLimit = 7 days;
         currentEpoch = 0;
         restartEpochTime();
@@ -106,6 +106,7 @@ contract GSR is Ownable {
 
     function cancelVote(string _registryName)
     registryExist(_registryName)
+    haveStake()
     public
     {
         checkEpoch();
@@ -120,6 +121,7 @@ contract GSR is Ownable {
     }
 
     function cancelVotes()
+    haveStake()
     public
     {
         checkEpoch();
