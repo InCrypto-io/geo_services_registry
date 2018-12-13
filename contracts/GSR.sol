@@ -154,6 +154,7 @@ contract GSR is Ownable {
     }
 
     function withdraw()
+    haveStake()
     public
     {
         checkEpoch();
@@ -168,6 +169,7 @@ contract GSR is Ownable {
 
     function getCandidatesList(string _registryName, uint16 _epoch)
     view
+    public
     returns (address[])
     {
         return candidatesListInRegistries[keccak256(_registryName)][_epoch];
@@ -178,6 +180,7 @@ contract GSR is Ownable {
         uint16 _epoch,
         address _candidate)
     view
+    public
     returns (uint256)
     {
         return totalTokensForCandidate[keccak256(_registryName)][_epoch][_candidate];
@@ -185,6 +188,7 @@ contract GSR is Ownable {
 
     function isRegistryExist(string _name)
     view
+    public
     returns (bool)
     {
         return registryName[keccak256(_name)];
@@ -192,6 +196,7 @@ contract GSR is Ownable {
 
     function getTotalVotesForNewRegistry(string _name)
     view
+    public
     returns (uint256)
     {
         return totalVotesForNewRegistry[keccak256(_name)];

@@ -30,6 +30,7 @@ contract GEO is IERC20 {
     address private _sellerInLockupPeriod;
 
     constructor()
+    public
     {
         lockupExpired = now + (1 years);
         _sellerInLockupPeriod = msg.sender;
