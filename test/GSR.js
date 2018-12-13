@@ -32,9 +32,19 @@ contract('GSR', accounts => {
         });
 
         it('Vote for new registry, small stake', async () => {
+            const name = "new registry";
             await assertRevert(gsr.voteForNewRegistry("new registry", {from: user1}));
-            
-            await gsr.voteServiceLockup(123123, {from: user1});
+            const howMany = 123123;
+            await gsr.voteServiceLockup(howMany, {from: user1});
+            await gsr.voteForNewRegistry(name, {from: user1});
+            assert.equal(await gsr.isRegistryExist(name),false,"Unexpected registry");
+            assert.equal(await gsr.getTotalVotesForNewRegistry(name),howMany,"Unexpected votes for registry");
+        });
+
+        it('Withdraw, cancel vote for new registry', async () => {
+            const name = "new registry";
+            await gsr.withdraw({from: user1});
+            assert.equal(await gsr.getTotalVotesForNewRegistry(name),0,"Unexpected votes for registry");
         });
     });
 

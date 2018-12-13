@@ -27,7 +27,7 @@ contract GSR is Ownable {
     mapping(bytes32 => mapping(uint16 => mapping(address => address))) private candidateForVoter;
 
     // bytes32 << keccak256(registry name)
-    mapping(bytes32 => bool) public registryName;
+    mapping(bytes32 => bool) private registryName;
     mapping(bytes32 => uint256) private totalVotesForNewRegistry;
     mapping(bytes32 => mapping(address => uint256)) private votesForNewRegistry;
     mapping(address => bytes32[]) private haveVotesForNewRegistry;
@@ -72,6 +72,7 @@ contract GSR is Ownable {
         votesForNewRegistry[registryHashName][msg.sender] = stake[msg.sender];
         if (totalVotesForNewRegistry[registryHashName] >= geo.totalSupply() / 10) {
             registryName[registryHashName] = true;
+            registryList.push(_name);
             //            delete totalVotesForRegistryName[registryHashName];
             //            delete votesForRegistryName[registryHashName]; can't delete this
         }
@@ -180,6 +181,20 @@ contract GSR is Ownable {
     returns (uint256)
     {
         return totalTokensForCandidate[keccak256(_registryName)][_epoch][_candidate];
+    }
+
+    function isRegistryExist(string _name)
+    view
+    returns (bool)
+    {
+        return registryName[keccak256(_name)];
+    }
+
+    function getTotalVotesForNewRegistry(string _name)
+    view
+    returns (uint256)
+    {
+        return totalVotesForNewRegistry[keccak256(_name)];
     }
 
     /**
