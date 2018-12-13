@@ -1,6 +1,7 @@
 var GEO = artifacts.require("./GEO.sol");
 var GSR = artifacts.require("./GSR.sol");
 const assertRevert = require('./helpers/assertRevert').assertRevert;
+const {increase,duration} = require('./helpers/time');
 
 contract('GSR', accounts => {
 
@@ -76,6 +77,14 @@ contract('GSR', accounts => {
             await gsr.withdraw({from: voter});
             assert.equal((await gsr.getTotalTokensVotedForCandidate(name, currentEpoch, candidate)).toNumber(),
                 0, "Unexpected token count for candidate, after withdraw");
+        });
+
+
+        it('Epoch switch', async () => {
+            const currentEpoch = (await gsr.currentEpoch()).toNumber();
+            await increase(duration.days(7)+duration.minutes(1));
+            await gsr.checkEpoch();
+            assert.equal((await gsr.currentEpoch()).toNumber(), currentEpoch+1, "Unexpected current epoch");
         });
     });
 
