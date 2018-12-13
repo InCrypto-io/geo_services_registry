@@ -79,10 +79,9 @@ contract('GSR', accounts => {
                 0, "Unexpected token count for candidate, after withdraw");
         });
 
-
         it('Epoch switch', async () => {
             const currentEpoch = (await gsr.currentEpoch()).toNumber();
-            await increase(duration.days(7)+duration.minutes(1));
+            await increase(duration.weeks(1));
             await gsr.checkEpoch();
             assert.equal((await gsr.currentEpoch()).toNumber(), currentEpoch+1, "Unexpected current epoch");
         });

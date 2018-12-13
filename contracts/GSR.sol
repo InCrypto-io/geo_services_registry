@@ -211,7 +211,7 @@ contract GSR is Ownable {
     public
     returns (uint16)
     {
-        if (epochTime < now) {
+        if (epochTime <= now) {
             return increaseEpoch();
         }
     }
