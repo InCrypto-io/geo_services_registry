@@ -1,12 +1,11 @@
 pragma solidity ^0.4.24;
 
-import "./Ownable.sol";
 import "./GEO.sol";
 import "./math/SafeMath8.sol";
 import "./math/SafeMath.sol";
 import "./math/SafeMath16.sol";
 
-contract GSR is Ownable {
+contract GSR {
     using SafeMath8 for uint8;
     using SafeMath16 for uint16;
     using SafeMath for uint256;
