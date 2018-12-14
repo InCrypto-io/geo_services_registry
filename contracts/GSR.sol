@@ -235,11 +235,9 @@ contract GSR is Ownable {
     */
     function increaseEpoch()
     private
-    returns (uint16)
     {
         restartEpochTime();
         currentEpoch = uint16(currentEpoch.add(1));
-        return currentEpoch;
     }
 
     /**
