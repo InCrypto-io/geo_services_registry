@@ -36,6 +36,11 @@ contract('GSR', accounts => {
             assert.equal(await gsr.stakeLockup(user1), 0, "Unexpected escrow");
         });
 
+        it('Test make escrow, not lockup method', async () => {
+            const howMany = 123123;
+            await assertRevert(gsr.voteService(howMany, {from: user1}));
+        });
+
         it('Vote for new registry, small stake', async () => {
             const name = "new registry";
             await assertRevert(gsr.voteForNewRegistry("new registry", {from: user1}));
