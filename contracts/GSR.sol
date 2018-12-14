@@ -95,7 +95,7 @@ contract GSR is Ownable {
     haveStake()
     public
     {
-        checkEpoch();
+        require(!checkEpoch());
         bytes32 registryHashName = keccak256(_registryName);
         address oldCandidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
         totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate] -= amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
@@ -113,7 +113,7 @@ contract GSR is Ownable {
     haveStake()
     public
     {
-        checkEpoch();
+        require(!checkEpoch());
         bytes32 registryHashName = keccak256(_registryName);
         address candidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
         uint256 amountTokens = amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
@@ -128,7 +128,7 @@ contract GSR is Ownable {
     haveStake()
     public
     {
-        checkEpoch();
+        require(!checkEpoch());
         for (uint256 i = 0; i < registryList.length; i++) {
             cancelVote(registryList[i]);
         }
@@ -137,7 +137,7 @@ contract GSR is Ownable {
     function voteService(uint256 _amount)
     public
     {
-        checkEpoch();
+        require(!checkEpoch());
         require(geo.lockupExpired() < now);
         if (stakeLockup[msg.sender] > 0) {
             stakeLockup[msg.sender] = 0;
@@ -150,7 +150,7 @@ contract GSR is Ownable {
     function voteServiceLockup(uint256 _amount)
     public
     {
-        checkEpoch();
+        require(!checkEpoch());
         require(geo.lockupExpired() > now);
         stake[msg.sender] = stake[msg.sender].add(_amount);
         if (stake[msg.sender] > geo.balanceOf(msg.sender)) {
@@ -163,7 +163,7 @@ contract GSR is Ownable {
     haveStake()
     public
     {
-        checkEpoch();
+        require(!checkEpoch());
         cancelVoteForNewRegistry();
         cancelVotes();
         if (stakeLockup[msg.sender] == 0) {
@@ -221,11 +221,13 @@ contract GSR is Ownable {
     */
     function checkEpoch()
     public
-    returns (uint16)
+    returns (bool)
     {
         if (epochTime <= now) {
-            return increaseEpoch();
+            increaseEpoch();
+            return true;
         }
+        return false;
     }
 
     /**
@@ -233,11 +235,9 @@ contract GSR is Ownable {
     */
     function increaseEpoch()
     private
-    returns (uint16)
     {
         restartEpochTime();
         currentEpoch = uint16(currentEpoch.add(1));
-        return currentEpoch;
     }
 
     /**
