@@ -36,6 +36,10 @@ contract GSR {
     uint256 private epochTimeLimit;
     uint256 private epochTime;
 
+    // Events
+    event NewEpochComing(uint256 _number);
+    event NewRegistry(string _name);
+
     modifier registryExist(string _name)
     {
         require(registryName[keccak256(_name)]);
@@ -74,6 +78,7 @@ contract GSR {
             registryList.push(_name);
             //            delete totalVotesForRegistryName[registryHashName];
             //            delete votesForRegistryName[registryHashName]; can't delete this
+            emit NewRegistry(_name);
         }
     }
 
@@ -224,6 +229,7 @@ contract GSR {
     {
         if (epochTime <= now) {
             increaseEpoch();
+            emit NewEpochComing(currentEpoch);
             return true;
         }
         return false;
