@@ -18,7 +18,7 @@ contract GSR is Ownable {
 
     mapping(bytes32 => mapping(uint16 => address[])) public candidatesListInRegistries;
     // (keccak256(registry name)) => (epoch) => (candidate address) => (is candidate)
-    mapping(bytes32 => mapping(uint16 => mapping(address => bool))) private isCandidateInCurrentEpoch;
+    mapping(bytes32 => mapping(uint16 => mapping(address => bool))) private isCandidateInRegistryForEpoch;
     // (keccak256(registry name)) => (epoch) => (candidate address) => (total votes amount)
     mapping(bytes32 => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
     // (keccak256(registry name)) => (epoch) => (voter address) => (vote amount)
@@ -27,7 +27,7 @@ contract GSR is Ownable {
     mapping(bytes32 => mapping(uint16 => mapping(address => address))) private candidateForVoter;
 
     // bytes32 << keccak256(registry name)
-    mapping(bytes32 => bool) public registryName;
+    mapping(bytes32 => bool) private registryName;
     mapping(bytes32 => uint256) private totalVotesForNewRegistry;
     mapping(bytes32 => mapping(address => uint256)) private votesForNewRegistry;
     mapping(address => bytes32[]) private haveVotesForNewRegistry;
@@ -51,7 +51,8 @@ contract GSR is Ownable {
         _;
     }
 
-    constructor() public {
+    constructor(address _geoAddress) public {
+        geo = GEO(_geoAddress);
         epochTimeLimit = 7 days;
         currentEpoch = 0;
         restartEpochTime();
@@ -71,6 +72,7 @@ contract GSR is Ownable {
         votesForNewRegistry[registryHashName][msg.sender] = stake[msg.sender];
         if (totalVotesForNewRegistry[registryHashName] >= geo.totalSupply() / 10) {
             registryName[registryHashName] = true;
+            registryList.push(_name);
             //            delete totalVotesForRegistryName[registryHashName];
             //            delete votesForRegistryName[registryHashName]; can't delete this
         }
@@ -100,10 +102,15 @@ contract GSR is Ownable {
         totalTokensForCandidate[registryHashName][currentEpoch][_candidate] += stake[msg.sender];
         amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender] = stake[msg.sender];
         candidateForVoter[registryHashName][currentEpoch][msg.sender] = _candidate;
+        if (isCandidateInRegistryForEpoch[registryHashName][currentEpoch][_candidate] == false) {
+            isCandidateInRegistryForEpoch[registryHashName][currentEpoch][_candidate] = true;
+            candidatesListInRegistries[registryHashName][currentEpoch].push(_candidate);
+        }
     }
 
     function cancelVote(string _registryName)
     registryExist(_registryName)
+    haveStake()
     public
     {
         checkEpoch();
@@ -118,6 +125,7 @@ contract GSR is Ownable {
     }
 
     function cancelVotes()
+    haveStake()
     public
     {
         checkEpoch();
@@ -152,6 +160,7 @@ contract GSR is Ownable {
     }
 
     function withdraw()
+    haveStake()
     public
     {
         checkEpoch();
@@ -166,9 +175,18 @@ contract GSR is Ownable {
 
     function getCandidatesList(string _registryName, uint16 _epoch)
     view
+    public
     returns (address[])
     {
         return candidatesListInRegistries[keccak256(_registryName)][_epoch];
+    }
+
+    function isCandidate(string _registryName, uint16 _epoch, address _candidate)
+    view
+    public
+    returns (bool)
+    {
+        return isCandidateInRegistryForEpoch[keccak256(_registryName)][_epoch][_candidate];
     }
 
     function getTotalTokensVotedForCandidate(
@@ -176,9 +194,26 @@ contract GSR is Ownable {
         uint16 _epoch,
         address _candidate)
     view
+    public
     returns (uint256)
     {
         return totalTokensForCandidate[keccak256(_registryName)][_epoch][_candidate];
+    }
+
+    function isRegistryExist(string _name)
+    view
+    public
+    returns (bool)
+    {
+        return registryName[keccak256(_name)];
+    }
+
+    function getTotalVotesForNewRegistry(string _name)
+    view
+    public
+    returns (uint256)
+    {
+        return totalVotesForNewRegistry[keccak256(_name)];
     }
 
     /**
@@ -188,7 +223,7 @@ contract GSR is Ownable {
     public
     returns (uint16)
     {
-        if (epochTime < now) {
+        if (epochTime <= now) {
             return increaseEpoch();
         }
     }
