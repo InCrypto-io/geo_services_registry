@@ -35,6 +35,7 @@ contract GSR {
     uint16 public currentEpoch;
     uint256 private epochTimeLimit;
     uint256 private epochTime;
+    uint256 private epochZero;
 
     // Events
     event NewEpochComing(uint256 _number);
@@ -58,7 +59,7 @@ contract GSR {
         geo = GEO(_geoAddress);
         epochTimeLimit = 7 days;
         currentEpoch = 0;
-        restartEpochTime();
+        epochZero = now;
     }
 
     function voteForNewRegistry(string _name)
@@ -227,7 +228,7 @@ contract GSR {
     public
     returns (bool)
     {
-        if (epochTime <= now) {
+        if(getEpochFinishTime() < now){
             increaseEpoch();
             emit NewEpochComing(currentEpoch);
             return true;
@@ -241,17 +242,17 @@ contract GSR {
     function increaseEpoch()
     private
     {
-        restartEpochTime();
-        currentEpoch = uint16(currentEpoch.add(1));
+        currentEpoch = uint16((now.sub(epochZero)).div(epochTimeLimit));
     }
 
     /**
     * @dev Start time from now
     */
-    function restartEpochTime()
+    function getEpochFinishTime()
     private
+    returns(uint256)
     {
-        epochTime = now.add(epochTimeLimit);
+        return (epochZero+(epochTimeLimit.mul(currentEpoch+1)));
     }
 
 }
