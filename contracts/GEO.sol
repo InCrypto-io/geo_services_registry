@@ -32,7 +32,7 @@ contract GEO is IERC20 {
     constructor()
     public
     {
-        lockupExpired = now + (1 years);
+        lockupExpired = now + (364 days);// WARNING lockup period need be multiple 7 days
         _sellerInLockupPeriod = msg.sender;
         _balances[msg.sender] = _totalSupply;
     }
