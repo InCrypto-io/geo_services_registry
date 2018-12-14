@@ -18,7 +18,7 @@ contract GSR is Ownable {
 
     mapping(bytes32 => mapping(uint16 => address[])) public candidatesListInRegistries;
     // (keccak256(registry name)) => (epoch) => (candidate address) => (is candidate)
-    mapping(bytes32 => mapping(uint16 => mapping(address => bool))) private isCandidateInCurrentEpoch;
+    mapping(bytes32 => mapping(uint16 => mapping(address => bool))) private isCandidateInRegistryForEpoch;
     // (keccak256(registry name)) => (epoch) => (candidate address) => (total votes amount)
     mapping(bytes32 => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
     // (keccak256(registry name)) => (epoch) => (voter address) => (vote amount)
@@ -102,6 +102,10 @@ contract GSR is Ownable {
         totalTokensForCandidate[registryHashName][currentEpoch][_candidate] += stake[msg.sender];
         amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender] = stake[msg.sender];
         candidateForVoter[registryHashName][currentEpoch][msg.sender] = _candidate;
+        if (isCandidateInRegistryForEpoch[registryHashName][currentEpoch][_candidate] == false) {
+            isCandidateInRegistryForEpoch[registryHashName][currentEpoch][_candidate] = true;
+            candidatesListInRegistries[registryHashName][currentEpoch].push(_candidate);
+        }
     }
 
     function cancelVote(string _registryName)
@@ -175,6 +179,14 @@ contract GSR is Ownable {
     returns (address[])
     {
         return candidatesListInRegistries[keccak256(_registryName)][_epoch];
+    }
+
+    function isCandidate(string _registryName, uint16 _epoch, address _candidate)
+    view
+    public
+    returns (bool)
+    {
+        return isCandidateInRegistryForEpoch[keccak256(_registryName)][_epoch][_candidate];
     }
 
     function getTotalTokensVotedForCandidate(
