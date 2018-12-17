@@ -17,7 +17,6 @@ contract GeoServiceRegistry {
     GEOToken public token;
 
     mapping(address => uint256) public stake;
-    mapping(address => uint256) public stakeLockup;
 
     // (keccak256(registry name)) => (epoch) => (candidate address) => (total votes amount)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
@@ -83,18 +82,6 @@ contract GeoServiceRegistry {
         }
     }
 
-    function cancelVoteForNewRegistry()
-    private
-    {
-        string[] memory namesForRegistryNames = haveVotesForNewRegistry[msg.sender];
-        for (uint256 v = 0; v < namesForRegistryNames.length; v++) {
-            if (!registryName[namesForRegistryNames[v]]) {
-                totalVotesForNewRegistry[namesForRegistryNames[v]] = totalVotesForNewRegistry[namesForRegistryNames[v]].sub(votesForNewRegistry[namesForRegistryNames[v]][msg.sender]);
-                votesForNewRegistry[namesForRegistryNames[v]][msg.sender] = 0;
-            }
-        }
-    }
-
     function vote(string _registryName, address _candidate)
     registryExist(_registryName)
     public
@@ -112,10 +99,6 @@ contract GeoServiceRegistry {
     {
         checkAndUpdateEpoch();
         require(token.lockupExpired() < now);
-        if (stakeLockup[msg.sender] > 0) {
-            stakeLockup[msg.sender] = 0;
-            stake[msg.sender] = 0;
-        }
         stake[msg.sender] = stake[msg.sender].add(_amount);
         token.transferFrom(msg.sender, address(this), _amount);
     }
@@ -125,11 +108,6 @@ contract GeoServiceRegistry {
     {
         checkAndUpdateEpoch();
         require(token.lockupExpired() > now);
-        stake[msg.sender] = stake[msg.sender].add(_amount);
-        if (stake[msg.sender] > token.balanceOf(msg.sender)) {
-            stake[msg.sender] = token.balanceOf(msg.sender);
-        }
-        stakeLockup[msg.sender] = stake[msg.sender];
     }
 
     function withdraw()
@@ -137,11 +115,8 @@ contract GeoServiceRegistry {
     {
         checkAndUpdateEpoch();
         require(stake[msg.sender] > 0);
-        if (stakeLockup[msg.sender] == 0) {
-            token.transfer(msg.sender, stake[msg.sender]);
-        }
+        token.transfer(msg.sender, stake[msg.sender]);
         stake[msg.sender] = 0;
-        stakeLockup[msg.sender] = 0;
     }
 
     function getTotalTokensVotedForCandidate(
