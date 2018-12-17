@@ -52,7 +52,7 @@ contract GeoServiceRegistry {
 
     modifier registryExist(string _name)
     {
-        require(registryName[keccak256(_name)]);
+        require(registryName[keccak256(abi.encodePacked(_name))]);
         _;
     }
 
@@ -83,19 +83,17 @@ contract GeoServiceRegistry {
     haveStake()
     public
     {
-        require(registryName[keccak256(_name)] == false);
-        bytes32 registryHashName = keccak256(_name);
+        require(registryName[keccak256(abi.encodePacked(_name))] == false);
+        bytes32 registryHashName = keccak256(abi.encodePacked(_name));
         if (votesForNewRegistry[registryHashName][msg.sender] == 0) {
             haveVotesForNewRegistry[msg.sender].push(registryHashName);
         }
-        totalVotesForNewRegistry[registryHashName] -= votesForNewRegistry[registryHashName][msg.sender];
-        totalVotesForNewRegistry[registryHashName] += stake[msg.sender];
+        totalVotesForNewRegistry[registryHashName] = totalVotesForNewRegistry[registryHashName].sub(votesForNewRegistry[registryHashName][msg.sender]);
+        totalVotesForNewRegistry[registryHashName] = totalVotesForNewRegistry[registryHashName].add(stake[msg.sender]);
         votesForNewRegistry[registryHashName][msg.sender] = stake[msg.sender];
         if (totalVotesForNewRegistry[registryHashName] >= token.totalSupply() / 10) {
             registryName[registryHashName] = true;
             registryList.push(_name);
-            //            delete totalVotesForRegistryName[registryHashName];
-            //            delete votesForRegistryName[registryHashName]; can't delete this
             emit NewRegistry(_name);
         }
     }
@@ -106,7 +104,7 @@ contract GeoServiceRegistry {
         bytes32[] memory hashesForRegistryNames = haveVotesForNewRegistry[msg.sender];
         for (uint256 v = 0; v < hashesForRegistryNames.length; v++) {
             if (!registryName[hashesForRegistryNames[v]]) {
-                totalVotesForNewRegistry[hashesForRegistryNames[v]] -= votesForNewRegistry[hashesForRegistryNames[v]][msg.sender];
+                totalVotesForNewRegistry[hashesForRegistryNames[v]] = totalVotesForNewRegistry[hashesForRegistryNames[v]].sub(votesForNewRegistry[hashesForRegistryNames[v]][msg.sender]);
                 votesForNewRegistry[hashesForRegistryNames[v]][msg.sender] = 0;
             }
         }
@@ -118,10 +116,10 @@ contract GeoServiceRegistry {
     public
     {
         require(!checkEpoch());
-        bytes32 registryHashName = keccak256(_registryName);
+        bytes32 registryHashName = keccak256(abi.encodePacked(_registryName));
         address oldCandidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
-        totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate] -= amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
-        totalTokensForCandidate[registryHashName][currentEpoch][_candidate] += stake[msg.sender];
+        totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate] = totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate].sub(amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender]);
+        totalTokensForCandidate[registryHashName][currentEpoch][_candidate] = totalTokensForCandidate[registryHashName][currentEpoch][_candidate].add(stake[msg.sender]);
         amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender] = stake[msg.sender];
         candidateForVoter[registryHashName][currentEpoch][msg.sender] = _candidate;
         if (isCandidateInRegistryForEpoch[registryHashName][currentEpoch][_candidate] == false) {
@@ -135,12 +133,12 @@ contract GeoServiceRegistry {
     haveStake()
     public
     {
-        require(!checkEpoch()); //todo due to code review -- should continue flow after check and increasing
+        require(!checkEpoch());
         bytes32 registryHashName = keccak256(_registryName);
         address candidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
         uint256 amountTokens = amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
         if (amountTokens > 0) {
-            totalTokensForCandidate[registryHashName][currentEpoch][candidate] -= amountTokens;
+            totalTokensForCandidate[registryHashName][currentEpoch][candidate] = totalTokensForCandidate[registryHashName][currentEpoch][candidate].sub(amountTokens);
             amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender] = 0;
             candidateForVoter[registryHashName][currentEpoch][msg.sender] = 0;
         }
@@ -200,7 +198,7 @@ contract GeoServiceRegistry {
     public
     returns (address[])
     {
-        return candidatesListInRegistries[keccak256(_registryName)][_epoch];
+        return candidatesListInRegistries[keccak256(abi.encodePacked(_registryName))][_epoch];
     }
 
     function isCandidate(string _registryName, uint16 _epoch, address _candidate)
@@ -208,7 +206,7 @@ contract GeoServiceRegistry {
     public
     returns (bool)
     {
-        return isCandidateInRegistryForEpoch[keccak256(_registryName)][_epoch][_candidate];
+        return isCandidateInRegistryForEpoch[keccak256(abi.encodePacked(_registryName))][_epoch][_candidate];
     }
 
     function getTotalTokensVotedForCandidate(
@@ -219,7 +217,7 @@ contract GeoServiceRegistry {
     public
     returns (uint256)
     {
-        return totalTokensForCandidate[keccak256(_registryName)][_epoch][_candidate];
+        return totalTokensForCandidate[keccak256(abi.encodePacked(_registryName))][_epoch][_candidate];
     }
 
     function isRegistryExist(string _name)
@@ -227,7 +225,7 @@ contract GeoServiceRegistry {
     public
     returns (bool)
     {
-        return registryName[keccak256(_name)];
+        return registryName[keccak256(abi.encodePacked(_name))];
     }
 
     function getTotalVotesForNewRegistry(string _name)
@@ -235,7 +233,7 @@ contract GeoServiceRegistry {
     public
     returns (uint256)
     {
-        return totalVotesForNewRegistry[keccak256(_name)];
+        return totalVotesForNewRegistry[keccak256(abi.encodePacked(_name))];
     }
 
     /**
@@ -245,7 +243,7 @@ contract GeoServiceRegistry {
     public
     returns (bool)
     {
-        if(getEpochFinishTime() < now){
+        if (getEpochFinishTime() < now) {
             increaseEpoch();
             emit NewEpoch(currentEpoch);
             return true;
@@ -266,10 +264,11 @@ contract GeoServiceRegistry {
     * @dev Start time from now
     */
     function getEpochFinishTime()
+    view
     private
-    returns(uint256)
+    returns (uint256)
     {
-        return (epochZero+(epochTimeLimit.mul(currentEpoch+1)));
+        return (epochZero + (epochTimeLimit.mul(currentEpoch + 1)));
     }
 
     //todo due to code review -- add documentation annotations for functions
