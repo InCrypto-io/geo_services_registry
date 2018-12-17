@@ -1,4 +1,4 @@
-var GEO = artifacts.require("./GEO.sol");
+var GEO = artifacts.require("./GEOToken.sol");
 var GSR = artifacts.require("./GSR.sol");
 
 module.exports = async function (deployer) {

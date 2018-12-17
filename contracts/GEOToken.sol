@@ -3,6 +3,7 @@ pragma solidity ^0.4.24;
 import "./IERC20.sol";
 import "./math/SafeMath.sol";
 
+
 /**
  * @title Standard ERC20 token
  *
@@ -14,7 +15,7 @@ import "./math/SafeMath.sol";
  * all accounts just by listening to said events. Note that this isn't required by the specification, and other
  * compliant implementations may not do it.
  */
-contract GEO is IERC20 {
+contract GEOToken is IERC20 {
     using SafeMath for uint256;
 
     mapping(address => uint256) private _balances;

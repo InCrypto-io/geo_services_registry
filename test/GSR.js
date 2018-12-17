@@ -1,4 +1,4 @@
-var GEO = artifacts.require("./GEO.sol");
+var GEO = artifacts.require("./GEOToken.sol");
 var GSR = artifacts.require("./GSR.sol");
 const assertRevert = require('./helpers/assertRevert').assertRevert;
 const {increase, duration} = require('./helpers/time');
