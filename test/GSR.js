@@ -150,5 +150,10 @@ contract('GSR', accounts => {
             assert.equal(await gsr.stakeLockup(user1), 0, "Unexpected escrow");
         });
 
+        it('Test make escrow, lockup method', async () => {
+            const howMany = 123123;
+            await assertRevert(gsr.voteServiceLockup(howMany, {from: user1}));
+        });
+
     });
 });
