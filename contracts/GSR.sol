@@ -16,7 +16,7 @@ contract GeoServiceRegistry {
 
     GEOToken public token;
 
-    mapping(address => uint256) public stake;
+    mapping(address => uint256) public deposit;
 
     // (keccak256(registry name)) => (epoch) => (candidate address) => (total votes amount)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
@@ -74,8 +74,8 @@ contract GeoServiceRegistry {
             haveVotesForNewRegistry[msg.sender].push(_registryName);
         }
         totalVotesForNewRegistry[_registryName] = totalVotesForNewRegistry[_registryName].sub(votesForNewRegistry[_registryName][msg.sender]);
-        totalVotesForNewRegistry[_registryName] = totalVotesForNewRegistry[_registryName].add(stake[msg.sender]);
-        votesForNewRegistry[_registryName][msg.sender] = stake[msg.sender];
+        totalVotesForNewRegistry[_registryName] = totalVotesForNewRegistry[_registryName].add(deposit[msg.sender]);
+        votesForNewRegistry[_registryName][msg.sender] = deposit[msg.sender];
         if (totalVotesForNewRegistry[_registryName] >= token.totalSupply() / 10) {
             registryName[_registryName] = true;
             emit NewRegistry(_registryName);
@@ -89,8 +89,8 @@ contract GeoServiceRegistry {
         checkAndUpdateEpoch();
         address oldCandidate = candidateForVoter[_registryName][voteForEpoch][msg.sender];
         totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate] = totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate].sub(amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender]);
-        totalTokensForCandidate[_registryName][voteForEpoch][_candidate] = totalTokensForCandidate[_registryName][voteForEpoch][_candidate].add(stake[msg.sender]);
-        amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender] = stake[msg.sender];
+        totalTokensForCandidate[_registryName][voteForEpoch][_candidate] = totalTokensForCandidate[_registryName][voteForEpoch][_candidate].add(deposit[msg.sender]);
+        amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender] = deposit[msg.sender];
         candidateForVoter[_registryName][voteForEpoch][msg.sender] = _candidate;
     }
 
@@ -99,7 +99,7 @@ contract GeoServiceRegistry {
     {
         checkAndUpdateEpoch();
         require(token.lockupExpired() < now);
-        stake[msg.sender] = stake[msg.sender].add(_amount);
+        deposit[msg.sender] = deposit[msg.sender].add(_amount);
         token.transferFrom(msg.sender, address(this), _amount);
     }
 
@@ -114,9 +114,9 @@ contract GeoServiceRegistry {
     public
     {
         checkAndUpdateEpoch();
-        require(stake[msg.sender] > 0);
-        token.transfer(msg.sender, stake[msg.sender]);
-        stake[msg.sender] = 0;
+        require(deposit[msg.sender] > 0);
+        token.transfer(msg.sender, deposit[msg.sender]);
+        deposit[msg.sender] = 0;
     }
 
     function getTotalTokensVotedForCandidate(
