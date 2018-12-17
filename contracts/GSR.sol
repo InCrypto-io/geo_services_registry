@@ -30,7 +30,6 @@ contract GeoServiceRegistry {
     mapping(string => uint256) private totalVotesForNewRegistry;
     mapping(string => mapping(address => uint256)) private votesForNewRegistry;
     mapping(address => string[]) private haveVotesForNewRegistry;
-    string[] public registryList; // todo due to code review -- remove
 
     uint16 public currentEpoch;
     uint16 private voteForEpoch;
@@ -80,7 +79,6 @@ contract GeoServiceRegistry {
         votesForNewRegistry[_registryName][msg.sender] = stake[msg.sender];
         if (totalVotesForNewRegistry[_registryName] >= token.totalSupply() / 10) {
             registryName[_registryName] = true;
-            registryList.push(_registryName);
             emit NewRegistry(_registryName);
         }
     }
