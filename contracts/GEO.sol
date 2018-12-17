@@ -2,6 +2,7 @@ pragma solidity ^0.4.24;
 
 import "./IERC20.sol";
 import "./math/SafeMath.sol";
+import "./Ownable.sol";
 
 /**
  * @title Standard ERC20 token
@@ -14,7 +15,7 @@ import "./math/SafeMath.sol";
  * all accounts just by listening to said events. Note that this isn't required by the specification, and other
  * compliant implementations may not do it.
  */
-contract GEO is IERC20 {
+contract GEO is IERC20, Ownable {
     using SafeMath for uint256;
 
     mapping(address => uint256) private _balances;
@@ -27,13 +28,14 @@ contract GEO is IERC20 {
 
     uint256 public lockupExpired;
 
-    address private _sellerInLockupPeriod;
+    mapping(address => bool) public allowTransferInLockupPeriod;
 
     constructor()
     public
     {
-        lockupExpired = now + (364 days);// WARNING lockup period need be multiple 7 days
-        _sellerInLockupPeriod = msg.sender;
+        // WARNING lockup period need be multiple 7 days
+        lockupExpired = now + (364 days);
+        allowTransferInLockupPeriod[msg.sender] = true;
         _balances[msg.sender] = _totalSupply;
     }
 
@@ -88,7 +90,7 @@ contract GEO is IERC20 {
     public
     returns (bool)
     {
-        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
+        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
         _transfer(msg.sender, to, value);
         return true;
     }
@@ -108,7 +110,7 @@ contract GEO is IERC20 {
     public
     returns (bool)
     {
-        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
+        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = value;
@@ -131,7 +133,7 @@ contract GEO is IERC20 {
     public
     returns (bool)
     {
-        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
+        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
         emit Approval(from, msg.sender, _allowed[from][msg.sender]);
@@ -154,7 +156,7 @@ contract GEO is IERC20 {
     public
     returns (bool)
     {
-        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
+        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = _allowed[msg.sender][spender].add(addedValue);
@@ -178,7 +180,7 @@ contract GEO is IERC20 {
     public
     returns (bool)
     {
-        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
+        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = _allowed[msg.sender][spender].sub(subtractedValue);
@@ -198,11 +200,25 @@ contract GEO is IERC20 {
         uint256 value)
     internal
     {
-        require(lockupExpired < now || msg.sender == _sellerInLockupPeriod);
+        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
         require(to != address(0));
 
         _balances[from] = _balances[from].sub(value);
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
+    }
+
+    function allowTransferInLockupPeriod(address _who)
+    onlyOwner()
+    public
+    {
+        allowTransferInLockupPeriod[_who] = true;
+    }
+
+    function dennyTransferInLockupPeriod(address _who)
+    onlyOwner()
+    public
+    {
+        allowTransferInLockupPeriod[_who] = false;
     }
 }
