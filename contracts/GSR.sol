@@ -19,9 +19,6 @@ contract GeoServiceRegistry {
     mapping(address => uint256) public stake;
     mapping(address => uint256) public stakeLockup;
 
-    mapping(string => mapping(uint16 => address[])) private candidatesListInRegistries;
-    // (keccak256(registry name)) => (epoch) => (candidate address) => (is candidate)
-    mapping(string => mapping(uint16 => mapping(address => bool))) private isCandidateInRegistryForEpoch;
     // (keccak256(registry name)) => (epoch) => (candidate address) => (total votes amount)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
     // (keccak256(registry name)) => (epoch) => (voter address) => (vote amount)
@@ -120,10 +117,6 @@ contract GeoServiceRegistry {
         totalTokensForCandidate[_registryName][voteForEpoch][_candidate] = totalTokensForCandidate[_registryName][voteForEpoch][_candidate].add(stake[msg.sender]);
         amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender] = stake[msg.sender];
         candidateForVoter[_registryName][voteForEpoch][msg.sender] = _candidate;
-        if (isCandidateInRegistryForEpoch[_registryName][voteForEpoch][_candidate] == false) {
-            isCandidateInRegistryForEpoch[_registryName][voteForEpoch][_candidate] = true;
-            candidatesListInRegistries[_registryName][voteForEpoch].push(_candidate);
-        }
     }
 
     function cancelVote(string _registryName)
@@ -190,22 +183,6 @@ contract GeoServiceRegistry {
         stakeLockup[msg.sender] = 0;
     }
 
-    function getCandidatesList(string _registryName, uint16 _epoch)
-    view
-    public
-    returns (address[])
-    {
-        return candidatesListInRegistries[_registryName][_epoch];
-    }
-
-    function isCandidate(string _registryName, uint16 _epoch, address _candidate)
-    view
-    public
-    returns (bool)
-    {
-        return isCandidateInRegistryForEpoch[_registryName][_epoch][_candidate];
-    }
-
     function getTotalTokensVotedForCandidate(
         string _registryName,
         uint16 _epoch,
@@ -246,7 +223,5 @@ contract GeoServiceRegistry {
             emit NewEpoch(currentEpoch);
         }
     }
-
-    // todo due to code review -- add documentation annotations for functions
 
 }
