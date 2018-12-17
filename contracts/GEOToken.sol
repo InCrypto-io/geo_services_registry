@@ -216,7 +216,7 @@ contract GEOToken is IERC20, Ownable {
         allowTransferInLockupPeriod[_who] = true;
     }
 
-    function dennyTransferInLockupPeriod(address _who)
+    function denyTransferInLockupPeriod(address _who)
     onlyOwner()
     public
     {
