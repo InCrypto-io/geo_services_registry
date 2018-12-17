@@ -17,9 +17,9 @@ contract('GSR', accounts => {
 
         console.log("gsr address", gsr.address);
 
-        geo.transfer(user1, 1012345678, {from: owner});
-        geo.transfer(user2, 1012345678, {from: owner});
-        gsr.voteServiceLockup(1012345678, {from: user2});
+        await geo.transfer(user1, 1012345678, {from: owner});
+        await geo.transfer(user2, 1012345678, {from: owner});
+        await gsr.voteServiceLockup(1012345678, {from: user2});
     });
 
     describe('Lockup period', () => {
@@ -125,4 +125,30 @@ contract('GSR', accounts => {
         });
     });
 
+    describe('After lockup period', () => {
+
+        it("Switch to the period after the lock", async () => {
+            await increase(duration.years(1));
+            await gsr.checkEpoch();
+            assert.isAbove((await gsr.currentEpoch()).toNumber(), 365/7, "Unexpected current epoch");
+        });
+
+        it("Make escrow and release", async () => {
+            await gsr.checkEpoch();
+            const howMany = 123123;
+            await geo.approve(gsr.address, howMany, {from: user1});
+            await gsr.voteService(howMany, {from: user1});
+            assert.equal(await gsr.stake(user1), howMany, "Unexpected escrow");
+            assert.equal(await gsr.stakeLockup(user1), 0, "Unexpected escrow");
+            await geo.approve(gsr.address, howMany, {from: user1});
+            await gsr.voteService(howMany, {from: user1});
+            assert.equal(await gsr.stake(user1), howMany * 2, "Unexpected escrow");
+            assert.equal(await gsr.stakeLockup(user1), 0, "Unexpected escrow");
+            await geo.approve(gsr.address, howMany, {from: user1});
+            await gsr.withdraw({from: user1});
+            assert.equal(await gsr.stake(user1), 0, "Unexpected escrow");
+            assert.equal(await gsr.stakeLockup(user1), 0, "Unexpected escrow");
+        });
+
+    });
 });
