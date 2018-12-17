@@ -93,36 +93,6 @@ contract('GSR', accounts => {
             await gsr.checkEpoch();
             assert.equal((await gsr.currentEpoch()).toNumber(), currentEpoch + 5, "Unexpected current epoch");
         });
-
-        it('Check winners list', async () => {
-            await increase(duration.weeks(1));
-            await gsr.checkEpoch();
-            const testEpoch = (await gsr.currentEpoch()).toNumber();
-            const name = "registry0";
-            gsr.voteServiceLockup(1012345678, {from: owner});
-            gsr.voteServiceLockup(1012345678, {from: user1});
-            gsr.voteServiceLockup(1012345678, {from: user2});
-            await gsr.vote(name, accounts[0], {from: owner});
-            await gsr.vote(name, accounts[2], {from: user1});
-            await gsr.vote(name, accounts[1], {from: user1}); // user1 change vote for accounts[1]
-            await gsr.vote(name, accounts[1], {from: user2});
-            await increase(duration.weeks(1));
-            await gsr.checkEpoch();
-            assert.equal((await gsr.currentEpoch()).toNumber(), testEpoch + 1, "Unexpected current epoch");
-            assert.equal((await gsr.isCandidate(name, testEpoch, accounts[0])), true, "Wrong candidate");
-            const candidatesList = await gsr.getCandidatesList(name, testEpoch);
-            const haveVote = [];
-            await Promise.all(candidatesList.map(e => (async () => {
-                    const total = (await gsr.getTotalTokensVotedForCandidate(name, testEpoch, e)).toNumber();
-                    if (total > 0) {
-                        haveVote.push({address: e, voted: total});
-                    }
-                })()
-            ));
-            const winnerList = sortBy(haveVote, ["voted"]).reverse();
-            assert.equal(winnerList[0].address, accounts[0], "Unexpected winner");
-            assert.equal(winnerList[1].address, accounts[1], "Unexpected winner");
-        });
     });
 
     describe('After lockup period', () => {

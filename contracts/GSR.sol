@@ -29,12 +29,11 @@ contract GeoServiceRegistry {
     // (keccak256(registry name)) => (epoch) => (voter address) => (candidate address)
     mapping(string => mapping(uint16 => mapping(address => address))) private candidateForVoter;
 
-    // bytes32 << registry name
-    mapping(string => bool) private registryName; //todo due to code review -- to string
+    mapping(string => bool) private registryName;
     mapping(string => uint256) private totalVotesForNewRegistry;
     mapping(string => mapping(address => uint256)) private votesForNewRegistry;
     mapping(address => string[]) private haveVotesForNewRegistry;
-    string[] public registryList; //todo due to code review -- remove
+    string[] public registryList; // todo due to code review -- remove
 
     uint16 public currentEpoch;
     uint16 private voteForEpoch;
@@ -56,7 +55,7 @@ contract GeoServiceRegistry {
         _;
     }
 
-    modifier haveStake() //todo due to code review -- remove
+    modifier haveStake() // todo due to code review -- remove
     {
         require(stake[msg.sender] > 0);
         if (stakeLockup[msg.sender] > 0)
@@ -248,6 +247,6 @@ contract GeoServiceRegistry {
         }
     }
 
-    //todo due to code review -- add documentation annotations for functions
+    // todo due to code review -- add documentation annotations for functions
 
 }
