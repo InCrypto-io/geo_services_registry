@@ -16,7 +16,7 @@ import "./Ownable.sol";
  * all accounts just by listening to said events. Note that this isn't required by the specification, and other
  * compliant implementations may not do it.
  */
-contract GEOToken is IERC20 {
+contract GEOToken is IERC20, Ownable {
     using SafeMath for uint256;
 
     mapping(address => uint256) private _balances;
