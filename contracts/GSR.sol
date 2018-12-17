@@ -43,7 +43,7 @@ contract GSR {
 
     modifier registryExist(string _name)
     {
-        require(registryName[keccak256(_name)]);
+        require(registryName[keccak256(abi.encodePacked(_name))]);
         _;
     }
 
@@ -66,8 +66,8 @@ contract GSR {
     haveStake()
     public
     {
-        require(registryName[keccak256(_name)] == false);
-        bytes32 registryHashName = keccak256(_name);
+        require(registryName[keccak256(abi.encodePacked(_name))] == false);
+        bytes32 registryHashName = keccak256(abi.encodePacked(_name));
         if (votesForNewRegistry[registryHashName][msg.sender] == 0) {
             haveVotesForNewRegistry[msg.sender].push(registryHashName);
         }
@@ -99,7 +99,7 @@ contract GSR {
     public
     {
         require(!checkEpoch());
-        bytes32 registryHashName = keccak256(_registryName);
+        bytes32 registryHashName = keccak256(abi.encodePacked(_registryName));
         address oldCandidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
         totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate] = totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate].sub(amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender]);
         totalTokensForCandidate[registryHashName][currentEpoch][_candidate] = totalTokensForCandidate[registryHashName][currentEpoch][_candidate].add(stake[msg.sender]);
@@ -117,7 +117,7 @@ contract GSR {
     public
     {
         require(!checkEpoch());
-        bytes32 registryHashName = keccak256(_registryName);
+        bytes32 registryHashName = keccak256(abi.encodePacked(_registryName));
         address candidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
         uint256 amountTokens = amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
         if (amountTokens > 0) {
@@ -181,7 +181,7 @@ contract GSR {
     public
     returns (address[])
     {
-        return candidatesListInRegistries[keccak256(_registryName)][_epoch];
+        return candidatesListInRegistries[keccak256(abi.encodePacked(_registryName))][_epoch];
     }
 
     function isCandidate(string _registryName, uint16 _epoch, address _candidate)
@@ -189,7 +189,7 @@ contract GSR {
     public
     returns (bool)
     {
-        return isCandidateInRegistryForEpoch[keccak256(_registryName)][_epoch][_candidate];
+        return isCandidateInRegistryForEpoch[keccak256(abi.encodePacked(_registryName))][_epoch][_candidate];
     }
 
     function getTotalTokensVotedForCandidate(
@@ -200,7 +200,7 @@ contract GSR {
     public
     returns (uint256)
     {
-        return totalTokensForCandidate[keccak256(_registryName)][_epoch][_candidate];
+        return totalTokensForCandidate[keccak256(abi.encodePacked(_registryName))][_epoch][_candidate];
     }
 
     function isRegistryExist(string _name)
@@ -208,7 +208,7 @@ contract GSR {
     public
     returns (bool)
     {
-        return registryName[keccak256(_name)];
+        return registryName[keccak256(abi.encodePacked(_name))];
     }
 
     function getTotalVotesForNewRegistry(string _name)
@@ -216,7 +216,7 @@ contract GSR {
     public
     returns (uint256)
     {
-        return totalVotesForNewRegistry[keccak256(_name)];
+        return totalVotesForNewRegistry[keccak256(abi.encodePacked(_name))];
     }
 
     /**
