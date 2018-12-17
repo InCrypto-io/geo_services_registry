@@ -52,14 +52,6 @@ contract GeoServiceRegistry {
         _;
     }
 
-    modifier haveStake() // todo due to code review -- remove
-    {
-        require(stake[msg.sender] > 0);
-        if (stakeLockup[msg.sender] > 0)
-            require(token.lockupExpired() > now);
-        _;
-    }
-
     /* CONSTRUCTOR
     */
 
@@ -77,7 +69,6 @@ contract GeoServiceRegistry {
     */
 
     function voteForNewRegistry(string _registryName)
-    haveStake()
     public
     {
         require(registryName[_registryName] == false);
@@ -108,7 +99,6 @@ contract GeoServiceRegistry {
 
     function vote(string _registryName, address _candidate)
     registryExist(_registryName)
-    haveStake()
     public
     {
         checkAndUpdateEpoch();
@@ -117,31 +107,6 @@ contract GeoServiceRegistry {
         totalTokensForCandidate[_registryName][voteForEpoch][_candidate] = totalTokensForCandidate[_registryName][voteForEpoch][_candidate].add(stake[msg.sender]);
         amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender] = stake[msg.sender];
         candidateForVoter[_registryName][voteForEpoch][msg.sender] = _candidate;
-    }
-
-    function cancelVote(string _registryName)
-    registryExist(_registryName)
-    haveStake()
-    public
-    {
-        checkAndUpdateEpoch();
-        address candidate = candidateForVoter[_registryName][voteForEpoch][msg.sender];
-        uint256 amountTokens = amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender];
-        if (amountTokens > 0) {
-            totalTokensForCandidate[_registryName][voteForEpoch][candidate] = totalTokensForCandidate[_registryName][voteForEpoch][candidate].sub(amountTokens);
-            amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender] = 0;
-            candidateForVoter[_registryName][voteForEpoch][msg.sender] = 0;
-        }
-    }
-
-    function cancelVotes()
-    haveStake()
-    public
-    {
-        checkAndUpdateEpoch();
-        for (uint256 i = 0; i < registryList.length; i++) {
-            cancelVote(registryList[i]);
-        }
     }
 
     function voteService(uint256 _amount)
@@ -170,12 +135,10 @@ contract GeoServiceRegistry {
     }
 
     function withdraw()
-    haveStake()
     public
     {
         checkAndUpdateEpoch();
-        cancelVoteForNewRegistry();
-        cancelVotes();
+        require(stake[msg.sender] > 0);
         if (stakeLockup[msg.sender] == 0) {
             token.transfer(msg.sender, stake[msg.sender]);
         }
