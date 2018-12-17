@@ -86,10 +86,12 @@ contract('GSR', accounts => {
         });
 
         it('Epoch switch', async () => {
-            const currentEpoch = (await gsr.currentEpoch()).toNumber();
             await increase(duration.weeks(1));
             await gsr.checkEpoch();
-            assert.equal((await gsr.currentEpoch()).toNumber(), currentEpoch + 1, "Unexpected current epoch");
+            const currentEpoch = (await gsr.currentEpoch()).toNumber();
+            await increase(duration.weeks(5));
+            await gsr.checkEpoch();
+            assert.equal((await gsr.currentEpoch()).toNumber(), currentEpoch + 5, "Unexpected current epoch");
         });
 
         it('Check winners list', async () => {
