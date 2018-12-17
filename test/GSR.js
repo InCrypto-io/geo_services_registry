@@ -172,5 +172,25 @@ contract('GSR', accounts => {
             assert.equal(await gsr.getTotalVotesForNewRegistry(name), 0, "Unexpected votes for registry");
         });
 
+        it('Vote for candidate, cancel vote, withdraw when have vote', async () => {
+            const name = "registry0";
+            const voter = user2;
+            const candidate = user2;
+            const currentEpoch = await gsr.currentEpoch();
+            const howMany = 123123;
+            await geo.approve(gsr.address, howMany, {from: voter});
+            await gsr.voteService(howMany, {from: voter});
+            await gsr.vote(name, candidate, {from: voter});
+            assert.equal((await gsr.getTotalTokensVotedForCandidate(name, currentEpoch, candidate)).toNumber(),
+                (await gsr.stake(voter)).toNumber(),
+                "Unexpected token count for candidate, after first vote");
+            await gsr.cancelVote(name, {from: voter});
+            assert.equal((await gsr.getTotalTokensVotedForCandidate(name, currentEpoch, candidate)).toNumber(),
+                0, "Unexpected token count for candidate, after cancel vote");
+            await gsr.vote(name, candidate, {from: voter});
+            await gsr.withdraw({from: voter});
+            assert.equal((await gsr.getTotalTokensVotedForCandidate(name, currentEpoch, candidate)).toNumber(),
+                0, "Unexpected token count for candidate, after withdraw");
+        });
     });
 });
