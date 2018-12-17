@@ -38,7 +38,6 @@ contract GeoServiceRegistry {
 
     uint16 public currentEpoch;
     uint256 private epochTimeLimit;
-    uint256 private epochTime; //todo due to code review -- unused var, m.b. use it instead epochTimeLimit?
     uint256 private epochZero;
 
     /* EVENTS
@@ -115,7 +114,7 @@ contract GeoServiceRegistry {
     haveStake()
     public
     {
-        require(!checkEpoch());
+        checkAndUpdateEpoch();
         bytes32 registryHashName = keccak256(abi.encodePacked(_registryName));
         address oldCandidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
         totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate] = totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate].sub(amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender]);
@@ -133,8 +132,8 @@ contract GeoServiceRegistry {
     haveStake()
     public
     {
-        require(!checkEpoch());
-        bytes32 registryHashName = keccak256(_registryName);
+        checkAndUpdateEpoch();
+        bytes32 registryHashName = keccak256(abi.encodePacked(_registryName));
         address candidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
         uint256 amountTokens = amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
         if (amountTokens > 0) {
@@ -148,7 +147,7 @@ contract GeoServiceRegistry {
     haveStake()
     public
     {
-        require(!checkEpoch());
+        checkAndUpdateEpoch();
         for (uint256 i = 0; i < registryList.length; i++) {
             cancelVote(registryList[i]);
         }
@@ -157,7 +156,7 @@ contract GeoServiceRegistry {
     function voteService(uint256 _amount)
     public
     {
-        require(!checkEpoch());
+        checkAndUpdateEpoch();
         require(token.lockupExpired() < now);
         if (stakeLockup[msg.sender] > 0) {
             stakeLockup[msg.sender] = 0;
@@ -170,7 +169,7 @@ contract GeoServiceRegistry {
     function voteServiceLockup(uint256 _amount)
     public
     {
-        require(!checkEpoch());
+        checkAndUpdateEpoch();
         require(token.lockupExpired() > now);
         stake[msg.sender] = stake[msg.sender].add(_amount);
         if (stake[msg.sender] > token.balanceOf(msg.sender)) {
@@ -183,7 +182,7 @@ contract GeoServiceRegistry {
     haveStake()
     public
     {
-        require(!checkEpoch());
+        checkAndUpdateEpoch();
         cancelVoteForNewRegistry();
         cancelVotes();
         if (stakeLockup[msg.sender] == 0) {
@@ -239,36 +238,14 @@ contract GeoServiceRegistry {
     /**
     * @dev Check and change number of current epoch
     */
-    function checkEpoch()
+    function checkAndUpdateEpoch()
     public
-    returns (bool)
     {
-        if (getEpochFinishTime() < now) {
-            increaseEpoch();
+        uint256 epochFinishTime = (epochZero + (epochTimeLimit.mul(currentEpoch + 1)));
+        if (epochFinishTime < now) {
+            currentEpoch = uint16((now.sub(epochZero)).div(epochTimeLimit));
             emit NewEpoch(currentEpoch);
-            return true;
         }
-        return false;
-    }
-
-    /**
-    * @dev Increase current epoch
-    */
-    function increaseEpoch()
-    private
-    {
-        currentEpoch = uint16((now.sub(epochZero)).div(epochTimeLimit));
-    }
-
-    /**
-    * @dev Start time from now
-    */
-    function getEpochFinishTime()
-    view
-    private
-    returns (uint256)
-    {
-        return (epochZero + (epochTimeLimit.mul(currentEpoch + 1)));
     }
 
     //todo due to code review -- add documentation annotations for functions
