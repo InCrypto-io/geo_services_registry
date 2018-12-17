@@ -71,14 +71,12 @@ contract GSR {
         if (votesForNewRegistry[registryHashName][msg.sender] == 0) {
             haveVotesForNewRegistry[msg.sender].push(registryHashName);
         }
-        totalVotesForNewRegistry[registryHashName] -= votesForNewRegistry[registryHashName][msg.sender];
-        totalVotesForNewRegistry[registryHashName] += stake[msg.sender];
+        totalVotesForNewRegistry[registryHashName] = totalVotesForNewRegistry[registryHashName].sub(votesForNewRegistry[registryHashName][msg.sender]);
+        totalVotesForNewRegistry[registryHashName] = totalVotesForNewRegistry[registryHashName].add(stake[msg.sender]);
         votesForNewRegistry[registryHashName][msg.sender] = stake[msg.sender];
         if (totalVotesForNewRegistry[registryHashName] >= geo.totalSupply() / 10) {
             registryName[registryHashName] = true;
             registryList.push(_name);
-            //            delete totalVotesForRegistryName[registryHashName];
-            //            delete votesForRegistryName[registryHashName]; can't delete this
             emit NewRegistry(_name);
         }
     }
@@ -89,7 +87,7 @@ contract GSR {
         bytes32[] memory hashesForRegistryNames = haveVotesForNewRegistry[msg.sender];
         for (uint256 v = 0; v < hashesForRegistryNames.length; v++) {
             if (!registryName[hashesForRegistryNames[v]]) {
-                totalVotesForNewRegistry[hashesForRegistryNames[v]] -= votesForNewRegistry[hashesForRegistryNames[v]][msg.sender];
+                totalVotesForNewRegistry[hashesForRegistryNames[v]] = totalVotesForNewRegistry[hashesForRegistryNames[v]].sub(votesForNewRegistry[hashesForRegistryNames[v]][msg.sender]);
                 votesForNewRegistry[hashesForRegistryNames[v]][msg.sender] = 0;
             }
         }
@@ -103,8 +101,8 @@ contract GSR {
         require(!checkEpoch());
         bytes32 registryHashName = keccak256(_registryName);
         address oldCandidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
-        totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate] -= amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
-        totalTokensForCandidate[registryHashName][currentEpoch][_candidate] += stake[msg.sender];
+        totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate] = totalTokensForCandidate[registryHashName][currentEpoch][oldCandidate].sub(amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender]);
+        totalTokensForCandidate[registryHashName][currentEpoch][_candidate] = totalTokensForCandidate[registryHashName][currentEpoch][_candidate].add(stake[msg.sender]);
         amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender] = stake[msg.sender];
         candidateForVoter[registryHashName][currentEpoch][msg.sender] = _candidate;
         if (isCandidateInRegistryForEpoch[registryHashName][currentEpoch][_candidate] == false) {
@@ -123,7 +121,7 @@ contract GSR {
         address candidate = candidateForVoter[registryHashName][currentEpoch][msg.sender];
         uint256 amountTokens = amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender];
         if (amountTokens > 0) {
-            totalTokensForCandidate[registryHashName][currentEpoch][candidate] -= amountTokens;
+            totalTokensForCandidate[registryHashName][currentEpoch][candidate] = totalTokensForCandidate[registryHashName][currentEpoch][candidate].sub(amountTokens);
             amountTokenForCandidateFromVoter[registryHashName][currentEpoch][msg.sender] = 0;
             candidateForVoter[registryHashName][currentEpoch][msg.sender] = 0;
         }
@@ -228,7 +226,7 @@ contract GSR {
     public
     returns (bool)
     {
-        if(getEpochFinishTime() < now){
+        if (getEpochFinishTime() < now) {
             increaseEpoch();
             emit NewEpochComing(currentEpoch);
             return true;
@@ -249,10 +247,11 @@ contract GSR {
     * @dev Start time from now
     */
     function getEpochFinishTime()
+    view
     private
-    returns(uint256)
+    returns (uint256)
     {
-        return (epochZero+(epochTimeLimit.mul(currentEpoch+1)));
+        return (epochZero + (epochTimeLimit.mul(currentEpoch + 1)));
     }
 
 }
