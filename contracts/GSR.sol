@@ -18,17 +18,17 @@ contract GeoServiceRegistry {
 
     mapping(address => uint256) public deposit;
 
-    // (keccak256(registry name)) => (epoch) => (candidate address) => (total votes amount)
+    // (registry name) => (epoch) => (candidate address) => (total votes amount)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
-    // (keccak256(registry name)) => (epoch) => (voter address) => (vote amount)
+    // (registry name) => (epoch) => (voter address) => (vote amount)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private amountTokenForCandidateFromVoter;
-    // (keccak256(registry name)) => (epoch) => (voter address) => (candidate address)
+    // (registry name) => (epoch) => (voter address) => (candidate address)
     mapping(string => mapping(uint16 => mapping(address => address))) private candidateForVoter;
 
     mapping(string => bool) private registryName;
-    // (keccak256(registry name)) => (epoch) => (total votes amount)
+    // (registry name) => (epoch) => (total votes amount)
     mapping(string => mapping(uint16 => uint256)) private totalVotesForNewRegistry;
-    // (keccak256(registry name)) => (epoch) => (voter address) => (amount vote from address)
+    // (registry name) => (epoch) => (voter address) => (amount vote from address)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private votesForNewRegistry;
 
     uint16 public currentEpoch;

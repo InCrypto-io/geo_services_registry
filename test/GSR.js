@@ -1,10 +1,10 @@
-var GEO = artifacts.require("./GEOToken.sol");
-var GSR = artifacts.require("./GSR.sol");
+var GEOToken = artifacts.require("./GEOToken.sol");
+var GeoServiceRegistry = artifacts.require("./GSR.sol");
 const assertRevert = require('./helpers/assertRevert').assertRevert;
 const {increase, duration} = require('./helpers/time');
 const {sortBy} = require('lodash');
 
-contract('GSR', accounts => {
+contract('GeoServiceRegistry', accounts => {
 
     let geo, gsr;
     const owner = accounts[0];
@@ -12,8 +12,8 @@ contract('GSR', accounts => {
     const user2 = accounts[2];
 
     before('setup', async () => {
-        geo = await GEO.new({from: owner});
-        gsr = await GSR.new(geo.address, {from: owner});
+        geo = await GEOToken.new({from: owner});
+        gsr = await GeoServiceRegistry.new(geo.address, {from: owner});
 
         console.log("gsr address", gsr.address);
 
@@ -26,14 +26,11 @@ contract('GSR', accounts => {
         it('Make escrow and release', async () => {
             const howMany = 123123;
             await gsr.voteServiceLockup(howMany, {from: user1});
-            assert.equal(await gsr.stake(user1), howMany, "Unexpected escrow");
-            assert.equal(await gsr.stakeLockup(user1), howMany, "Unexpected escrow");
+            assert.equal(await gsr.deposit(user1), howMany, "Unexpected escrow");
             await gsr.voteServiceLockup(howMany, {from: user1});
-            assert.equal(await gsr.stake(user1), howMany * 2, "Unexpected escrow");
-            assert.equal(await gsr.stakeLockup(user1), howMany * 2, "Unexpected escrow");
+            assert.equal(await gsr.deposit(user1), howMany * 2, "Unexpected escrow");
             await gsr.withdraw({from: user1});
-            assert.equal(await gsr.stake(user1), 0, "Unexpected escrow");
-            assert.equal(await gsr.stakeLockup(user1), 0, "Unexpected escrow");
+            assert.equal(await gsr.deposit(user1), 0, "Unexpected escrow");
         });
 
         it('Test make escrow, not lockup method', async () => {
@@ -74,7 +71,7 @@ contract('GSR', accounts => {
             const currentEpoch = await gsr.currentEpoch();
             await gsr.vote(name, candidate, {from: voter});
             assert.equal((await gsr.getTotalTokensVotedForCandidate(name, currentEpoch, candidate)).toNumber(),
-                (await gsr.stake(voter)).toNumber(),
+                (await gsr.deposit(voter)).toNumber(),
                 "Unexpected token count for candidate, after first vote");
             await gsr.cancelVote(name, {from: voter});
             assert.equal((await gsr.getTotalTokensVotedForCandidate(name, currentEpoch, candidate)).toNumber(),
@@ -108,16 +105,13 @@ contract('GSR', accounts => {
             const howMany = 123123;
             await geo.approve(gsr.address, howMany, {from: user1});
             await gsr.voteService(howMany, {from: user1});
-            assert.equal(await gsr.stake(user1), howMany, "Unexpected escrow");
-            assert.equal(await gsr.stakeLockup(user1), 0, "Unexpected escrow");
+            assert.equal(await gsr.deposit(user1), howMany, "Unexpected escrow");
             await geo.approve(gsr.address, howMany, {from: user1});
             await gsr.voteService(howMany, {from: user1});
-            assert.equal(await gsr.stake(user1), howMany * 2, "Unexpected escrow");
-            assert.equal(await gsr.stakeLockup(user1), 0, "Unexpected escrow");
+            assert.equal(await gsr.deposit(user1), howMany * 2, "Unexpected escrow");
             await geo.approve(gsr.address, howMany, {from: user1});
             await gsr.withdraw({from: user1});
-            assert.equal(await gsr.stake(user1), 0, "Unexpected escrow");
-            assert.equal(await gsr.stakeLockup(user1), 0, "Unexpected escrow");
+            assert.equal(await gsr.deposit(user1), 0, "Unexpected escrow");
         });
 
         it('Test make escrow, lockup method', async () => {
@@ -152,7 +146,7 @@ contract('GSR', accounts => {
             await gsr.voteService(howMany, {from: voter});
             await gsr.vote(name, candidate, {from: voter});
             assert.equal((await gsr.getTotalTokensVotedForCandidate(name, currentEpoch, candidate)).toNumber(),
-                (await gsr.stake(voter)).toNumber(),
+                (await gsr.deposit(voter)).toNumber(),
                 "Unexpected token count for candidate, after first vote");
             await gsr.cancelVote(name, {from: voter});
             assert.equal((await gsr.getTotalTokensVotedForCandidate(name, currentEpoch, candidate)).toNumber(),
