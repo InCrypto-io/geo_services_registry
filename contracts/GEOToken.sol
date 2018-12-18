@@ -29,14 +29,14 @@ contract GEOToken is IERC20, Ownable {
 
     uint256 public lockupExpired;
 
-    mapping(address => bool) public allowTransferInLockupPeriod;
+    mapping(address => uint256) private individualLockupExpireTime;
 
     constructor()
     public
     {
         // WARNING lockup period need be multiple 7 days
         lockupExpired = now + (364 days);
-        allowTransferInLockupPeriod[msg.sender] = true;
+        individualLockupExpireTime[msg.sender] = now;
         _balances[msg.sender] = _totalSupply;
     }
 
@@ -91,7 +91,7 @@ contract GEOToken is IERC20, Ownable {
     public
     returns (bool)
     {
-        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
+        require(isLockupExpired(msg.sender));
         _transfer(msg.sender, to, value);
         return true;
     }
@@ -111,7 +111,7 @@ contract GEOToken is IERC20, Ownable {
     public
     returns (bool)
     {
-        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
+        require(isLockupExpired(msg.sender));
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = value;
@@ -134,7 +134,7 @@ contract GEOToken is IERC20, Ownable {
     public
     returns (bool)
     {
-        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
+        require(isLockupExpired(msg.sender));
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
         emit Approval(from, msg.sender, _allowed[from][msg.sender]);
@@ -157,7 +157,7 @@ contract GEOToken is IERC20, Ownable {
     public
     returns (bool)
     {
-        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
+        require(isLockupExpired(msg.sender));
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = _allowed[msg.sender][spender].add(addedValue);
@@ -181,7 +181,7 @@ contract GEOToken is IERC20, Ownable {
     public
     returns (bool)
     {
-        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
+        require(isLockupExpired(msg.sender));
         require(spender != address(0));
 
         _allowed[msg.sender][spender] = _allowed[msg.sender][spender].sub(subtractedValue);
@@ -201,7 +201,7 @@ contract GEOToken is IERC20, Ownable {
         uint256 value)
     internal
     {
-        require(lockupExpired < now || allowTransferInLockupPeriod[msg.sender]);
+        require(isLockupExpired(msg.sender));
         require(to != address(0));
 
         _balances[from] = _balances[from].sub(value);
@@ -213,13 +213,33 @@ contract GEOToken is IERC20, Ownable {
     onlyOwner()
     public
     {
-        allowTransferInLockupPeriod[_who] = true;
+        individualLockupExpireTime[_who] = now - 1;
     }
 
     function denyTransferInLockupPeriod(address _who)
     onlyOwner()
     public
     {
-        allowTransferInLockupPeriod[_who] = false;
+        individualLockupExpireTime[_who] = 0;
+    }
+
+    function setIndividualLockupExpireTime(
+        address _who,
+        uint256 _time)
+    onlyOwner()
+    public
+    {
+        individualLockupExpireTime[_who] = _time;
+    }
+
+    function isLockupExpired(address _who)
+    view
+    public
+    returns (bool)
+    {
+        if (individualLockupExpireTime[_who] != 0) {
+            return individualLockupExpireTime[_who] < now;
+        }
+        return lockupExpired < now;
     }
 }
