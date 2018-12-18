@@ -164,6 +164,7 @@ contract GeoServiceRegistry {
     }
 
     function checkSolvencyInLockupPeriod(uint256 _amount)
+    view
     private
     {
         require(token.lockupExpired() > now);
@@ -222,7 +223,7 @@ contract GeoServiceRegistry {
 
     function sumOfArray(uint256[] _array)
     pure
-    public
+    private
     returns (uint256)
     {
         uint256 amount = 0;
