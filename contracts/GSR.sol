@@ -14,7 +14,7 @@ contract GeoServiceRegistry {
     /* STORAGE
     */
 
-    GEOToken public token;
+    GEOToken private token;
 
     mapping(address => uint256) public deposit;
 
@@ -154,7 +154,7 @@ contract GeoServiceRegistry {
     function checkOrReplenishDeposit(uint256 _amount)
     private
     {
-        require(token.lockupExpired() < now);
+        require(token.isLockupExpired(msg.sender));
         if (deposit[msg.sender] < _amount) {
             uint256 additionAmount = _amount.sub(deposit[msg.sender]);
             deposit[msg.sender] = deposit[msg.sender].add(additionAmount);
@@ -167,7 +167,7 @@ contract GeoServiceRegistry {
     view
     private
     {
-        require(token.lockupExpired() > now);
+        require(!token.isLockupExpired(msg.sender));
         require(token.balanceOf(msg.sender) >= _amount);
     }
 
