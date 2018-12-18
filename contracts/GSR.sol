@@ -99,7 +99,7 @@ contract GeoServiceRegistry {
         delete candidateForVoter[_registryName][voteForEpoch][msg.sender];
         delete amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender];
         uint256 candidatesCount = _candidates.length;
-        for (uint256 n = 0; n < oldCandidatesCount; n++) {
+        for (uint256 n = 0; n < candidatesCount; n++) {
             address candidate = _candidates[n];
             totalTokensForCandidate[_registryName][voteForEpoch][candidate] = totalTokensForCandidate[_registryName][voteForEpoch][candidate].add(_amounts[n]);
             candidateForVoter[_registryName][voteForEpoch][msg.sender].push(candidate);
@@ -109,24 +109,31 @@ contract GeoServiceRegistry {
 
     function voteService(
         string _registryName,
-        address _candidate,
-        uint256 _amount)
+        address[] _candidates,
+        uint256[] _amounts)
     public
     {
         checkAndUpdateEpoch();
         require(token.lockupExpired() < now);
-        deposit[msg.sender] = deposit[msg.sender].add(_amount);
-        token.transferFrom(msg.sender, address(this), _amount);
+        uint256 amount = sumOfArray(_amounts);
+        if (deposit[msg.sender] < amount) {
+            deposit[msg.sender] = deposit[msg.sender].add(amount);
+            token.transferFrom(msg.sender, address(this), amount);
+        }
+        _vote(_registryName, _candidates, _amounts);
     }
 
     function voteServiceLockup(
         string _registryName,
-        address _candidate,
-        uint256 _amount)
+        address[] _candidates,
+        uint256[] _amounts)
     public
     {
         checkAndUpdateEpoch();
         require(token.lockupExpired() > now);
+        uint256 amount = sumOfArray(_amounts);
+        require(token.balanceOf(msg.sender) >= amount);
+        _vote(_registryName, _candidates, _amounts);
     }
 
     function voteServiceForNewRegistry(
@@ -201,6 +208,18 @@ contract GeoServiceRegistry {
             voteForEpoch = currentEpoch + 1;
             emit NewEpoch(currentEpoch);
         }
+    }
+
+    function sumOfArray(uint256[] _array)
+    pure
+    public
+    returns (uint256)
+    {
+        uint256 amount = 0;
+        for (uint256 n = 0; n < _array.length; n++) {
+            amount = amount.add(_array[n]);
+        }
+        return amount;
     }
 
 }
