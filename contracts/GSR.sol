@@ -114,12 +114,8 @@ contract GeoServiceRegistry {
     public
     {
         checkAndUpdateEpoch();
-        require(token.lockupExpired() < now);
         uint256 amount = sumOfArray(_amounts);
-        if (deposit[msg.sender] < amount) {
-            deposit[msg.sender] = deposit[msg.sender].add(amount);
-            token.transferFrom(msg.sender, address(this), amount);
-        }
+        checkOrReplenishDeposit(amount);
         _vote(_registryName, _candidates, _amounts);
     }
 
@@ -130,9 +126,8 @@ contract GeoServiceRegistry {
     public
     {
         checkAndUpdateEpoch();
-        require(token.lockupExpired() > now);
         uint256 amount = sumOfArray(_amounts);
-        require(token.balanceOf(msg.sender) >= amount);
+        checkSolvencyInLockupPeriod(amount);
         _vote(_registryName, _candidates, _amounts);
     }
 
@@ -142,11 +137,7 @@ contract GeoServiceRegistry {
     public
     {
         checkAndUpdateEpoch();
-        require(token.lockupExpired() < now);
-        if (deposit[msg.sender] < _amount) {
-            deposit[msg.sender] = deposit[msg.sender].add(_amount);
-            token.transferFrom(msg.sender, address(this), _amount);
-        }
+        checkOrReplenishDeposit(_amount);
         _voteForNewRegistry(_registryName, _amount);
     }
 
@@ -156,8 +147,27 @@ contract GeoServiceRegistry {
     public
     {
         checkAndUpdateEpoch();
-        require(token.lockupExpired() > now);
+        checkSolvencyInLockupPeriod(_amount);
         _voteForNewRegistry(_registryName, _amount);
+    }
+
+    function checkOrReplenishDeposit(uint256 _amount)
+    private
+    {
+        require(token.lockupExpired() < now);
+        if (deposit[msg.sender] < _amount) {
+            uint256 additionAmount = _amount.sub(deposit[msg.sender]);
+            deposit[msg.sender] = deposit[msg.sender].add(additionAmount);
+            token.transferFrom(msg.sender, address(this), additionAmount);
+        }
+        require(deposit[msg.sender] >= _amount);
+    }
+
+    function checkSolvencyInLockupPeriod(uint256 _amount)
+    private
+    {
+        require(token.lockupExpired() > now);
+        require(token.balanceOf(msg.sender) >= _amount);
     }
 
     function withdraw()
