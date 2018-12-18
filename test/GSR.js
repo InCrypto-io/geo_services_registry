@@ -1,5 +1,5 @@
 var GEOToken = artifacts.require("./GEOToken.sol");
-var GeoServiceRegistry = artifacts.require("./GSR.sol");
+var GeoServiceRegistry = artifacts.require("./GeoServiceRegistry.sol");
 const assertRevert = require('./helpers/assertRevert').assertRevert;
 const {increase, duration} = require('./helpers/time');
 const {sortBy} = require('lodash');
@@ -10,43 +10,32 @@ contract('GeoServiceRegistry', accounts => {
     const owner = accounts[0];
     const user1 = accounts[1];
     const user2 = accounts[2];
+    const userEmptyBalance = accounts[8];
+    const candidatesList = [owner, user1];
+    const amountForCandidatesList = [15155, 551514];
 
     before('setup', async () => {
         geo = await GEOToken.new({from: owner});
         gsr = await GeoServiceRegistry.new(geo.address, {from: owner});
 
-        console.log("gsr address", gsr.address);
+        console.log("\tgsr address", gsr.address);
 
         await geo.transfer(user1, 1012345678, {from: owner});
         await geo.transfer(user2, 1012345678, {from: owner});
-        await gsr.voteServiceLockup(1012345678, {from: user2});
     });
 
     describe('Lockup period', () => {
-        it('Make escrow and release', async () => {
-            const howMany = 123123;
-            await gsr.voteServiceLockup(howMany, {from: user1});
-            assert.equal(await gsr.deposit(user1), howMany, "Unexpected escrow");
-            await gsr.voteServiceLockup(howMany, {from: user1});
-            assert.equal(await gsr.deposit(user1), howMany * 2, "Unexpected escrow");
-            await gsr.withdraw({from: user1});
-            assert.equal(await gsr.deposit(user1), 0, "Unexpected escrow");
-        });
-
-        it('Test make escrow, not lockup method', async () => {
-            const howMany = 123123;
-            await assertRevert(gsr.voteService(howMany, {from: user1}));
-        });
 
         it('Vote for new registry, small stake', async () => {
             const name = "new registry";
-            await assertRevert(gsr.voteForNewRegistry("new registry", {from: user1}));
             const howMany = 123123;
-            await gsr.voteServiceLockup(howMany, {from: user1});
-            await gsr.voteForNewRegistry(name, {from: user1});
-            assert.equal(await gsr.isRegistryExist(name), false, "Unexpected registry");
-            assert.equal(await gsr.getTotalVotesForNewRegistry(name), howMany, "Unexpected votes for registry");
+            await assertRevert(gsr.voteServiceForNewRegistry(name, howMany, {from: user1}));
+            // await gsr.voteServiceLockupForNewRegistry(name, howMany, {from: user1});
+            // assert.equal(await gsr.isRegistryExist(name), false, "Unexpected registry");
+            // assert.equal(await gsr.getTotalVotesForNewRegistry(name), howMany, "Unexpected votes for registry");
         });
+
+        return;
 
         it('Withdraw, cancel vote for new registry', async () => {
             const name = "new registry";
@@ -62,6 +51,11 @@ contract('GeoServiceRegistry', accounts => {
             await gsr.voteServiceLockup(howMany, {from: who});
             await gsr.voteForNewRegistry(name, {from: who});
             assert.equal(await gsr.isRegistryExist(name), true, "Can't create new registry");
+        });
+
+        it('Vote without tokens', async () => {
+            const name = "new registry";
+            await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: userEmptyBalance}));
         });
 
         it('Vote for candidate, cancel vote, withdraw when have vote', async () => {
@@ -92,12 +86,14 @@ contract('GeoServiceRegistry', accounts => {
         });
     });
 
+    return;
+
     describe('After lockup period', () => {
 
         it("Switch to the period after the lock", async () => {
             await increase(duration.years(1));
             await gsr.checkEpoch();
-            assert.isAbove((await gsr.currentEpoch()).toNumber(), 365/7, "Unexpected current epoch");
+            assert.isAbove((await gsr.currentEpoch()).toNumber(), 365 / 7, "Unexpected current epoch");
         });
 
         it("Make escrow and release", async () => {

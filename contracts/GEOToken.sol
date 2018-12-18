@@ -36,7 +36,7 @@ contract GEOToken is IERC20, Ownable {
     {
         // WARNING lockup period need be multiple 7 days
         lockupExpired = now + (364 days);
-        individualLockupExpireTime[msg.sender] = now;
+        allowTransferInLockupPeriod(msg.sender);
         _balances[msg.sender] = _totalSupply;
     }
 
