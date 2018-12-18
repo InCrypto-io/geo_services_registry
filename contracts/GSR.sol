@@ -17,6 +17,7 @@ contract GeoServiceRegistry {
     GEOToken private token;
 
     mapping(address => uint256) public deposit;
+    mapping(address => uint256) public withdrawLockupExpired;
 
     // (registry name) => (epoch) => (candidate address) => (total votes amount)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
@@ -117,6 +118,7 @@ contract GeoServiceRegistry {
         uint256 amount = sumOfArray(_amounts);
         checkOrReplenishDeposit(amount);
         _vote(_registryName, _candidates, _amounts);
+        lockupWithdrawForNextEpoch();
     }
 
     function voteServiceLockup(
@@ -139,6 +141,7 @@ contract GeoServiceRegistry {
         checkAndUpdateEpoch();
         checkOrReplenishDeposit(_amount);
         _voteForNewRegistry(_registryName, _amount);
+        lockupWithdrawForNextEpoch();
     }
 
     function voteServiceLockupForNewRegistry(
@@ -171,10 +174,17 @@ contract GeoServiceRegistry {
         require(token.balanceOf(msg.sender) >= _amount);
     }
 
+    function lockupWithdrawForNextEpoch()
+    private
+    {
+        withdrawLockupExpired[msg.sender] = (epochZero + (epochTimeLimit.mul(voteForEpoch + 1)));
+    }
+
     function withdraw()
     public
     {
         checkAndUpdateEpoch();
+        require(withdrawLockupExpired[msg.sender] < now);
         require(deposit[msg.sender] > 0);
         token.transfer(msg.sender, deposit[msg.sender]);
         deposit[msg.sender] = 0;
