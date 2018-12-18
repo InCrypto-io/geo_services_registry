@@ -26,9 +26,10 @@ contract GeoServiceRegistry {
     mapping(string => mapping(uint16 => mapping(address => address))) private candidateForVoter;
 
     mapping(string => bool) private registryName;
-    mapping(string => uint256) private totalVotesForNewRegistry;
-    mapping(string => mapping(address => uint256)) private votesForNewRegistry;
-    mapping(address => string[]) private haveVotesForNewRegistry;
+    // (keccak256(registry name)) => (epoch) => (total votes amount)
+    mapping(string => mapping(uint16 => uint256)) private totalVotesForNewRegistry;
+    // (keccak256(registry name)) => (epoch) => (voter address) => (amount vote from address)
+    mapping(string => mapping(uint16 => mapping(address => uint256))) private votesForNewRegistry;
 
     uint16 public currentEpoch;
     uint16 private voteForEpoch;
@@ -66,25 +67,23 @@ contract GeoServiceRegistry {
     /* FUNCTIONS
     */
 
-    function voteForNewRegistry(string _registryName)
-    public
+    function _voteForNewRegistry(string _registryName)
+    private
     {
+        checkAndUpdateEpoch();
         require(registryName[_registryName] == false);
-        if (votesForNewRegistry[_registryName][msg.sender] == 0) {
-            haveVotesForNewRegistry[msg.sender].push(_registryName);
-        }
-        totalVotesForNewRegistry[_registryName] = totalVotesForNewRegistry[_registryName].sub(votesForNewRegistry[_registryName][msg.sender]);
-        totalVotesForNewRegistry[_registryName] = totalVotesForNewRegistry[_registryName].add(deposit[msg.sender]);
-        votesForNewRegistry[_registryName][msg.sender] = deposit[msg.sender];
-        if (totalVotesForNewRegistry[_registryName] >= token.totalSupply() / 10) {
+        totalVotesForNewRegistry[_registryName][voteForEpoch] = totalVotesForNewRegistry[_registryName][voteForEpoch].sub(votesForNewRegistry[_registryName][voteForEpoch][msg.sender]);
+        totalVotesForNewRegistry[_registryName][voteForEpoch] = totalVotesForNewRegistry[_registryName][voteForEpoch].add(deposit[msg.sender]);
+        votesForNewRegistry[_registryName][voteForEpoch][msg.sender] = deposit[msg.sender];
+        if (totalVotesForNewRegistry[_registryName][voteForEpoch] >= token.totalSupply() / 10) {
             registryName[_registryName] = true;
             emit NewRegistry(_registryName);
         }
     }
 
-    function vote(string _registryName, address _candidate)
+    function _vote(string _registryName, address _candidate)
     registryExist(_registryName)
-    public
+    private
     {
         checkAndUpdateEpoch();
         address oldCandidate = candidateForVoter[_registryName][voteForEpoch][msg.sender];
@@ -94,7 +93,10 @@ contract GeoServiceRegistry {
         candidateForVoter[_registryName][voteForEpoch][msg.sender] = _candidate;
     }
 
-    function voteService(uint256 _amount)
+    function voteService(
+        uint256 _amount,
+        string _registryName,
+        address _candidate)
     public
     {
         checkAndUpdateEpoch();
@@ -130,20 +132,20 @@ contract GeoServiceRegistry {
         return totalTokensForCandidate[_registryName][_epoch][_candidate];
     }
 
-    function isRegistryExist(string _name)
+    function isRegistryExist(string _registryName)
     view
     public
     returns (bool)
     {
-        return registryName[_name];
+        return registryName[_registryName];
     }
 
-    function getTotalVotesForNewRegistry(string _name)
+    function getTotalVotesForNewRegistry(string _registryName)
     view
     public
     returns (uint256)
     {
-        return totalVotesForNewRegistry[_name];
+        return totalVotesForNewRegistry[_registryName][voteForEpoch];
     }
 
     /**
