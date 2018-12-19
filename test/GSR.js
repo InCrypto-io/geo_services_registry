@@ -95,34 +95,20 @@ contract('GeoServiceRegistry', accounts => {
         });
     });
 
-    return;
-
     describe('After lockup period', () => {
 
         it("Switch to the period after the lock", async () => {
             await increase(duration.years(1));
-            await gsr.checkEpoch();
+            await gsr.checkAndUpdateEpoch();
             assert.isAbove((await gsr.currentEpoch()).toNumber(), 365 / 7, "Unexpected current epoch");
         });
 
-        it("Make escrow and release", async () => {
-            await gsr.checkEpoch();
+        it('Vote by lockup method', async () => {
             const howMany = 123123;
-            await geo.approve(gsr.address, howMany, {from: user1});
-            await gsr.voteService(howMany, {from: user1});
-            assert.equal(await gsr.deposit(user1), howMany, "Unexpected escrow");
-            await geo.approve(gsr.address, howMany, {from: user1});
-            await gsr.voteService(howMany, {from: user1});
-            assert.equal(await gsr.deposit(user1), howMany * 2, "Unexpected escrow");
-            await geo.approve(gsr.address, howMany, {from: user1});
-            await gsr.withdraw({from: user1});
-            assert.equal(await gsr.deposit(user1), 0, "Unexpected escrow");
+            await assertRevert(gsr.voteServiceLockup(howMany, candidatesList, amountForCandidatesList, {from: user1}));
         });
 
-        it('Test make escrow, lockup method', async () => {
-            const howMany = 123123;
-            await assertRevert(gsr.voteServiceLockup(howMany, {from: user1}));
-        });
+        return;
 
         it('Vote for new registry, small stake', async () => {
             const name = "new registry";
