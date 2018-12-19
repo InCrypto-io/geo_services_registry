@@ -63,6 +63,14 @@ contract('GeoServiceRegistry', accounts => {
             assert.equal((await gsr.deposit(bigHolderAllowTransfer)).toNumber(), 0, "Unexpected deposit size");
         });
 
+        it('Vote for registry, but exist registry', async () => {
+            const name = "registry0";//exist registry
+            const howMany = await geo.totalSupply() / 10;
+            await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: bigHolder}));
+
+            assert.equal(await gsr.isRegistryExist(name), true, "Can't create new registry");
+        });
+
         it('Vote without tokens', async () => {
             const name = "new registry";
             await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: userEmptyBalance}));
@@ -83,6 +91,9 @@ contract('GeoServiceRegistry', accounts => {
             await gsr.voteServiceLockup(name, [], [], {from: voter});
             assert.equal((await gsr.getTotalTokensVotedForCandidate(name, nextEpoch, candidatesList[0])).toNumber(),
                 0, "Unexpected token count for candidate, after change vote");
+            await assertRevert(gsr.withdraw({from: voter}));
+            await increase(duration.weeks(2));
+            await assertRevert(gsr.withdraw({from: voter}));
         });
 
         it('Epoch switch', async () => {
@@ -137,6 +148,12 @@ contract('GeoServiceRegistry', accounts => {
             await gsr.voteService(name, [], [], {from: voter});
             assert.equal((await gsr.getTotalTokensVotedForCandidate(name, nextEpoch, candidatesList[0])).toNumber(),
                 0, "Unexpected token count for candidate, after change vote");
+            const depositSize = (await gsr.deposit(voter)).toNumber();
+            await assertRevert(gsr.withdraw({from: voter}));
+            assert.equal((await gsr.deposit(voter)).toNumber(), depositSize, "Unexpected deposit size");
+            await increase(duration.weeks(2));
+            await gsr.withdraw({from: voter});
+            assert.equal((await gsr.deposit(voter)).toNumber(), 0, "Unexpected deposit size");
         });
     });
 });
