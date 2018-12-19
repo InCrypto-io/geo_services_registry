@@ -126,7 +126,7 @@ contract('GeoServiceRegistry', accounts => {
 
         it('Vote for candidate, low balance', async () => {
             const name = "registry0";
-            await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: userEmptyBalance}));
+            await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: lowBalanceUser}));
         });
 
         it('Vote for candidate, empty balance', async () => {
@@ -191,7 +191,7 @@ contract('GeoServiceRegistry', accounts => {
             const howMany = await geo.totalSupply() / 10;
             const geoBalance = (await geo.balanceOf(lowBalanceUser)).toNumber();
             await geo.approve(gsr.address, geoBalance, {from: lowBalanceUser});
-            await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: lowBalanceUser}));
+            await assertRevert(gsr.voteServiceForNewRegistry(name, howMany, {from: lowBalanceUser}));
         });
 
         it('Vote for new registry, empty balance', async () => {
@@ -199,7 +199,21 @@ contract('GeoServiceRegistry', accounts => {
             const howMany = await geo.totalSupply() / 10;
             const geoBalance = (await geo.balanceOf(userEmptyBalance)).toNumber();
             await geo.approve(gsr.address, geoBalance, {from: userEmptyBalance});
-            await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: userEmptyBalance}));
+            await assertRevert(gsr.voteServiceForNewRegistry(name, howMany, {from: userEmptyBalance}));
+        });
+
+        it('Vote for candidate, low balance', async () => {
+            const name = "registry0";
+            const geoBalance = (await geo.balanceOf(lowBalanceUser)).toNumber();
+            await geo.approve(gsr.address, geoBalance, {from: lowBalanceUser});
+            await assertRevert(gsr.voteService(name, candidatesList, amountForCandidatesList, {from: lowBalanceUser}));
+        });
+
+        it('Vote for candidate, empty balance', async () => {
+            const name = "registry0";
+            const geoBalance = (await geo.balanceOf(userEmptyBalance)).toNumber();
+            await geo.approve(gsr.address, geoBalance, {from: userEmptyBalance});
+            await assertRevert(gsr.voteService(name, candidatesList, amountForCandidatesList, {from: userEmptyBalance}));
         });
     });
 });
