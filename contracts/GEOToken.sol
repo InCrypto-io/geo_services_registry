@@ -134,7 +134,6 @@ contract GEOToken is IERC20, Ownable {
     public
     returns (bool)
     {
-        require(isLockupExpired(msg.sender));
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
         emit Approval(from, msg.sender, _allowed[from][msg.sender]);
@@ -201,7 +200,6 @@ contract GEOToken is IERC20, Ownable {
         uint256 value)
     internal
     {
-        require(isLockupExpired(msg.sender));
         require(to != address(0));
 
         _balances[from] = _balances[from].sub(value);
