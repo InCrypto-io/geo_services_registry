@@ -41,6 +41,7 @@ contract GeoServiceRegistry {
     */
 
     event NewEpoch(uint256 _number);
+    event VoteForNewRegistry(string _name, uint256 _amou);
     event NewRegistry(string _name);
     event Vote(string _name, address _candidate, uint256 _amount);
     event CancelVote(string _name, address _candidate, uint256 _amount);
@@ -83,6 +84,8 @@ contract GeoServiceRegistry {
         if (totalVotesForNewRegistry[_registryName][voteForEpoch] >= token.totalSupply() / 10) {
             registryName[_registryName] = true;
             emit NewRegistry(_registryName);
+        } else {
+            emit VoteForNewRegistry(_registryName, _amount);
         }
     }
 
