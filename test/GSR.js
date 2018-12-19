@@ -12,6 +12,7 @@ contract('GeoServiceRegistry', accounts => {
     const user2 = accounts[2];
     const bigHolder = accounts[3];
     const bigHolderAllowTransfer = accounts[4];
+    const lowBalanceUser = accounts[5];
     const userEmptyBalance = accounts[8];
     const candidatesList = [owner, user1];
     const amountForCandidatesList = [15155, 551514];
@@ -25,8 +26,9 @@ contract('GeoServiceRegistry', accounts => {
         console.log("\tgsr address", gsr.address);
         await geo.transfer(user1, 1012345678, {from: owner});
         await geo.transfer(user2, 1012345678, {from: owner});
-        await geo.transfer(bigHolder, (await geo.totalSupply()) / 10 + 12345, {from: owner});
-        await geo.transfer(bigHolderAllowTransfer, (await geo.totalSupply()) / 10 + 12345, {from: owner});
+        await geo.transfer(lowBalanceUser, 100, {from: owner});
+        await geo.transfer(bigHolder, (await geo.totalSupply()).toNumber() / 10 + 12345, {from: owner});
+        await geo.transfer(bigHolderAllowTransfer, (await geo.totalSupply()).toNumber() / 10 + 12345, {from: owner});
         await geo.allowTransferInLockupPeriod(bigHolderAllowTransfer, {from: owner});
     });
 
@@ -109,6 +111,18 @@ contract('GeoServiceRegistry', accounts => {
             await gsr.checkAndUpdateEpoch();
             assert.equal((await gsr.currentEpoch()).toNumber(), currentEpoch + 5, "Unexpected current epoch");
         });
+
+        it('Vote for new registry, low balance', async () => {
+            const name = "registry low balance";
+            const howMany = await geo.totalSupply() / 10;
+            await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: lowBalanceUser}));
+        });
+
+        it('Vote for new registry, empty balance', async () => {
+            const name = "registry empty balance";
+            const howMany = await geo.totalSupply() / 10;
+            await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: userEmptyBalance}));
+        });
     });
 
     describe('After lockup period', () => {
@@ -159,6 +173,22 @@ contract('GeoServiceRegistry', accounts => {
             await increase(duration.weeks(2));
             await gsr.withdraw({from: voter});
             assert.equal((await gsr.deposit(voter)).toNumber(), 0, "Unexpected deposit size");
+        });
+
+        it('Vote for new registry, low balance', async () => {
+            const name = "registry low balance";
+            const howMany = await geo.totalSupply() / 10;
+            const geoBalance = (await geo.balanceOf(lowBalanceUser)).toNumber();
+            await geo.approve(gsr.address, geoBalance, {from: lowBalanceUser});
+            await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: lowBalanceUser}));
+        });
+
+        it('Vote for new registry, low balance', async () => {
+            const name = "registry low balance";
+            const howMany = await geo.totalSupply() / 10;
+            const geoBalance = (await geo.balanceOf(userEmptyBalance)).toNumber();
+            await geo.approve(gsr.address, geoBalance, {from: userEmptyBalance});
+            await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: userEmptyBalance}));
         });
     });
 });
