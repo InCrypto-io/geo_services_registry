@@ -96,6 +96,11 @@ contract('GeoServiceRegistry', accounts => {
             await assertRevert(gsr.withdraw({from: voter}));
         });
 
+        it('Vote for candidate, wrong registry', async () => {
+            const name = "registry0 not exist";
+            await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: user2}));
+        });
+
         it('Epoch switch', async () => {
             await increase(duration.weeks(1));
             await gsr.checkAndUpdateEpoch();
