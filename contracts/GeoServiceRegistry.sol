@@ -100,8 +100,9 @@ contract GeoServiceRegistry {
         uint256 oldCandidatesCount = candidateForVoter[_registryName][voteForEpoch][msg.sender].length;
         for (uint256 o = 0; o < oldCandidatesCount; o++) {
             address oldCandidate = candidateForVoter[_registryName][voteForEpoch][msg.sender][o];
-            totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate] = totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate].sub(amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender][o]);
-            emit CancelVote(_registryName, oldCandidate, amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender][o]);
+            uint256 amount = amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender][o];
+            totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate] = totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate].sub(amount);
+            emit CancelVote(_registryName, oldCandidate, amount);
         }
         delete candidateForVoter[_registryName][voteForEpoch][msg.sender];
         delete amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender];
