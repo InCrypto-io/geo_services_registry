@@ -10,6 +10,7 @@ contract('GeoServiceRegistry', accounts => {
     const owner = accounts[0];
     const user1 = accounts[1];
     const user2 = accounts[2];
+    const bigHolder = accounts[3];
     const userEmptyBalance = accounts[8];
     const candidatesList = [owner, user1];
     const amountForCandidatesList = [15155, 551514];
@@ -22,6 +23,7 @@ contract('GeoServiceRegistry', accounts => {
 
         await geo.transfer(user1, 1012345678, {from: owner});
         await geo.transfer(user2, 1012345678, {from: owner});
+        await geo.transfer(bigHolder, (await geo.totalSupply()) / 10 + 12345, {from: owner});
     });
 
     describe('Lockup period', () => {
@@ -30,28 +32,20 @@ contract('GeoServiceRegistry', accounts => {
             const name = "new registry";
             const howMany = 123123;
             await assertRevert(gsr.voteServiceForNewRegistry(name, howMany, {from: user1}));
-            // await gsr.voteServiceLockupForNewRegistry(name, howMany, {from: user1});
-            // assert.equal(await gsr.isRegistryExist(name), false, "Unexpected registry");
-            // assert.equal(await gsr.getTotalVotesForNewRegistry(name), howMany, "Unexpected votes for registry");
-        });
-
-        return;
-
-        it('Withdraw, cancel vote for new registry', async () => {
-            const name = "new registry";
-            await gsr.withdraw({from: user1});
-            assert.equal(await gsr.getTotalVotesForNewRegistry(name), 0, "Unexpected votes for registry");
+            await gsr.voteServiceLockupForNewRegistry(name, howMany, {from: user1});
+            assert.equal(await gsr.isRegistryExist(name), false, "Unexpected registry");
+            assert.equal(await gsr.getTotalVotesForNewRegistry(name), howMany, "Unexpected votes for registry");
         });
 
         it('Vote for new registry, create registry', async () => {
             const name = "registry0";
-            const who = owner;
-            await assertRevert(gsr.voteForNewRegistry("new registry", {from: who}));
             const howMany = await geo.totalSupply() / 10;
-            await gsr.voteServiceLockup(howMany, {from: who});
-            await gsr.voteForNewRegistry(name, {from: who});
+            await assertRevert(gsr.voteServiceForNewRegistry(name, howMany, {from: bigHolder}));
+            await gsr.voteServiceLockupForNewRegistry(name, howMany, {from: bigHolder});
             assert.equal(await gsr.isRegistryExist(name), true, "Can't create new registry");
         });
+
+        return;
 
         it('Vote without tokens', async () => {
             const name = "new registry";
