@@ -133,6 +133,24 @@ contract('GeoServiceRegistry', accounts => {
             const name = "registry0";
             await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: userEmptyBalance}));
         });
+
+        it('Check winners list', async () => {
+            const name = "registry0";
+            await gsr.checkAndUpdateEpoch({from: owner});
+            const nextEpoch = (await gsr.currentEpoch()).toNumber() + 1;
+            await gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: bigHolder});
+            await gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: user1});
+            await gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: user2});
+            await gsr.voteServiceLockup(name, [], [], {from: user1});// user1 change vote
+            await increase(duration.weeks(2));
+            await gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: bigHolder});
+            assert.equal((await gsr.getTotalTokensVotedForCandidate(name, nextEpoch, candidatesList[0])).toNumber(),
+                amountForCandidatesList[0]*2,
+                "Unexpected token count for candidate");
+            assert.equal((await gsr.getTotalTokensVotedForCandidate(name, nextEpoch, candidatesList[1])).toNumber(),
+                amountForCandidatesList[1]*2,
+                "Unexpected token count for candidate");
+        });
     });
 
     describe('After lockup period', () => {
