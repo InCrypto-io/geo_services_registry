@@ -123,6 +123,16 @@ contract('GeoServiceRegistry', accounts => {
             const howMany = await geo.totalSupply() / 10;
             await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: userEmptyBalance}));
         });
+
+        it('Vote for candidate, low balance', async () => {
+            const name = "registry0";
+            await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: userEmptyBalance}));
+        });
+
+        it('Vote for candidate, empty balance', async () => {
+            const name = "registry0";
+            await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: userEmptyBalance}));
+        });
     });
 
     describe('After lockup period', () => {
@@ -173,18 +183,19 @@ contract('GeoServiceRegistry', accounts => {
             await increase(duration.weeks(2));
             await gsr.withdraw({from: voter});
             assert.equal((await gsr.deposit(voter)).toNumber(), 0, "Unexpected deposit size");
+            await assertRevert(gsr.withdraw({from: voter}));
         });
 
         it('Vote for new registry, low balance', async () => {
-            const name = "registry low balance";
+            const name = "registry0";
             const howMany = await geo.totalSupply() / 10;
             const geoBalance = (await geo.balanceOf(lowBalanceUser)).toNumber();
             await geo.approve(gsr.address, geoBalance, {from: lowBalanceUser});
             await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: lowBalanceUser}));
         });
 
-        it('Vote for new registry, low balance', async () => {
-            const name = "registry low balance";
+        it('Vote for new registry, empty balance', async () => {
+            const name = "registry0";
             const howMany = await geo.totalSupply() / 10;
             const geoBalance = (await geo.balanceOf(userEmptyBalance)).toNumber();
             await geo.approve(gsr.address, geoBalance, {from: userEmptyBalance});
