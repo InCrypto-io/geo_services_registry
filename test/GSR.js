@@ -109,24 +109,16 @@ contract('GeoServiceRegistry', accounts => {
         });
 
         it('Vote for new registry, small stake', async () => {
-            const name = "new registry";
-            await assertRevert(gsr.voteForNewRegistry("new registry", {from: user1}));
+            const name = "new registry 2";
             const howMany = 123123;
+            await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: user1}));
             await geo.approve(gsr.address, howMany, {from: user1});
-            await gsr.voteService(howMany, {from: user1});
-            await gsr.voteForNewRegistry(name, {from: user1});
+            await gsr.voteServiceForNewRegistry(name, howMany, {from: user1});
             assert.equal(await gsr.isRegistryExist(name), false, "Unexpected registry");
             assert.equal(await gsr.getTotalVotesForNewRegistry(name), howMany, "Unexpected votes for registry");
         });
 
         return;
-
-        it('Withdraw, cancel vote for new registry', async () => {
-            const name = "new registry";
-            await gsr.withdraw({from: user1});
-            assert.equal(await gsr.getTotalVotesForNewRegistry(name), 0, "Unexpected votes for registry");
-        });
-
         it('Vote for candidate, cancel vote, withdraw when have vote', async () => {
             const name = "registry0";
             const voter = user2;
