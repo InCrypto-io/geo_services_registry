@@ -11,6 +11,7 @@ contract('GeoServiceRegistry', accounts => {
     const user1 = accounts[1];
     const user2 = accounts[2];
     const bigHolder = accounts[3];
+    const bigHolderAllowTransfer = accounts[4];
     const userEmptyBalance = accounts[8];
     const candidatesList = [owner, user1];
     const amountForCandidatesList = [15155, 551514];
@@ -18,12 +19,14 @@ contract('GeoServiceRegistry', accounts => {
     before('setup', async () => {
         geo = await GEOToken.new({from: owner});
         gsr = await GeoServiceRegistry.new(geo.address, {from: owner});
+        await geo.allowTransferInLockupPeriod(gsr.address, {from: owner});
 
         console.log("\tgsr address", gsr.address);
-
         await geo.transfer(user1, 1012345678, {from: owner});
         await geo.transfer(user2, 1012345678, {from: owner});
         await geo.transfer(bigHolder, (await geo.totalSupply()) / 10 + 12345, {from: owner});
+        await geo.transfer(bigHolderAllowTransfer, (await geo.totalSupply()) / 10 + 12345, {from: owner});
+        await geo.allowTransferInLockupPeriod(bigHolderAllowTransfer, {from: owner});
     });
 
     describe('Lockup period', () => {
@@ -45,12 +48,26 @@ contract('GeoServiceRegistry', accounts => {
             assert.equal(await gsr.isRegistryExist(name), true, "Can't create new registry");
         });
 
-        return;
+        it('Vote for new registry, create registry, voter can transfer', async () => {
+            const name = "registry123";
+            const howMany = await geo.totalSupply() / 10;
+            await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: bigHolderAllowTransfer}));
+            await geo.approve(gsr.address, howMany, {from: bigHolderAllowTransfer});
+            await gsr.voteServiceForNewRegistry(name, howMany, {from: bigHolderAllowTransfer});
+            assert.equal(await gsr.isRegistryExist(name), true, "Can't create new registry");
+            await assertRevert(gsr.withdraw({from: bigHolderAllowTransfer}));
+            assert.equal((await gsr.deposit(bigHolderAllowTransfer)).toNumber(), howMany, "Unexpected deposit size");
+            await increase(duration.weeks(2));
+            await gsr.withdraw({from: bigHolderAllowTransfer});
+            assert.equal((await gsr.deposit(bigHolderAllowTransfer)).toNumber(), 0, "Unexpected deposit size");
+        });
 
         it('Vote without tokens', async () => {
             const name = "new registry";
             await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: userEmptyBalance}));
         });
+
+        return;
 
         it('Vote for candidate, cancel vote, withdraw when have vote', async () => {
             const name = "registry0";
