@@ -240,4 +240,62 @@ contract GEOToken is IERC20, Ownable {
         }
         return lockupExpired < now;
     }
+
+    /**
+     * @dev Public function for owner that mints an amount of the token and assigns it to
+     * an account. This encapsulates the modification of balances such that the
+     * proper events are emitted.
+     * @param account The account that will receive the created tokens.
+     * @param value The amount that will be created.
+     */
+    function mint(
+        address account,
+        uint256 value)
+    onlyOwner()
+    public
+    {
+        require(account != address(0));
+
+        _totalSupply = _totalSupply.add(value);
+        _balances[account] = _balances[account].add(value);
+        emit Transfer(address(0), account, value);
+    }
+
+    /**
+     * @dev Public function for owner that burns an amount of the token of a given
+     * account.
+     * @param account The account whose tokens will be burnt.
+     * @param value The amount that will be burnt.
+     */
+    function burn(
+        address account,
+        uint256 value)
+    onlyOwner()
+    public
+    {
+        require(account != address(0));
+
+        _totalSupply = _totalSupply.sub(value);
+        _balances[account] = _balances[account].sub(value);
+        emit Transfer(account, address(0), value);
+    }
+
+    /**
+     * @dev Public function for owner that burns an amount of the token of a given
+     * account, deducting from the sender's allowance for said account. Uses the
+     * internal burn function.
+     * Emits an Approval event (reflecting the reduced allowance).
+     * @param account The account whose tokens will be burnt.
+     * @param value The amount that will be burnt.
+     */
+    function burnFrom(
+        address account,
+        uint256 value)
+    onlyOwner()
+    public
+    {
+        _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(value);
+        burn(account, value);
+        emit Approval(account, msg.sender, _allowed[account][msg.sender]);
+    }
 }
