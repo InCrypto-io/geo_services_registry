@@ -42,6 +42,8 @@ contract GeoServiceRegistry {
 
     event NewEpoch(uint256 _number);
     event NewRegistry(string _name);
+    event Vote(string _name, address _candidate, uint256 _amount);
+    event CancelVote(string _name, address _candidate, uint256 _amount);
 
     /* MODIFIERS
     */
@@ -96,6 +98,7 @@ contract GeoServiceRegistry {
         for (uint256 o = 0; o < oldCandidatesCount; o++) {
             address oldCandidate = candidateForVoter[_registryName][voteForEpoch][msg.sender][o];
             totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate] = totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate].sub(amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender][o]);
+            emit CancelVote(_registryName, oldCandidate, amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender][o]);
         }
         delete candidateForVoter[_registryName][voteForEpoch][msg.sender];
         delete amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender];
@@ -105,6 +108,7 @@ contract GeoServiceRegistry {
             totalTokensForCandidate[_registryName][voteForEpoch][candidate] = totalTokensForCandidate[_registryName][voteForEpoch][candidate].add(_amounts[n]);
             candidateForVoter[_registryName][voteForEpoch][msg.sender].push(candidate);
             amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender].push(_amounts[n]);
+            emit Vote(_registryName, candidate, _amounts[n]);
         }
     }
 
