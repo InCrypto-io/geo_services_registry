@@ -85,14 +85,12 @@ contract('GeoServiceRegistry', accounts => {
                 0, "Unexpected token count for candidate, after change vote");
         });
 
-        return;
-
         it('Epoch switch', async () => {
             await increase(duration.weeks(1));
-            await gsr.checkEpoch();
+            await gsr.checkAndUpdateEpoch();
             const currentEpoch = (await gsr.currentEpoch()).toNumber();
             await increase(duration.weeks(5));
-            await gsr.checkEpoch();
+            await gsr.checkAndUpdateEpoch();
             assert.equal((await gsr.currentEpoch()).toNumber(), currentEpoch + 5, "Unexpected current epoch");
         });
     });
