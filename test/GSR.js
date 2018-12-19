@@ -118,26 +118,25 @@ contract('GeoServiceRegistry', accounts => {
             assert.equal(await gsr.getTotalVotesForNewRegistry(name), howMany, "Unexpected votes for registry");
         });
 
-        return;
-        it('Vote for candidate, cancel vote, withdraw when have vote', async () => {
+
+        it('Vote for candidate, change vote', async () => {
             const name = "registry0";
             const voter = user2;
-            const candidate = user2;
-            const currentEpoch = await gsr.currentEpoch();
-            const howMany = 123123;
-            await geo.approve(gsr.address, howMany, {from: voter});
-            await gsr.voteService(howMany, {from: voter});
-            await gsr.vote(name, candidate, {from: voter});
-            assert.equal((await gsr.getTotalTokensVotedForCandidate(name, currentEpoch, candidate)).toNumber(),
-                (await gsr.deposit(voter)).toNumber(),
+            await gsr.checkAndUpdateEpoch({from: voter});
+            const nextEpoch = (await gsr.currentEpoch()).toNumber() + 1;
+            const geoBalance = (await geo.balanceOf(voter)).toNumber();
+            await geo.approve(gsr.address, geoBalance, {from: voter});
+            await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: voter}));
+            await gsr.voteService(name, candidatesList, amountForCandidatesList, {from: voter});
+            assert.equal((await gsr.getTotalTokensVotedForCandidate(name, nextEpoch, candidatesList[0])).toNumber(),
+                amountForCandidatesList[0],
                 "Unexpected token count for candidate, after first vote");
-            await gsr.cancelVote(name, {from: voter});
-            assert.equal((await gsr.getTotalTokensVotedForCandidate(name, currentEpoch, candidate)).toNumber(),
-                0, "Unexpected token count for candidate, after cancel vote");
-            await gsr.vote(name, candidate, {from: voter});
-            await gsr.withdraw({from: voter});
-            assert.equal((await gsr.getTotalTokensVotedForCandidate(name, currentEpoch, candidate)).toNumber(),
-                0, "Unexpected token count for candidate, after withdraw");
+            assert.equal((await gsr.getTotalTokensVotedForCandidate(name, nextEpoch, candidatesList[1])).toNumber(),
+                amountForCandidatesList[1],
+                "Unexpected token count for candidate, after first vote");
+            await gsr.voteService(name, [], [], {from: voter});
+            assert.equal((await gsr.getTotalTokensVotedForCandidate(name, nextEpoch, candidatesList[0])).toNumber(),
+                0, "Unexpected token count for candidate, after change vote");
         });
     });
 });
