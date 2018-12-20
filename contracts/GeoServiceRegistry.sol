@@ -34,9 +34,11 @@ contract GeoServiceRegistry {
     // (registry name) => (exist)
     mapping(string => bool) private existingRegistries;
 
+    // Proposed registries with corresponding votes broken down by epoch
     // (registry name) => (epoch) => (total votes amount)
     mapping(string => mapping(uint16 => uint256)) private totalVotesForNewRegistry;
 
+    // Votes size for proposed registries broken down by epoch and voters
     // (registry name) => (epoch) => (voter address) => (amount vote from address)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private votesForNewRegistry;
 
