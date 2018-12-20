@@ -154,7 +154,7 @@ contract GeoServiceRegistry {
 
     /**
     * @dev Vote for candidate in registry.
-    * After lockup period.
+    * Method for vote after lockup period.
     * Maximum candidates 10.
     * Votes going by epoch.
     * Sender must approve tokens for deposit to contract address.
@@ -197,6 +197,13 @@ contract GeoServiceRegistry {
         _vote(_registryName, _candidates, _amounts);
     }
 
+    /**
+    * @dev Vote for new registry.
+    * Method for vote after lockup period.
+    * Votes going by epoch.
+    * @param _registryName Proposed registry name.
+    * @param _amount Size of vote in tokens.
+    */
     function voteServiceForNewRegistry(
         string _registryName,
         uint256 _amount)
@@ -208,6 +215,15 @@ contract GeoServiceRegistry {
         _lockupWithdrawForNextEpoch();
     }
 
+
+    /**
+    * @dev Vote for new registry.
+    * Method for vote after lockup period.
+    * Votes going by epoch.
+    * Sender must approve tokens for deposit to contract address.
+    * @param _registryName Proposed registry name.
+    * @param _amount Size of vote in tokens.
+    */
     function voteServiceLockupForNewRegistry(
         string _registryName,
         uint256 _amount)
