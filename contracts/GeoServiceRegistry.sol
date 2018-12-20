@@ -64,6 +64,9 @@ contract GeoServiceRegistry {
     /* MODIFIERS
     */
 
+    /**
+    * @dev Modifier to make a function callable only if registry exist.
+    */
     modifier registryExist(string _name)
     {
         require(existingRegistries[_name]);
