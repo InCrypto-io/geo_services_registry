@@ -16,6 +16,10 @@ contract('GeoServiceRegistry', accounts => {
     const userEmptyBalance = accounts[8];
     const candidatesList = [owner, user1];
     const amountForCandidatesList = [15155, 551514];
+    const candidatesListWrong = [owner, accounts[0], accounts[0], accounts[0], accounts[0], accounts[0], accounts[0],
+        accounts[0], accounts[0], accounts[0], accounts[0], accounts[0]];
+    const amountForCandidatesListWrong = [15155, 551514, 551514, 551514, 551514, 551514, 551514, 551514, 551514, 551514,
+        551514, 551514];
 
     before('setup', async () => {
         geo = await GEOToken.new({from: owner});
@@ -134,6 +138,16 @@ contract('GeoServiceRegistry', accounts => {
             await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: userEmptyBalance}));
         });
 
+        it('Vote for candidate, many candidates', async () => {
+            const name = "registry0";
+            await assertRevert(gsr.voteServiceLockup(name, candidatesListWrong, amountForCandidatesListWrong, {from: user1}));
+        });
+
+        it('Vote for candidate, wrong list of candidates', async () => {
+            const name = "registry0";
+            await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesListWrong, {from: user1}));
+        });
+
         it('Check winners list', async () => {
             const name = "registry0";
             await gsr.checkAndUpdateEpoch({from: owner});
@@ -145,10 +159,10 @@ contract('GeoServiceRegistry', accounts => {
             await increase(duration.weeks(2));
             await gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: bigHolder});
             assert.equal((await gsr.getTotalTokensVotedForCandidate(name, nextEpoch, candidatesList[0])).toNumber(),
-                amountForCandidatesList[0]*2,
+                amountForCandidatesList[0] * 2,
                 "Unexpected token count for candidate");
             assert.equal((await gsr.getTotalTokensVotedForCandidate(name, nextEpoch, candidatesList[1])).toNumber(),
-                amountForCandidatesList[1]*2,
+                amountForCandidatesList[1] * 2,
                 "Unexpected token count for candidate");
         });
     });
