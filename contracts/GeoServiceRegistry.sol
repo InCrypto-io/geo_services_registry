@@ -44,10 +44,12 @@ contract GeoServiceRegistry {
 
     uint16 public currentEpoch;
 
+    // Voting doing in next epoch
     uint16 private voteForEpoch;
 
     uint256 private epochTimeLimit;
 
+    // Time of start first epoch
     uint256 private epochZero;
 
     /* EVENTS
