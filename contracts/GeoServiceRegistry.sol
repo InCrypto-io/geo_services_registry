@@ -67,7 +67,8 @@ contract GeoServiceRegistry {
     /**
     * @dev Modifier to make a function callable only if registry exist.
     */
-    modifier registryExist(string _name)
+    modifier registryExist(
+        string _name)
     {
         require(existingRegistries[_name]);
         _;
@@ -76,7 +77,8 @@ contract GeoServiceRegistry {
     /* CONSTRUCTOR
     */
 
-    constructor(address _geoAddress)
+    constructor(
+        address _geoAddress)
     public
     {
         token = GEOToken(_geoAddress);
@@ -180,7 +182,8 @@ contract GeoServiceRegistry {
         _voteForNewRegistry(_registryName, _amount);
     }
 
-    function _checkOrReplenishDeposit(uint256 _amount)
+    function _checkOrReplenishDeposit(
+        uint256 _amount)
     private
     {
         require(token.isLockupExpired(msg.sender));
@@ -192,7 +195,8 @@ contract GeoServiceRegistry {
         require(deposit[msg.sender] >= _amount);
     }
 
-    function _checkSolvencyInLockupPeriod(uint256 _amount)
+    function _checkSolvencyInLockupPeriod(
+        uint256 _amount)
     view
     private
     {
@@ -227,7 +231,8 @@ contract GeoServiceRegistry {
         return totalVotesForCandidate[_registryName][_epoch][_candidate];
     }
 
-    function isRegistryExist(string _registryName)
+    function isRegistryExist(
+        string _registryName)
     view
     public
     returns (bool)
@@ -235,7 +240,8 @@ contract GeoServiceRegistry {
         return existingRegistries[_registryName];
     }
 
-    function getTotalVotesForNewRegistry(string _registryName)
+    function getTotalVotesForNewRegistry(
+        string _registryName)
     view
     public
     returns (uint256)
@@ -257,7 +263,8 @@ contract GeoServiceRegistry {
         }
     }
 
-    function sumOfArray(uint256[] _array)
+    function sumOfArray(
+        uint256[] _array)
     pure
     private
     returns (uint256)
