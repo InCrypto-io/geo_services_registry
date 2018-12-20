@@ -6,35 +6,43 @@ import "./math/SafeMath.sol";
 import "./math/SafeMath16.sol";
 
 contract GeoServiceRegistry {
-
     using SafeMath8 for uint8;
     using SafeMath16 for uint16;
     using SafeMath for uint256;
 
-    /* STORAGE
-    */
-
+    // STORAGE
     GEOToken private token;
 
+    // The balance of the user in tokens, which is deposited on the contract
     mapping(address => uint256) public deposit;
-    mapping(address => uint256) public withdrawLockupExpired;
 
+    // The time after which the user will be able to withdraw their tokens.
+    mapping(address => uint256) public withdrawalBlockingTime;
+
+    // Total counting of votes for a candidate, broken down by epochs and and registries
     // (registry name) => (epoch) => (candidate address) => (total votes amount)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
+
     // (registry name) => (epoch) => (voter address) => (vote amounts)
     mapping(string => mapping(uint16 => mapping(address => uint256[]))) private amountTokenForCandidatesFromVoter;
+
     // (registry name) => (epoch) => (voter address) => (candidates addresses)
     mapping(string => mapping(uint16 => mapping(address => address[]))) private candidatesForVoter;
 
     mapping(string => bool) private registryName;
+
     // (registry name) => (epoch) => (total votes amount)
     mapping(string => mapping(uint16 => uint256)) private totalVotesForNewRegistry;
+
     // (registry name) => (epoch) => (voter address) => (amount vote from address)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private votesForNewRegistry;
 
     uint16 public currentEpoch;
+
     uint16 private voteForEpoch;
+
     uint256 private epochTimeLimit;
+
     uint256 private epochZero;
 
     /* EVENTS
@@ -185,14 +193,14 @@ contract GeoServiceRegistry {
     function _lockupWithdrawForNextEpoch()
     private
     {
-        withdrawLockupExpired[msg.sender] = (epochZero + (epochTimeLimit.mul(voteForEpoch + 1)));
+        withdrawalBlockingTime[msg.sender] = (epochZero + (epochTimeLimit.mul(voteForEpoch + 1)));
     }
 
     function withdraw()
     public
     {
         checkAndUpdateEpoch();
-        require(withdrawLockupExpired[msg.sender] < now);
+        require(withdrawalBlockingTime[msg.sender] < now);
         require(deposit[msg.sender] > 0);
         token.transfer(msg.sender, deposit[msg.sender]);
         deposit[msg.sender] = 0;
