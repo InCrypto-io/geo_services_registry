@@ -91,6 +91,13 @@ contract GeoServiceRegistry {
     /* FUNCTIONS
     */
 
+    /**
+    * @dev Call to vote for new registry.
+    * After collect target count votes, create a registry.
+    * Votes going by epoch.
+    * @param _registryName Proposed registry name.
+    * @param _amount Size of vote in tokens.
+    */
     function _voteForNewRegistry(
         string _registryName,
         uint256 _amount)
@@ -101,6 +108,7 @@ contract GeoServiceRegistry {
         totalVotesForNewRegistry[_registryName][voteForEpoch] = totalVotesForNewRegistry[_registryName][voteForEpoch].sub(votesForNewRegistry[_registryName][voteForEpoch][msg.sender]);
         totalVotesForNewRegistry[_registryName][voteForEpoch] = totalVotesForNewRegistry[_registryName][voteForEpoch].add(_amount);
         votesForNewRegistry[_registryName][voteForEpoch][msg.sender] = _amount;
+        // For create a new registry, need collect 10% of total supply
         if (totalVotesForNewRegistry[_registryName][voteForEpoch] >= token.totalSupply() / 10) {
             existingRegistries[_registryName] = true;
             emit NewRegistry(_registryName);
