@@ -23,11 +23,13 @@ contract GeoServiceRegistry {
     // (registry name) => (epoch) => (candidate address) => (total votes amount)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
 
+    // List of candidates from voters, broken down by epochs and and registries
+    // (registry name) => (epoch) => (voter address) => (candidates addresses)
+    mapping(string => mapping(uint16 => mapping(address => address[]))) private votersHaveChosenCandidates;
+
+    // List of votes, broken down by epochs and and registries
     // (registry name) => (epoch) => (voter address) => (vote amounts)
     mapping(string => mapping(uint16 => mapping(address => uint256[]))) private amountTokenForCandidatesFromVoter;
-
-    // (registry name) => (epoch) => (voter address) => (candidates addresses)
-    mapping(string => mapping(uint16 => mapping(address => address[]))) private candidatesForVoter;
 
     mapping(string => bool) private registryName;
 
@@ -105,20 +107,20 @@ contract GeoServiceRegistry {
     private
     {
         require(_candidates.length < 10 && _candidates.length == _amounts.length);
-        uint256 oldCandidatesCount = candidatesForVoter[_registryName][voteForEpoch][msg.sender].length;
+        uint256 oldCandidatesCount = votersHaveChosenCandidates[_registryName][voteForEpoch][msg.sender].length;
         for (uint256 o = 0; o < oldCandidatesCount; o++) {
-            address oldCandidate = candidatesForVoter[_registryName][voteForEpoch][msg.sender][o];
+            address oldCandidate = votersHaveChosenCandidates[_registryName][voteForEpoch][msg.sender][o];
             uint256 amount = amountTokenForCandidatesFromVoter[_registryName][voteForEpoch][msg.sender][o];
             totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate] = totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate].sub(amount);
             emit CancelVote(_registryName, oldCandidate, amount);
         }
-        delete candidatesForVoter[_registryName][voteForEpoch][msg.sender];
+        delete votersHaveChosenCandidates[_registryName][voteForEpoch][msg.sender];
         delete amountTokenForCandidatesFromVoter[_registryName][voteForEpoch][msg.sender];
         uint256 candidatesCount = _candidates.length;
         for (uint256 n = 0; n < candidatesCount; n++) {
             address candidate = _candidates[n];
             totalTokensForCandidate[_registryName][voteForEpoch][candidate] = totalTokensForCandidate[_registryName][voteForEpoch][candidate].add(_amounts[n]);
-            candidatesForVoter[_registryName][voteForEpoch][msg.sender].push(candidate);
+            votersHaveChosenCandidates[_registryName][voteForEpoch][msg.sender].push(candidate);
             amountTokenForCandidatesFromVoter[_registryName][voteForEpoch][msg.sender].push(_amounts[n]);
             emit Vote(_registryName, candidate, _amounts[n]);
         }
