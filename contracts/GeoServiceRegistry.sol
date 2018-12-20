@@ -19,19 +19,20 @@ contract GeoServiceRegistry {
     // The time after which the user will be able to withdraw their tokens.
     mapping(address => uint256) public withdrawalBlockingTime;
 
-    // Total counting of votes for a candidate, broken down by epochs and and registries
+    // Total counting of votes for a candidate, broken down by epochs and registries
     // (registry name) => (epoch) => (candidate address) => (total votes amount)
-    mapping(string => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
+    mapping(string => mapping(uint16 => mapping(address => uint256))) private totalVotesForCandidate;
 
-    // List of candidates from voters, broken down by epochs and and registries
+    // List of candidates from voters, broken down by epochs and registries
     // (registry name) => (epoch) => (voter address) => (candidates addresses)
-    mapping(string => mapping(uint16 => mapping(address => address[]))) private votersHaveChosenCandidates;
+    mapping(string => mapping(uint16 => mapping(address => address[]))) private selectedCandidatesByVoter;
 
     // List of votes, broken down by epochs and and registries
     // (registry name) => (epoch) => (voter address) => (vote amounts)
-    mapping(string => mapping(uint16 => mapping(address => uint256[]))) private amountTokenForCandidatesFromVoter;
+    mapping(string => mapping(uint16 => mapping(address => uint256[]))) private votesForCandidatesChosenByVoters;
 
-    mapping(string => bool) private registryName;
+    // (registry name) => (exist)
+    mapping(string => bool) private existingRegistries;
 
     // (registry name) => (epoch) => (total votes amount)
     mapping(string => mapping(uint16 => uint256)) private totalVotesForNewRegistry;
@@ -61,7 +62,7 @@ contract GeoServiceRegistry {
 
     modifier registryExist(string _name)
     {
-        require(registryName[_name]);
+        require(existingRegistries[_name]);
         _;
     }
 
@@ -87,12 +88,12 @@ contract GeoServiceRegistry {
     private
     {
         checkAndUpdateEpoch();
-        require(registryName[_registryName] == false);
+        require(existingRegistries[_registryName] == false);
         totalVotesForNewRegistry[_registryName][voteForEpoch] = totalVotesForNewRegistry[_registryName][voteForEpoch].sub(votesForNewRegistry[_registryName][voteForEpoch][msg.sender]);
         totalVotesForNewRegistry[_registryName][voteForEpoch] = totalVotesForNewRegistry[_registryName][voteForEpoch].add(_amount);
         votesForNewRegistry[_registryName][voteForEpoch][msg.sender] = _amount;
         if (totalVotesForNewRegistry[_registryName][voteForEpoch] >= token.totalSupply() / 10) {
-            registryName[_registryName] = true;
+            existingRegistries[_registryName] = true;
             emit NewRegistry(_registryName);
         } else {
             emit VoteForNewRegistry(_registryName, _amount);
@@ -107,21 +108,21 @@ contract GeoServiceRegistry {
     private
     {
         require(_candidates.length < 10 && _candidates.length == _amounts.length);
-        uint256 oldCandidatesCount = votersHaveChosenCandidates[_registryName][voteForEpoch][msg.sender].length;
+        uint256 oldCandidatesCount = selectedCandidatesByVoter[_registryName][voteForEpoch][msg.sender].length;
         for (uint256 o = 0; o < oldCandidatesCount; o++) {
-            address oldCandidate = votersHaveChosenCandidates[_registryName][voteForEpoch][msg.sender][o];
-            uint256 amount = amountTokenForCandidatesFromVoter[_registryName][voteForEpoch][msg.sender][o];
-            totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate] = totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate].sub(amount);
+            address oldCandidate = selectedCandidatesByVoter[_registryName][voteForEpoch][msg.sender][o];
+            uint256 amount = votesForCandidatesChosenByVoters[_registryName][voteForEpoch][msg.sender][o];
+            totalVotesForCandidate[_registryName][voteForEpoch][oldCandidate] = totalVotesForCandidate[_registryName][voteForEpoch][oldCandidate].sub(amount);
             emit CancelVote(_registryName, oldCandidate, amount);
         }
-        delete votersHaveChosenCandidates[_registryName][voteForEpoch][msg.sender];
-        delete amountTokenForCandidatesFromVoter[_registryName][voteForEpoch][msg.sender];
+        delete selectedCandidatesByVoter[_registryName][voteForEpoch][msg.sender];
+        delete votesForCandidatesChosenByVoters[_registryName][voteForEpoch][msg.sender];
         uint256 candidatesCount = _candidates.length;
         for (uint256 n = 0; n < candidatesCount; n++) {
             address candidate = _candidates[n];
-            totalTokensForCandidate[_registryName][voteForEpoch][candidate] = totalTokensForCandidate[_registryName][voteForEpoch][candidate].add(_amounts[n]);
-            votersHaveChosenCandidates[_registryName][voteForEpoch][msg.sender].push(candidate);
-            amountTokenForCandidatesFromVoter[_registryName][voteForEpoch][msg.sender].push(_amounts[n]);
+            totalVotesForCandidate[_registryName][voteForEpoch][candidate] = totalVotesForCandidate[_registryName][voteForEpoch][candidate].add(_amounts[n]);
+            selectedCandidatesByVoter[_registryName][voteForEpoch][msg.sender].push(candidate);
+            votesForCandidatesChosenByVoters[_registryName][voteForEpoch][msg.sender].push(_amounts[n]);
             emit Vote(_registryName, candidate, _amounts[n]);
         }
     }
@@ -216,7 +217,7 @@ contract GeoServiceRegistry {
     public
     returns (uint256)
     {
-        return totalTokensForCandidate[_registryName][_epoch][_candidate];
+        return totalVotesForCandidate[_registryName][_epoch][_candidate];
     }
 
     function isRegistryExist(string _registryName)
@@ -224,7 +225,7 @@ contract GeoServiceRegistry {
     public
     returns (bool)
     {
-        return registryName[_registryName];
+        return existingRegistries[_registryName];
     }
 
     function getTotalVotesForNewRegistry(string _registryName)
