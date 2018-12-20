@@ -92,7 +92,7 @@ contract GeoServiceRegistry {
     */
 
     /**
-    * @dev Call to vote for new registry.
+    * @dev Vote for new registry.
     * After collect target count votes, create a registry.
     * Votes going by epoch.
     * @param _registryName Proposed registry name.
@@ -117,6 +117,14 @@ contract GeoServiceRegistry {
         }
     }
 
+    /**
+    * @dev Vote for candidate in registry.
+    * Maximum candidates 10
+    * Votes going by epoch.
+    * @param _registryName Exist registry name.
+    * @param _candidates List of candidates.
+    * @param _amounts List of votes for corresponding candidates in tokens.
+    */
     function _vote(
         string _registryName,
         address[] _candidates,
