@@ -22,9 +22,9 @@ contract GeoServiceRegistry {
     // (registry name) => (epoch) => (candidate address) => (total votes amount)
     mapping(string => mapping(uint16 => mapping(address => uint256))) private totalTokensForCandidate;
     // (registry name) => (epoch) => (voter address) => (vote amounts)
-    mapping(string => mapping(uint16 => mapping(address => uint256[]))) private amountTokenForCandidateFromVoter;
+    mapping(string => mapping(uint16 => mapping(address => uint256[]))) private amountTokenForCandidatesFromVoter;
     // (registry name) => (epoch) => (voter address) => (candidates addresses)
-    mapping(string => mapping(uint16 => mapping(address => address[]))) private candidateForVoter;
+    mapping(string => mapping(uint16 => mapping(address => address[]))) private candidatesForVoter;
 
     mapping(string => bool) private registryName;
     // (registry name) => (epoch) => (total votes amount)
@@ -97,21 +97,21 @@ contract GeoServiceRegistry {
     private
     {
         require(_candidates.length < 10 && _candidates.length == _amounts.length);
-        uint256 oldCandidatesCount = candidateForVoter[_registryName][voteForEpoch][msg.sender].length;
+        uint256 oldCandidatesCount = candidatesForVoter[_registryName][voteForEpoch][msg.sender].length;
         for (uint256 o = 0; o < oldCandidatesCount; o++) {
-            address oldCandidate = candidateForVoter[_registryName][voteForEpoch][msg.sender][o];
-            uint256 amount = amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender][o];
+            address oldCandidate = candidatesForVoter[_registryName][voteForEpoch][msg.sender][o];
+            uint256 amount = amountTokenForCandidatesFromVoter[_registryName][voteForEpoch][msg.sender][o];
             totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate] = totalTokensForCandidate[_registryName][voteForEpoch][oldCandidate].sub(amount);
             emit CancelVote(_registryName, oldCandidate, amount);
         }
-        delete candidateForVoter[_registryName][voteForEpoch][msg.sender];
-        delete amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender];
+        delete candidatesForVoter[_registryName][voteForEpoch][msg.sender];
+        delete amountTokenForCandidatesFromVoter[_registryName][voteForEpoch][msg.sender];
         uint256 candidatesCount = _candidates.length;
         for (uint256 n = 0; n < candidatesCount; n++) {
             address candidate = _candidates[n];
             totalTokensForCandidate[_registryName][voteForEpoch][candidate] = totalTokensForCandidate[_registryName][voteForEpoch][candidate].add(_amounts[n]);
-            candidateForVoter[_registryName][voteForEpoch][msg.sender].push(candidate);
-            amountTokenForCandidateFromVoter[_registryName][voteForEpoch][msg.sender].push(_amounts[n]);
+            candidatesForVoter[_registryName][voteForEpoch][msg.sender].push(candidate);
+            amountTokenForCandidatesFromVoter[_registryName][voteForEpoch][msg.sender].push(_amounts[n]);
             emit Vote(_registryName, candidate, _amounts[n]);
         }
     }
@@ -124,9 +124,9 @@ contract GeoServiceRegistry {
     {
         checkAndUpdateEpoch();
         uint256 amount = sumOfArray(_amounts);
-        checkOrReplenishDeposit(amount);
+        _checkOrReplenishDeposit(amount);
         _vote(_registryName, _candidates, _amounts);
-        lockupWithdrawForNextEpoch();
+        _lockupWithdrawForNextEpoch();
     }
 
     function voteServiceLockup(
@@ -137,7 +137,7 @@ contract GeoServiceRegistry {
     {
         checkAndUpdateEpoch();
         uint256 amount = sumOfArray(_amounts);
-        checkSolvencyInLockupPeriod(amount);
+        _checkSolvencyInLockupPeriod(amount);
         _vote(_registryName, _candidates, _amounts);
     }
 
@@ -147,9 +147,9 @@ contract GeoServiceRegistry {
     public
     {
         checkAndUpdateEpoch();
-        checkOrReplenishDeposit(_amount);
+        _checkOrReplenishDeposit(_amount);
         _voteForNewRegistry(_registryName, _amount);
-        lockupWithdrawForNextEpoch();
+        _lockupWithdrawForNextEpoch();
     }
 
     function voteServiceLockupForNewRegistry(
@@ -158,11 +158,11 @@ contract GeoServiceRegistry {
     public
     {
         checkAndUpdateEpoch();
-        checkSolvencyInLockupPeriod(_amount);
+        _checkSolvencyInLockupPeriod(_amount);
         _voteForNewRegistry(_registryName, _amount);
     }
 
-    function checkOrReplenishDeposit(uint256 _amount)
+    function _checkOrReplenishDeposit(uint256 _amount)
     private
     {
         require(token.isLockupExpired(msg.sender));
@@ -174,7 +174,7 @@ contract GeoServiceRegistry {
         require(deposit[msg.sender] >= _amount);
     }
 
-    function checkSolvencyInLockupPeriod(uint256 _amount)
+    function _checkSolvencyInLockupPeriod(uint256 _amount)
     view
     private
     {
@@ -182,7 +182,7 @@ contract GeoServiceRegistry {
         require(token.balanceOf(msg.sender) >= _amount);
     }
 
-    function lockupWithdrawForNextEpoch()
+    function _lockupWithdrawForNextEpoch()
     private
     {
         withdrawLockupExpired[msg.sender] = (epochZero + (epochTimeLimit.mul(voteForEpoch + 1)));
