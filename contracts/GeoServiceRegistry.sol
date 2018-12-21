@@ -218,9 +218,8 @@ contract GeoServiceRegistry {
 
     /**
     * @dev Vote for new registry.
-    * Method for vote after lockup period.
+    * Method for vote in lockup period.
     * Votes going by epoch.
-    * Sender must approve tokens for deposit to contract address.
     * @param _registryName Proposed registry name.
     * @param _amount Size of vote in tokens.
     */
@@ -234,6 +233,12 @@ contract GeoServiceRegistry {
         _voteForNewRegistry(_registryName, _amount);
     }
 
+    /**
+    * @dev Used after lockup period.
+    * Sender must approve tokens for deposit to contract address.
+    * Check size of deposit an increase if need.
+    * @param _amount Target level of deposit.
+    */
     function _checkOrReplenishDeposit(
         uint256 _amount)
     private
