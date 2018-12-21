@@ -10,7 +10,7 @@ contract GeoServiceRegistry {
     using SafeMath16 for uint16;
     using SafeMath for uint256;
 
-    // STORAGE
+    // STORAGE //
     GEOToken private token;
 
     // The balance of the user in tokens, which is deposited on the contract
@@ -51,6 +51,8 @@ contract GeoServiceRegistry {
 
     // Time of start first epoch
     uint256 private epochZero;
+
+    // STORAGE END //
 
     /* EVENTS
     */
