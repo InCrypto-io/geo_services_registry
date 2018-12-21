@@ -306,6 +306,11 @@ contract GeoServiceRegistry {
         return totalVotesForCandidate[_registryName][_epoch][_candidate];
     }
 
+    /**
+    * @dev Check for the existence of a register.
+    * @param _registryName Exist registry name.
+    * @return bool True if registry exist.
+    */
     function isRegistryExist(
         string _registryName)
     view
