@@ -320,6 +320,11 @@ contract GeoServiceRegistry {
         return existingRegistries[_registryName];
     }
 
+    /**
+    * @dev Get total size of voting for registry in next epoch.
+    * @param _registryName Exist registry name.
+    * @return uint256 Total size of voting.
+    */
     function getTotalVotesForNewRegistry(
         string _registryName)
     view
