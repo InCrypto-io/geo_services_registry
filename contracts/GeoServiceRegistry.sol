@@ -78,7 +78,6 @@ contract GeoServiceRegistry {
 
     /* CONSTRUCTOR
     */
-
     constructor(
         address _geoAddress)
     public

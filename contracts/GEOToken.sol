@@ -19,6 +19,7 @@ import "./Ownable.sol";
 contract GEOToken is IERC20, Ownable {
     using SafeMath for uint256;
 
+    // STORAGE //
     mapping(address => uint256) private _balances;
 
     mapping(address => mapping(address => uint256)) private _allowed;
@@ -27,10 +28,16 @@ contract GEOToken is IERC20, Ownable {
     string public symbol = 'GEO';
     uint8 public decimals = 8;
 
+    // The end time of the blocking period
     uint256 public lockupExpired;
 
+    // End time of individual blocking period
     mapping(address => uint256) private individualLockupExpireTime;
 
+    // STORAGE END //
+
+    /* CONSTRUCTOR
+    */
     constructor()
     public
     {
@@ -207,6 +214,11 @@ contract GEOToken is IERC20, Ownable {
         emit Transfer(from, to, value);
     }
 
+    /**
+    * @dev Allow transfer for chosen address and in lockup period.
+    * Can use only owner.
+    * @param _who Address for token owner.
+    */
     function allowTransferInLockupPeriod(address _who)
     onlyOwner()
     public
@@ -214,6 +226,11 @@ contract GEOToken is IERC20, Ownable {
         individualLockupExpireTime[_who] = now - 1;
     }
 
+    /**
+    * @dev Denny transfer for chosen address and in lockup period.
+    * Can use only owner.
+    * @param _who Address for token owner.
+    */
     function denyTransferInLockupPeriod(address _who)
     onlyOwner()
     public
@@ -221,6 +238,12 @@ contract GEOToken is IERC20, Ownable {
         individualLockupExpireTime[_who] = 0;
     }
 
+    /**
+    * @dev Denny transfer for chosen address and in lockup period.
+    * Can use only owner.
+    * @param _who Address for token owner.
+    * @param _time Time when lockup expired.
+    */
     function setIndividualLockupExpireTime(
         address _who,
         uint256 _time)
