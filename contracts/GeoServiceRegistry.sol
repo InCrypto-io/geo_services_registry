@@ -267,7 +267,7 @@ contract GeoServiceRegistry {
     }
 
     /**
-    * @dev Individual lock(sender address) on withdraw to end of next epoch.
+    * @dev Individual lock(for sender address) on withdraw to end of next epoch.
     */
     function _lockupWithdrawForNextEpoch()
     private
@@ -275,6 +275,9 @@ contract GeoServiceRegistry {
         withdrawalBlockingTime[msg.sender] = (epochZero + (epochTimeLimit.mul(voteForEpoch + 1)));
     }
 
+    /**
+    * @dev Transfer tokens back to deposit creator.
+    */
     function withdraw()
     public
     {
@@ -285,7 +288,14 @@ contract GeoServiceRegistry {
         deposit[msg.sender] = 0;
     }
 
-    function getTotalTokensVotedForCandidate(
+    /**
+    * @dev Get total size of voting.
+    * @param _registryName Exist registry name.
+    * @param _epoch Epoch number.
+    * @param _candidate Address of candidate.
+    * @return uint256 Total size of voting.
+    */
+    function getTotalVotedForCandidate(
         string _registryName,
         uint16 _epoch,
         address _candidate)
