@@ -252,7 +252,6 @@ contract GeoServiceRegistry {
         require(deposit[msg.sender] >= _amount);
     }
 
-
     /**
     * @dev Used in lockup period.
     * Compare balance of address corresponding sender with target value.
@@ -267,6 +266,9 @@ contract GeoServiceRegistry {
         require(token.balanceOf(msg.sender) >= _amount);
     }
 
+    /**
+    * @dev Individual lock(sender address) on withdraw to end of next epoch.
+    */
     function _lockupWithdrawForNextEpoch()
     private
     {
