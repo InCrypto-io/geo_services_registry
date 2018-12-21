@@ -252,6 +252,12 @@ contract GeoServiceRegistry {
         require(deposit[msg.sender] >= _amount);
     }
 
+
+    /**
+    * @dev Used in lockup period.
+    * Compare balance of address corresponding sender with target value.
+    * @param _amount Require minimum tokens in GEOToken.
+    */
     function _checkSolvencyInLockupPeriod(
         uint256 _amount)
     view
