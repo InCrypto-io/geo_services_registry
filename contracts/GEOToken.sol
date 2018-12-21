@@ -32,6 +32,7 @@ contract GEOToken is IERC20, Ownable {
     uint256 public lockupExpired;
 
     // End time of individual blocking period
+    // If it set and expired, global lock not leverage on transfer
     mapping(address => uint256) private individualLockupExpireTime;
 
     // STORAGE END //
@@ -253,6 +254,11 @@ contract GEOToken is IERC20, Ownable {
         individualLockupExpireTime[_who] = _time;
     }
 
+    /**
+    * @dev Check lock up by time.
+    * @param _who Address for token owner.
+    * @return bool True if not locked.
+    */
     function isLockupExpired(address _who)
     view
     public
