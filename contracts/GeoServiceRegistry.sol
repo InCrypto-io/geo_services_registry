@@ -335,7 +335,7 @@ contract GeoServiceRegistry {
     }
 
     /**
-    * @dev Check and change number of current epoch
+    * @dev Check and update number of current epoch
     */
     function checkAndUpdateEpoch()
     public
@@ -348,6 +348,11 @@ contract GeoServiceRegistry {
         }
     }
 
+    /**
+    * @dev Calculate sum of input array.
+    * @param _array Array of uint256.
+    * @return uint256 Total sum.
+    */
     function sumOfArray(
         uint256[] _array)
     pure
