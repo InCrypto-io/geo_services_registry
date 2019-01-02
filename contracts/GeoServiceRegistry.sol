@@ -16,24 +16,8 @@ contract GeoServiceRegistry {
     // The balance of the user in tokens, which is deposited on the contract
     mapping(address => uint256) public deposit;
 
-    // List of candidates from voters, broken down by registries
-    // (registry name) => (voter address) => (candidates addresses)
-    mapping(string => mapping(address => address[])) private selectedCandidatesByVoter;
-
-    // List of votes, broken down by registries
-    // (registry name) => (voter address) => (vote amounts)
-    mapping(string => mapping(address => uint256[])) private votesForCandidatesChosenByVoters;
-
     // (registry name) => (exist)
     mapping(string => bool) private existingRegistries;
-
-    // Proposed registries with corresponding votes
-    // (registry name) => (total votes amount)
-    mapping(string => uint256) private totalVotesForNewRegistry;
-
-    // Votes size for proposed registries broken down by voters
-    // (registry name) => (voter address) => (amount vote from address)
-    mapping(string => mapping(address => uint256)) private votesForNewRegistry;
 
     // STORAGE END //
 
@@ -103,20 +87,8 @@ contract GeoServiceRegistry {
     private
     {
         require(_candidates.length <= 20 && _candidates.length == _amounts.length);
-        uint256 oldCandidatesCount = selectedCandidatesByVoter[_registryName][msg.sender].length;
-        for (uint256 o = 0; o < oldCandidatesCount; o++) {
-            address oldCandidate = selectedCandidatesByVoter[_registryName][msg.sender][o];
-            uint256 amount = votesForCandidatesChosenByVoters[_registryName][msg.sender][o];
-            emit CancelVote(_registryName, oldCandidate, amount);
-        }
-        delete selectedCandidatesByVoter[_registryName][msg.sender];
-        delete votesForCandidatesChosenByVoters[_registryName][msg.sender];
-        uint256 candidatesCount = _candidates.length;
-        for (uint256 n = 0; n < candidatesCount; n++) {
-            address candidate = _candidates[n];
-            selectedCandidatesByVoter[_registryName][msg.sender].push(candidate);
-            votesForCandidatesChosenByVoters[_registryName][msg.sender].push(_amounts[n]);
-            emit Vote(_registryName, candidate, _amounts[n]);
+        for (uint256 n = 0; n < _candidates.length; n++) {
+            emit Vote(_registryName, _candidates[n], _amounts[n]);
         }
     }
 
