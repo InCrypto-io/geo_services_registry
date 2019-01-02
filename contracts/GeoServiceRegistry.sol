@@ -44,6 +44,7 @@ contract GeoServiceRegistry {
     event NewRegistry(string _name);
     event Vote(string _name, address _candidate, uint256 _amount);
     event CancelVote(string _name, address _candidate, uint256 _amount);
+    event Withdrawal(address _voter, uint256 _amountWithdraw);
 
     /* MODIFIERS
     */
@@ -74,7 +75,6 @@ contract GeoServiceRegistry {
     * @dev Vote for new registry.
     * After collect target count votes, create a registry.
     * @param _registryName Proposed registry name.
-    * @param _amount Size of vote in tokens.
     */
     function _voteForNewRegistry(
         string _registryName)
@@ -161,15 +161,12 @@ contract GeoServiceRegistry {
     * @dev Vote for new registry.
     * Method for vote after lockup period.
     * @param _registryName Proposed registry name.
-    * @param _amount Size of vote in tokens.
     */
     function voteServiceForNewRegistry(
-        string _registryName,
-        uint256 _amount)
+        string _registryName)
     public
     {
-        _checkOrReplenishDeposit(_amount);
-        _voteForNewRegistry(_registryName, _amount);
+        _voteForNewRegistry(_registryName);
     }
 
 
@@ -177,15 +174,12 @@ contract GeoServiceRegistry {
     * @dev Vote for new registry.
     * Method for vote in lockup period.
     * @param _registryName Proposed registry name.
-    * @param _amount Size of vote in tokens.
     */
     function voteServiceLockupForNewRegistry(
-        string _registryName,
-        uint256 _amount)
+        string _registryName)
     public
     {
-        _checkSolvencyInLockupPeriod(_amount);
-        _voteForNewRegistry(_registryName, _amount);
+        _voteForNewRegistry(_registryName);
     }
 
     /**
@@ -224,7 +218,8 @@ contract GeoServiceRegistry {
     /**
     * @dev Transfer tokens back to deposit creator.
     */
-    function withdraw()
+    function withdraw(
+        uint _amount) // todo amount!!!
     public
     {
         require(deposit[msg.sender] > 0);
@@ -244,20 +239,6 @@ contract GeoServiceRegistry {
     returns (bool)
     {
         return existingRegistries[_registryName];
-    }
-
-    /**
-    * @dev Get total size of voting for registry
-    * @param _registryName Exist registry name.
-    * @return uint256 Total size of voting.
-    */
-    function getTotalVotesForNewRegistry(
-        string _registryName)
-    view
-    public
-    returns (uint256)
-    {
-        return totalVotesForNewRegistry[_registryName];
     }
 
     /**
