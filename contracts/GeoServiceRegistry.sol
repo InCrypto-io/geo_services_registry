@@ -19,10 +19,6 @@ contract GeoServiceRegistry {
     // The time after which the user will be able to withdraw their tokens.
     mapping(address => uint256) public withdrawalBlockingTime;
 
-    // Total counting of votes for a candidate, broken down by registries
-    // (registry name) => (candidate address) => (total votes amount)
-    mapping(string => mapping(address => uint256)) private totalVotesForCandidate;
-
     // List of candidates from voters, broken down by registries
     // (registry name) => (voter address) => (candidates addresses)
     mapping(string => mapping(address => address[])) private selectedCandidatesByVoter;
@@ -120,7 +116,6 @@ contract GeoServiceRegistry {
         for (uint256 o = 0; o < oldCandidatesCount; o++) {
             address oldCandidate = selectedCandidatesByVoter[_registryName][msg.sender][o];
             uint256 amount = votesForCandidatesChosenByVoters[_registryName][msg.sender][o];
-            totalVotesForCandidate[_registryName][oldCandidate] = totalVotesForCandidate[_registryName][oldCandidate].sub(amount);
             emit CancelVote(_registryName, oldCandidate, amount);
         }
         delete selectedCandidatesByVoter[_registryName][msg.sender];
@@ -128,7 +123,6 @@ contract GeoServiceRegistry {
         uint256 candidatesCount = _candidates.length;
         for (uint256 n = 0; n < candidatesCount; n++) {
             address candidate = _candidates[n];
-            totalVotesForCandidate[_registryName][candidate] = totalVotesForCandidate[_registryName][candidate].add(_amounts[n]);
             selectedCandidatesByVoter[_registryName][msg.sender].push(candidate);
             votesForCandidatesChosenByVoters[_registryName][msg.sender].push(_amounts[n]);
             emit Vote(_registryName, candidate, _amounts[n]);
@@ -249,22 +243,6 @@ contract GeoServiceRegistry {
         require(deposit[msg.sender] > 0);
         token.transfer(msg.sender, deposit[msg.sender]);
         deposit[msg.sender] = 0;
-    }
-
-    /**
-    * @dev Get total size of voting.
-    * @param _registryName Exist registry name.
-    * @param _candidate Address of candidate.
-    * @return uint256 Total size of voting.
-    */
-    function getTotalVotedForCandidate(
-        string _registryName,
-        address _candidate)
-    view
-    public
-    returns (uint256)
-    {
-        return totalVotesForCandidate[_registryName][_candidate];
     }
 
     /**
