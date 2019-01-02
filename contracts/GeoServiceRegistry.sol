@@ -111,7 +111,7 @@ contract GeoServiceRegistry {
     registryExist(_registryName)
     private
     {
-        require(_candidates.length < 10 && _candidates.length == _amounts.length);
+        require(_candidates.length <= 20 && _candidates.length == _amounts.length);
         uint256 oldCandidatesCount = selectedCandidatesByVoter[_registryName][msg.sender].length;
         for (uint256 o = 0; o < oldCandidatesCount; o++) {
             address oldCandidate = selectedCandidatesByVoter[_registryName][msg.sender][o];
