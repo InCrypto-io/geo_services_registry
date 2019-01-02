@@ -16,9 +16,6 @@ contract GeoServiceRegistry {
     // The balance of the user in tokens, which is deposited on the contract
     mapping(address => uint256) public deposit;
 
-    // The time after which the user will be able to withdraw their tokens.
-    mapping(address => uint256) public withdrawalBlockingTime;
-
     // List of candidates from voters, broken down by registries
     // (registry name) => (voter address) => (candidates addresses)
     mapping(string => mapping(address => address[])) private selectedCandidatesByVoter;
@@ -80,21 +77,12 @@ contract GeoServiceRegistry {
     * @param _amount Size of vote in tokens.
     */
     function _voteForNewRegistry(
-        string _registryName,
-        uint256 _amount)
+        string _registryName)
     private
     {
         require(existingRegistries[_registryName] == false);
-        totalVotesForNewRegistry[_registryName] = totalVotesForNewRegistry[_registryName].sub(votesForNewRegistry[_registryName][msg.sender]);
-        totalVotesForNewRegistry[_registryName] = totalVotesForNewRegistry[_registryName].add(_amount);
-        votesForNewRegistry[_registryName][msg.sender] = _amount;
-        // For create a new registry, need collect 10% of total supply
-        if (totalVotesForNewRegistry[_registryName] >= token.totalSupply() / 10) {
-            existingRegistries[_registryName] = true;
-            emit NewRegistry(_registryName);
-        } else {
-            emit VoteForNewRegistry(_registryName, _amount);
-        }
+        existingRegistries[_registryName] = true;
+        emit NewRegistry(_registryName);
     }
 
     /**
@@ -239,7 +227,6 @@ contract GeoServiceRegistry {
     function withdraw()
     public
     {
-        require(withdrawalBlockingTime[msg.sender] < now);
         require(deposit[msg.sender] > 0);
         token.transfer(msg.sender, deposit[msg.sender]);
         deposit[msg.sender] = 0;
