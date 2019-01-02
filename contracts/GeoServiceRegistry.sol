@@ -217,14 +217,16 @@ contract GeoServiceRegistry {
 
     /**
     * @dev Transfer tokens back to deposit creator.
+    * @param _amount Withdraw part or full deposit.
     */
     function withdraw(
-        uint _amount) // todo amount!!!
+        uint _amount)
     public
     {
-        require(deposit[msg.sender] > 0);
+        require(deposit[msg.sender] >= _amount);
         token.transfer(msg.sender, deposit[msg.sender]);
-        deposit[msg.sender] = 0;
+        deposit[msg.sender] = deposit[msg.sender].sub(_amount);
+        emit Withdrawal(msg.sender, _amount);
     }
 
     /**
