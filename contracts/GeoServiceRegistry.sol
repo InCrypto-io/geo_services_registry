@@ -34,7 +34,7 @@ contract GeoServiceRegistry {
     // (registry name) => (total votes amount)
     mapping(string => uint256) private totalVotesForNewRegistry;
 
-    // Votes size for proposed registries broke1n down by voters
+    // Votes size for proposed registries broken down by voters
     // (registry name) => (voter address) => (amount vote from address)
     mapping(string => mapping(address => uint256)) private votesForNewRegistry;
 
