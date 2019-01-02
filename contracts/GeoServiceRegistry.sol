@@ -66,6 +66,9 @@ contract GeoServiceRegistry {
     public
     {
         token = GEOToken(_geoAddress);
+        _voteForNewRegistry("observer");
+        _voteForNewRegistry("provider");
+        _voteForNewRegistry("hub");
     }
 
     /* FUNCTIONS
