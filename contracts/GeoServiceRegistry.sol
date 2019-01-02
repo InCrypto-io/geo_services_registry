@@ -43,7 +43,7 @@ contract GeoServiceRegistry {
     /* EVENTS
     */
 
-    event VoteForNewRegistry(string _name, uint256 _amou);
+    event VoteForNewRegistry(string _name, uint256 _amount);
     event NewRegistry(string _name);
     event Vote(string _name, address _candidate, uint256 _amount);
     event CancelVote(string _name, address _candidate, uint256 _amount);
@@ -99,7 +99,7 @@ contract GeoServiceRegistry {
 
     /**
     * @dev Vote for candidate in registry.
-    * Maximum candidates 10
+    * Maximum candidates 20
     * @param _registryName Exist registry name.
     * @param _candidates List of candidates.
     * @param _amounts List of votes for corresponding candidates in tokens.
