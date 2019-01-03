@@ -87,6 +87,7 @@ contract GeoServiceRegistry {
     private
     {
         require(_candidates.length <= 20 && _candidates.length == _amounts.length);
+        require(sumOfArray(_amounts) == 10000);
         for (uint256 n = 0; n < _candidates.length; n++) {
             emit Vote(_registryName, _candidates[n], _amounts[n]);
         }
@@ -132,7 +133,6 @@ contract GeoServiceRegistry {
 
         require(token.balanceOf(msg.sender) >= 0);  // todo
 
-        require(sumOfArray(_amounts) == 10000);
         _vote(_registryName, _candidates, _amounts);
     }
 
