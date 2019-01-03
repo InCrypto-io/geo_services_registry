@@ -108,8 +108,8 @@ contract GeoServiceRegistry {
         uint256[] _amounts)
     public
     {
-        require(deposit[msg.sender] >= _amount); // todo
-
+        require(token.isLockupExpired(msg.sender));
+        require(deposit[msg.sender] > 0);
         require(sumOfArray(_amounts) == 10000);
         _vote(_registryName, _candidates, _amounts);
     }
@@ -130,9 +130,7 @@ contract GeoServiceRegistry {
     public
     {
         require(!token.isLockupExpired(msg.sender));
-
-        require(token.balanceOf(msg.sender) >= 0);  // todo
-
+        require(token.balanceOf(msg.sender) >= 0);
         _vote(_registryName, _candidates, _amounts);
     }
 
@@ -145,10 +143,8 @@ contract GeoServiceRegistry {
         string _registryName)
     public
     {
+        require(token.isLockupExpired(msg.sender));
         require(deposit[msg.sender] > 0);
-
-        require(deposit[msg.sender] >= _amount); // todo
-
         _voteForNewRegistry(_registryName);
     }
 
@@ -163,9 +159,7 @@ contract GeoServiceRegistry {
     public
     {
         require(!token.isLockupExpired(msg.sender));
-
-        require(token.balanceOf(msg.sender) >= 0);  // todo
-
+        require(token.balanceOf(msg.sender) >= 0);
         _voteForNewRegistry(_registryName);
     }
 
