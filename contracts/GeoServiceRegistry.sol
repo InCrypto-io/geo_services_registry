@@ -24,10 +24,9 @@ contract GeoServiceRegistry {
     /* EVENTS
     */
 
-    event VoteForNewRegistry(string _name, uint256 _amount);
+    event Deposit(address _voter, uint256 _fullSize);
     event NewRegistry(string _name);
     event Vote(string _name, address _candidate, uint256 _amount);
-    event CancelVote(string _name, address _candidate, uint256 _amount);
     event Withdrawal(address _voter, uint256 _amountWithdraw);
 
     /* MODIFIERS
