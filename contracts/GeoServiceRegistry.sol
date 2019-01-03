@@ -202,8 +202,8 @@ contract GeoServiceRegistry {
         uint _amount)
     public
     {
-        require(deposit[msg.sender] >= _amount);
-        token.transfer(msg.sender, deposit[msg.sender]);
+        require(deposit[msg.sender] >= _amount && _amount > 0);
+        token.transfer(msg.sender, _amount);
         deposit[msg.sender] = deposit[msg.sender].sub(_amount);
         emit Withdrawal(msg.sender, _amount);
     }
