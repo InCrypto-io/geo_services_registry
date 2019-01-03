@@ -162,39 +162,6 @@ contract GeoServiceRegistry {
     }
 
     /**
-    * @dev Used after lockup period.
-    * Sender must approve tokens for deposit to contract address.
-    * Check size of deposit an increase if need.
-    * @param _amount Target level of deposit.
-    */
-    function _checkOrReplenishDeposit(
-        uint256 _amount)
-    private
-    {
-        require(token.isLockupExpired(msg.sender));
-        if (deposit[msg.sender] < _amount) {
-            uint256 additionAmount = _amount.sub(deposit[msg.sender]);
-            deposit[msg.sender] = deposit[msg.sender].add(additionAmount);
-            token.transferFrom(msg.sender, address(this), additionAmount);
-        }
-        require(deposit[msg.sender] >= _amount);
-    }
-
-    /**
-    * @dev Used in lockup period.
-    * Compare balance of address corresponding sender with target value.
-    * @param _amount Require minimum tokens in GEOToken.
-    */
-    function _checkSolvencyInLockupPeriod(
-        uint256 _amount)
-    view
-    private
-    {
-        require(!token.isLockupExpired(msg.sender));
-        require(token.balanceOf(msg.sender) >= _amount);
-    }
-
-    /**
     * @dev Transfer tokens back to deposit creator.
     * @param _amount Withdraw part or full deposit.
     */
