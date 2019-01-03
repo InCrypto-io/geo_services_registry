@@ -240,4 +240,22 @@ contract GeoServiceRegistry {
         return amount;
     }
 
+    function makeDeposit(
+        uint256 _additionAmount)
+    public
+    {
+        require(token.isLockupExpired(msg.sender));
+        deposit[msg.sender] = deposit[msg.sender].add(_additionAmount);
+        token.transferFrom(msg.sender, address(this), _additionAmount);
+        emit Deposit(msg.sender, deposit[msg.sender]);
+    }
+
+    function setVoteWeightInLockupPeriod(
+        uint256 _newAmount)
+    public
+    {
+        require(!token.isLockupExpired(msg.sender));
+        require(token.balanceOf(msg.sender) >= _newAmount);
+        emit Deposit(msg.sender, _newAmount);
+    }
 }
