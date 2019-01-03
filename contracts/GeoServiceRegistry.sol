@@ -109,7 +109,6 @@ contract GeoServiceRegistry {
     {
         require(token.isLockupExpired(msg.sender));
         require(deposit[msg.sender] > 0);
-        require(sumOfArray(_amounts) == 10000);
         _vote(_registryName, _candidates, _amounts);
     }
 
