@@ -28,8 +28,11 @@ class GeoServiceRegistry:
             abi=contract_interface['abi'],
         )
 
+    def is_registry_exist(self, registry_name):
+        return self.contract.functions.isRegistryExist(registry_name).call()
+
     def test(self):
         reg_name = "provider"
-        print("isRegistryExist {} - {}".format(reg_name, self.contract.functions.isRegistryExist(reg_name).call()))
+        print("isRegistryExist {} - {}".format(reg_name, self.is_registry_exist(reg_name)))
         reg_name = "gggggggggg"
-        print("isRegistryExist {} - {}".format(reg_name, self.contract.functions.isRegistryExist(reg_name).call()))
+        print("isRegistryExist {} - {}".format(reg_name, self.is_registry_exist(reg_name)))
