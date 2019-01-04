@@ -15,7 +15,7 @@ class GeoServiceRegistry:
             abi=contract_interface['abi'],
         )
 
-        if (len(connection.get_accounts()) > 0):
+        if len(connection.get_accounts()) > 0:
             self.account = connection.get_accounts()[0]
         else:
             self.account = ""

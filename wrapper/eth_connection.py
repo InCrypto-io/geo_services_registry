@@ -7,14 +7,14 @@ class EthConnection:
 
         assert len(provider) > 0
 
-        if ("http" in provider.lower()):
+        if "http" in provider.lower():
             self.w3 = Web3(Web3.HTTPProvider(provider))
         else:
             self.w3 = Web3(Web3.WebsocketProvider(provider))
 
         print("connected to {}: {}".format(provider, self.w3.isConnected()))
 
-        if (len(self.w3.eth.accounts) > 0):
+        if len(self.w3.eth.accounts) > 0:
             self.w3.eth.defaultAccount = self.w3.eth.accounts[0]
 
     def get_web3(self):
