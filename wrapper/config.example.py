@@ -1,0 +1,5 @@
+
+
+WEB3_PROVIDER = "HTTPS://127.0.0.1:7545"
+GeoServiceRegistry_Address = "0x2011Cc6E9B69b6336680F0Ee8A6744b9ae87Af0C"
+GEOToken_Address = "0xcd99d3da679db4f1a605076028ddfd9b79433918"
