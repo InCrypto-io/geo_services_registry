@@ -59,4 +59,10 @@ class Test:
             print("\tExpected revert. Fail!!!")
 
         print("Try vote for candidate")
-        self.gsr.vote_service_lockup(reg_name, [owner], [10000])
+        tx_hash = self.gsr.vote_service_lockup(reg_name, [owner, user1], [5000, 5000])
+        print("\tresult transaction hash {}".format(tx_hash.hex()))
+
+        print("Try get events:")
+        tx_receipt = self.eth_connection.get_web3().eth.getTransactionReceipt(tx_hash)
+        rich_logs = self.gsr.contract.events.Vote().processReceipt(tx_receipt)
+        print("\tlogs", rich_logs)

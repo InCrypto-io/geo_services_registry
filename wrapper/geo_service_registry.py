@@ -27,29 +27,29 @@ class GeoServiceRegistry:
         return self.contract.functions.isRegistryExist(registry_name).call()
 
     def withdraw(self, amount):
-        self.contract.functions.withdraw(amount) \
+        return self.contract.functions.withdraw(amount) \
             .transact({'from': self.account, 'gas': 100000})
 
     def vote_service_for_new_registry(self, registry_name):
-        self.contract.functions.voteServiceForNewRegistry(registry_name) \
+        return self.contract.functions.voteServiceForNewRegistry(registry_name) \
             .transact({'from': self.account, 'gas': 100000})
 
     def vote_service_lockup_for_new_registry(self, registry_name):
-        self.contract.functions.voteServiceLockupForNewRegistry(registry_name) \
+        return self.contract.functions.voteServiceLockupForNewRegistry(registry_name) \
             .transact({'from': self.account, 'gas': 100000})
 
     def vote_service(self, registry_name, _candidates, _amounts):
-        self.contract.functions.voteService(registry_name, _candidates, _amounts) \
+        return self.contract.functions.voteService(registry_name, _candidates, _amounts) \
             .transact({'from': self.account, 'gas': 100000})
 
     def vote_service_lockup(self, registry_name, _candidates, _amounts):
-        self.contract.functions.voteServiceLockup(registry_name, _candidates, _amounts) \
+        return self.contract.functions.voteServiceLockup(registry_name, _candidates, _amounts) \
             .transact({'from': self.account, 'gas': 100000})
 
     def set_vote_weight_in_lockup_period(self, new_amount):
-        self.contract.functions.setVoteWeightInLockupPeriod(new_amount) \
+        return self.contract.functions.setVoteWeightInLockupPeriod(new_amount) \
             .transact({'from': self.account, 'gas': 100000})
 
     def make_deposit(self, addition_amount):
-        self.contract.functions.makeDeposit(addition_amount) \
+        return self.contract.functions.makeDeposit(addition_amount) \
             .transact({'from': self.account, 'gas': 100000})
