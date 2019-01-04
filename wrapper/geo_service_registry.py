@@ -18,9 +18,3 @@ class GeoServiceRegistry:
 
     def is_registry_exist(self, registry_name):
         return self.contract.functions.isRegistryExist(registry_name).call()
-
-    def test(self):
-        reg_name = "provider"
-        print("isRegistryExist {} - {}".format(reg_name, self.is_registry_exist(reg_name)))
-        reg_name = "not_exist_registry"
-        print("isRegistryExist {} - {}".format(reg_name, self.is_registry_exist(reg_name)))

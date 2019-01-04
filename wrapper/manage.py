@@ -1,7 +1,6 @@
 #!/usr/bin/python
 import config
-from geo_service_registry import GeoServiceRegistry
-from eth_connection import EthConnection
+from test import Test
 
 if __name__ == "__main__":
     print("+++++++++++Manage++++++++++++")
@@ -9,9 +8,7 @@ if __name__ == "__main__":
     print("GEOSERVICEREGISTRY_ADDRESS", config.GEOSERVICEREGISTRY_ADDRESS)
     print("GEOTOKEN_ADDRESS", config.GEOTOKEN_ADDRESS)
 
-    eth_connection = EthConnection(config.WEB3_PROVIDER)
-
-    gsr = GeoServiceRegistry(eth_connection, config.GEOSERVICEREGISTRY_ADDRESS)
-    gsr.test()
+    test = Test()
+    test.test()
 
     print("+++++++++Done!+++++++++++++++++++")
