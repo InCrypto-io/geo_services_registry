@@ -47,3 +47,11 @@ class Test:
         print("Add registry")
         self.gsr.vote_service_lockup_for_new_registry(reg_name)
         print("isRegistryExist {} - {}".format(reg_name, self.gsr.is_registry_exist(reg_name)))
+
+        print("Try catch revert:")
+        try:
+            self.gsr.vote_service_lockup_for_new_registry("provider")
+        except:
+            print("\tOk!!!")
+        else:
+            print("\tExpected revert. Fail!!!")
