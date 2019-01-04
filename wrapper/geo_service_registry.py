@@ -16,29 +16,34 @@ class GeoServiceRegistry:
             abi=contract_interface['abi'],
         )
 
+        if (len(connection.get_accounts()) > 0):
+            self.account = connection.get_accounts()[0]
+        else:
+            self.account = ""
+
+    def set_account(self, account):
+        self.account = account
+
     def is_registry_exist(self, registry_name):
         return self.contract.functions.isRegistryExist(registry_name).call()
 
-    def withdraw(amount):
-        pass
+    def withdraw(self, amount):
+        self.contract.functions.withdraw(amount).transact({'from': self.account, 'gas': 100000})
 
-    def vote_service_lockup_for_new_registry(registry_name):
-        pass
+    def vote_service_for_new_registry(self, registry_name):
+        self.contract.functions.voteServiceForNewRegistry(registry_name).transact({'from': self.account, 'gas': 100000})
 
-    def vote_service_lockup(registry_name, _candidates, _amounts):
-        pass
+    def vote_service_lockup_for_new_registry(self, registry_name):
+        self.contract.functions.voteServiceLockupForNewRegistry(registry_name).transact({'from': self.account, 'gas': 100000})
 
-    def vote_service_for_new_registry(registry_name):
-        pass
+    def vote_service(self, registry_name, _candidates, _amounts):
+        self.contract.functions.voteService(registry_name, _candidates, _amounts).transact({'from': self.account, 'gas': 100000})
 
-    def vote_service(registry_name, _candidates, _amounts):
-        pass
+    def vote_service_lockup(self, registry_name, _candidates, _amounts):
+        self.contract.functions.voteServiceLockup(registry_name, _candidates, _amounts).transact({'from': self.account, 'gas': 100000})
 
-    def sum_of_array(array):
-        pass
+    def set_vote_weight_in_lockup_period(self, new_amount):
+        self.contract.functions.setVoteWeightInLockupPeriod(new_amount).transact({'from': self.account, 'gas': 100000})
 
-    def set_vote_weight_in_lockup_period(new_amount):
-        pass
-
-    def make_deposit(addition_amount):
-        pass
+    def make_deposit(self, addition_amount):
+        self.contract.functions.makeDeposit(addition_amount).transact({'from': self.account, 'gas': 100000})
