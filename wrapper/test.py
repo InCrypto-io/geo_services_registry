@@ -55,3 +55,6 @@ class Test:
             print("\tOk!!!")
         else:
             print("\tExpected revert. Fail!!!")
+
+        print("Try vote for candidate")
+        self.gsr.vote_service_lockup(reg_name, [owner], [10000])
