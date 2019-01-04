@@ -31,6 +31,8 @@ class Test:
         self.geo.transfer(user1, 123123)
         self.geo.transfer(user2, 123123)
 
+        print("Balance of {}: {} tokens".format(user1, self.geo.balance_of(user1)))
+
         print("Request for set vote size")
         self.gsr.set_account(user1)
         self.gsr.set_vote_weight_in_lockup_period(10000)
