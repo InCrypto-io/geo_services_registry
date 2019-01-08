@@ -2,6 +2,7 @@ import config
 from eth_connection import EthConnection
 from geo_service_registry import GeoServiceRegistry
 from geo_token import GEOToken
+import time
 
 
 class Test:
@@ -63,6 +64,11 @@ class Test:
         print("\tresult transaction hash {}".format(tx_hash.hex()))
 
         print("Try get events:")
-        tx_receipt = self.eth_connection.get_web3().eth.getTransactionReceipt(tx_hash)
-        rich_logs = self.gsr.contract.events.Vote().processReceipt(tx_receipt)
-        print("\tlogs", rich_logs)
+        while True:
+            tx_receipt = self.eth_connection.get_web3().eth.getTransactionReceipt(tx_hash)
+            if tx_receipt:
+                break
+            print("Wait for include transaction in block")
+            time.sleep(1)
+        events_list = self.gsr.contract.events.Vote().processReceipt(tx_receipt)
+        print("\tlogs", events_list)
