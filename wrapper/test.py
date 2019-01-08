@@ -64,11 +64,8 @@ class Test:
         print("\tresult transaction hash {}".format(tx_hash.hex()))
 
         print("Try get events:")
-        while True:
-            tx_receipt = self.eth_connection.get_web3().eth.getTransactionReceipt(tx_hash)
-            if tx_receipt:
-                break
-            print("Wait for include transaction in block")
-            time.sleep(1)
+        tx_receipt = self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)
+
         events_list = self.gsr.contract.events.Vote().processReceipt(tx_receipt)
         print("\tlogs", events_list)
+
