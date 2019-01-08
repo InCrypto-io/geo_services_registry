@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.11",
-    "pify": "^4.0.1"
+    "pify": "^4.0.1",
+    "truffle-hdwallet-provider": "^1.0.2"
   }
 }
