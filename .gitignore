@@ -2,3 +2,6 @@ node_modules/
 build/
 dist/
 .idea/
+.env
+*.pyc
+/wrapper/config.py
