@@ -7,7 +7,7 @@ import time
 
 class Test:
     def __init__(self):
-        self.eth_connection = EthConnection(config.WEB3_PROVIDER)
+        self.eth_connection = EthConnection(config.WEB3_PROVIDER, config.MNEMONIC)
         self.gsr = GeoServiceRegistry(self.eth_connection, config.GEOSERVICEREGISTRY_ADDRESS)
         self.geo = GEOToken(self.eth_connection, config.GEOTOKEN_ADDRESS)
 
@@ -28,14 +28,14 @@ class Test:
         user2 = accounts[2]
 
         print("Transfer token to users")
-        self.geo.set_account(owner)
+        self.geo.set_sender(owner)
         self.geo.transfer(user1, 123123)
         self.geo.transfer(user2, 123123)
 
         print("Balance of {}: {} tokens".format(user1, self.geo.balance_of(user1)))
 
         print("Request for set vote size")
-        self.gsr.set_account(user1)
+        self.gsr.set_sender(user1)
         self.gsr.set_vote_weight_in_lockup_period(10000)
 
         print("Create registry")
