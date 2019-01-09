@@ -4,7 +4,6 @@ from geo_service_registry import GeoServiceRegistry
 from geo_token import GEOToken
 import time
 
-
 class Test:
     def __init__(self):
         self.eth_connection = EthConnection(config.WEB3_PROVIDER, config.MNEMONIC)
