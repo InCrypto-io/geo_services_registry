@@ -15,6 +15,9 @@ class Test:
         self.test_gsr()
 
     def test_gsr(self):
+
+        event_filter = self.gsr.contract.events.Vote.createFilter(fromBlock="latest")
+
         print("Test gsr isRegistryExist")
         reg_name = "provider"
         print("isRegistryExist {} - {}".format(reg_name, self.gsr.is_registry_exist(reg_name)))
@@ -69,3 +72,7 @@ class Test:
         events_list = self.gsr.contract.events.Vote().processReceipt(tx_receipt)
         print("\tlogs", events_list)
 
+        while True:
+            for event in event_filter.get_new_entries():
+                print(event)
+            time.sleep(5)
