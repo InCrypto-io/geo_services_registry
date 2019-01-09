@@ -32,6 +32,8 @@ class EthConnection:
             except Exception:
                 self.accounts = []
 
+        self.nonces = {}
+
     def get_web3(self):
         return self.w3
 
@@ -39,6 +41,13 @@ class EthConnection:
         if len(self.accounts):
             return self.accounts
         return self.w3.eth.accounts
+
+    def get_nonce(self, address):
+        if address in self.nonces.keys():
+            self.nonces[address] = self.nonces[address] + 1
+            return self.nonces[address]
+        self.nonces[address] = self.w3.eth.getTransactionCount(address, "pending")
+        return self.nonces[address]
 
     def signAndSendTransaction(self, address, raw_transaction):
         assert address in self.get_accounts()
