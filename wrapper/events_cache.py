@@ -6,7 +6,7 @@ class EventCache:
         self.gsr_address = gsr_address
         self.client = MongoClient(db_url)
         self.db = self.client['events' + str(gsr_address)]
-        self.collection = self.db["events"]
+        self.events_collection = self.db["events"]
 
     def collect(self):
         pass
@@ -15,7 +15,7 @@ class EventCache:
         pass
 
     def write_event(self, event):
-        pass
+        self.events_collection.insert_one(event)
 
     def erase_all(self, from_block_number=0):
         pass
