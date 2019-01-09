@@ -54,3 +54,6 @@ class EthConnection:
         private_key = self.private_keys[self.get_accounts().index(address)]
         signed_transaction = self.w3.eth.account.signTransaction(raw_transaction, private_key)
         return self.w3.eth.sendRawTransaction(signed_transaction.rawTransaction)
+
+    def get_gas_price(self):
+        return int(self.w3.eth.gasPrice)
