@@ -77,7 +77,7 @@ class Test:
         #     time.sleep(5)
 
     def test_events_cache(self):
-        event_cache = EventCache()
+        event_cache = EventCache(self.eth_connection, config.GEOSERVICEREGISTRY_ADDRESS, config.DB_URL)
         event_cache.collect()
 
         accounts = self.eth_connection.get_accounts()
