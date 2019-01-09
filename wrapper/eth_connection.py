@@ -39,3 +39,10 @@ class EthConnection:
         if len(self.accounts):
             return self.accounts
         return self.w3.eth.accounts
+
+    def signAndSendTransaction(self, address, raw_transaction):
+        assert address in self.get_accounts()
+        private_key = self.private_keys[self.get_accounts().index(address)]
+        print(private_key)
+        signed_transaction = self.w3.eth.account.signTransaction(raw_transaction, private_key)
+        return self.w3.eth.sendRawTransaction(signed_transaction.rawTransaction)
