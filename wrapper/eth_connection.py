@@ -28,7 +28,7 @@ class EthConnection:
                     pub_key = priv_key.public_key
                     address = pub_key.address()
                     self.accounts.append(self.w3.toChecksumAddress(address))
-                    self.private_keys.append(priv_key.to_hex())
+                    self.private_keys.append(priv_key._key.to_hex())
             except Exception:
                 self.accounts = []
 
