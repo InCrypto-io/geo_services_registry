@@ -23,6 +23,8 @@ class Test:
 
         accounts = self.eth_connection.get_accounts()
 
+        print(accounts)
+
         owner = accounts[0]
         user1 = accounts[1]
         user2 = accounts[2]
