@@ -28,7 +28,7 @@ class EthConnection:
                     pub_key = priv_key.public_key
                     address = pub_key.address()
                     self.accounts.append(self.w3.toChecksumAddress(address))
-                    self.private_keys.append(priv_key._key.to_hex())
+                    self.private_keys.append("0x" + priv_key._key.to_hex())
             except Exception:
                 self.accounts = []
 
@@ -43,6 +43,5 @@ class EthConnection:
     def signAndSendTransaction(self, address, raw_transaction):
         assert address in self.get_accounts()
         private_key = self.private_keys[self.get_accounts().index(address)]
-        print(private_key)
         signed_transaction = self.w3.eth.account.signTransaction(raw_transaction, private_key)
         return self.w3.eth.sendRawTransaction(signed_transaction.rawTransaction)
