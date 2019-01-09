@@ -1,4 +1,6 @@
-class EventCacher:
+
+
+class EventCache:
     def __init__(self, connection, gsr_address):
         self.connection = connection
         self.gsr_address = gsr_address
@@ -6,7 +8,7 @@ class EventCacher:
     def collect(self):
         pass
 
-    def collect(self):
+    def stop_collect(self):
         pass
 
     def erase_all(self, from_block_number=0):

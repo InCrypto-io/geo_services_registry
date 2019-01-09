@@ -2,7 +2,9 @@ import config
 from eth_connection import EthConnection
 from geo_service_registry import GeoServiceRegistry
 from geo_token import GEOToken
+from events_cache import EventCache
 import time
+
 
 class Test:
     def __init__(self):
@@ -73,3 +75,15 @@ class Test:
         #     for event in event_filter.get_new_entries():
         #         print(event)
         #     time.sleep(5)
+
+    def test_events_cache(self):
+        event_cache = EventCache()
+        event_cache.collect()
+
+        accounts = self.eth_connection.get_accounts()
+        owner = accounts[0]
+        user1 = accounts[1]
+        while True:
+            tx_hash = self.gsr.vote_service_lockup("provider", [owner, user1], [5000, 5000])
+            self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)
+            time.sleep(10)
