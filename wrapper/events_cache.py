@@ -1,17 +1,29 @@
+import pymongo
 from pymongo import MongoClient
 import time
 from threading import Thread
 
 
 class EventCache:
-    def __init__(self, connection, gsr, db_url, confirmation_count):
+    def __init__(self, connection, gsr, gsr_created_at_block, db_url, confirmation_count):
         self.connection = connection
         self.gsr = gsr
         self.confirmation_count = confirmation_count
         self.client = MongoClient(db_url)
         self.db = self.client['events']
         self.events_collection = self.db["events"]
+        self.events_collection.create_index([
+            ("blockNumber", pymongo.ASCENDING),
+            ("logIndex", pymongo.ASCENDING)
+        ], unique=True)
         self.stop_collect_events = True
+
+        self.last_processed_block = gsr_created_at_block
+        if self.get_events_count():
+            try:
+                self.last_processed_block = int(self.get_event(self.get_events_count() - 1)["blockNumber"])
+            except:
+                print("Can't determinate last processed block")
 
     def collect(self):
         self.stop_collect_events = False
@@ -37,7 +49,7 @@ class EventCache:
         pass
 
     def get_events_count(self):
-        pass
+        return 0
 
     def get_event(self, index):
         pass

@@ -78,7 +78,12 @@ class Test:
 
     def test_events_cache(self):
         print("Test event cache")
-        event_cache = EventCache(self.eth_connection, self.gsr, config.DB_URL, config.CONFIRMATION_COUNT)
+        event_cache = EventCache(
+            self.eth_connection,
+            self.gsr,
+            config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK,
+            config.DB_URL,
+            config.CONFIRMATION_COUNT)
         event_cache.collect()
 
         accounts = self.eth_connection.get_accounts()
