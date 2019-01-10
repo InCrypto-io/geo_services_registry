@@ -85,6 +85,6 @@ class Test:
         owner = accounts[0]
         user1 = accounts[1]
         while True:
-            tx_hash = self.gsr.vote_service_lockup("provider", [owner, user1], [5000, 5000])
-            self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)
+            print("push new event, vote_service_lockup")
+            self.gsr.vote_service_lockup("provider", [owner, user1], [5000, 5000])
             time.sleep(10)
