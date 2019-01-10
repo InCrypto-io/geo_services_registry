@@ -26,7 +26,6 @@ class EventCache:
             except:
                 print("Can't determinate last processed block")
 
-
     def collect(self):
         self.stop_collect_events = False
         worker = Thread(target=self.process_events, daemon=True)
@@ -76,10 +75,10 @@ class EventCache:
         pass
 
     def get_events_count(self):
-        return 0
+        return self.events_collection.count()
 
     def get_event(self, index):
-        pass
+        return self.events_collection.find().sort(["blockNumber", "logIndex"]).skip(index).limit(1)
 
     def get_events_in_range(self, block_start, block_end):
         pass
@@ -92,4 +91,3 @@ class EventCache:
                 break
             except pymongo.errors.ServerSelectionTimeoutError:
                 print("Can't connect to mongodb server")
-
