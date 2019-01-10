@@ -10,19 +10,13 @@ class EventCache:
         self.gsr = gsr
         self.confirmation_count = confirmation_count
         self.client = MongoClient(db_url)
-        while True:
-            try:
-                print("Check connection to mongodb server")
-                print(self.client.server_info())
-                break
-            except pymongo.errors.ServerSelectionTimeoutError:
-                print("Can't connect to mongodb:", db_url)
-        self.db = self.client['events_rtre1']
+        self.db = self.client['events_1']
         self.events_collection = self.db["events_collection"]
-        # self.events_collection.create_index([
-        #     ("blockNumber", pymongo.ASCENDING),
-        #     ("logIndex", pymongo.ASCENDING)
-        # ], unique=True)
+        self.check_and_wait_connection_to_db()
+        self.events_collection.create_index([
+            ("blockNumber", pymongo.ASCENDING),
+            ("logIndex", pymongo.ASCENDING)
+        ], unique=True)
         self.stop_collect_events = True
 
         self.last_processed_block = gsr_created_at_block
@@ -31,6 +25,7 @@ class EventCache:
                 self.last_processed_block = int(self.get_event(self.get_events_count() - 1)["blockNumber"])
             except:
                 print("Can't determinate last processed block")
+
 
     def collect(self):
         self.stop_collect_events = False
@@ -75,11 +70,7 @@ class EventCache:
             'blockHash': event['blockHash'],
             'blockNumber': event['blockNumber']
         }
-        # self.events_collection.insert_one(data)
-        self.events_collection.insert_one({
-            "sdfsdf": "dfgdfg",
-            "fghfgjghf": "gfhgfhf"
-        })
+        self.events_collection.insert_one(data)
 
     def erase_all(self, from_block_number=0):
         pass
@@ -92,3 +83,13 @@ class EventCache:
 
     def get_events_in_range(self, block_start, block_end):
         pass
+
+    def check_and_wait_connection_to_db(self):
+        while True:
+            try:
+                print("Check connection to mongodb server")
+                print(self.client.server_info())
+                break
+            except pymongo.errors.ServerSelectionTimeoutError:
+                print("Can't connect to mongodb server")
+
