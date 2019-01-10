@@ -38,13 +38,13 @@ class EventCache:
                 print("exist new block", last_block_number)
                 while self.last_processed_block + self.confirmation_count <= last_block_number:
                     print("try get event for block:", self.last_processed_block + 1)
-                    # todo for all events in contract.events
-                    event_filter = self.gsr.contract.eventFilter("Vote", {'fromBlock': self.last_processed_block + 1,
-                                                                          'toBlock': self.last_processed_block + 1})
-                    event_logs = event_filter.get_all_entries()
-                    for event in event_logs:
-                        self.write_event(event)
-                    self.connection.get_web3().eth.uninstallFilter(event_filter.filter_id)
+                    for event_name in self.gsr.get_events_list():
+                        event_filter = self.gsr.contract.eventFilter(event_name,
+                                                                     {'fromBlock': self.last_processed_block + 1,
+                                                                      'toBlock': self.last_processed_block + 1})
+                        for event in event_filter.get_all_entries():
+                            self.write_event(event)
+                        self.connection.get_web3().eth.uninstallFilter(event_filter.filter_id)
                     self.last_processed_block = self.last_processed_block + 1
             time.sleep(10)
 
