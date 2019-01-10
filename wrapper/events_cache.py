@@ -10,8 +10,15 @@ class EventCache:
         self.gsr = gsr
         self.confirmation_count = confirmation_count
         self.client = MongoClient(db_url)
-        self.db = self.client['events_123']
-        self.events_collection = self.db["events_collections"]
+        while True:
+            try:
+                self.client.is_mongos()
+            except pymongo.errors.ServerSelectionTimeoutError:
+                print("Can't connect to mongo db:", db_url)
+            finally:
+                break
+        self.db = self.client['events_rtre1']
+        self.events_collection = self.db["events_collection"]
         # self.events_collection.create_index([
         #     ("blockNumber", pymongo.ASCENDING),
         #     ("logIndex", pymongo.ASCENDING)
@@ -55,7 +62,24 @@ class EventCache:
 
     def write_event(self, event):
         print("write event", event)
-        # self.events_collection.insert_one(event)
+        for f in ["event", "logIndex", "transactionIndex", "transactionHash", "address", "blockHash", "blockNumber"]:
+            if f not in event:
+                print("Event not contains expected fields")
+                break
+        data = {
+            'event': event['event'],
+            'logIndex': event['logIndex'],
+            'transactionIndex': event['transactionIndex'],
+            'transactionHash': event['transactionHash'],
+            'address': event['address'],
+            'blockHash': event['blockHash'],
+            'blockNumber': event['blockNumber']
+        }
+        # self.events_collection.insert_one(data)
+        self.events_collection.insert_one({
+            "sdfsdf": "dfgdfg",
+            "fghfgjghf": "gfhgfhf"
+        })
 
     def erase_all(self, from_block_number=0):
         pass
