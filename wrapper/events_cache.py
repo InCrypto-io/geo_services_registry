@@ -23,11 +23,14 @@ class EventCache:
             "address": self.gsr_address,
         })
         print("created filter id", event_filter.filter_id)
+
         while not self.stop_collect_events:
             print("check events")
             for event in event_filter.get_new_entries():
                 self.write_event(event)
             time.sleep(5)
+
+        self.connection.get_web3().eth.uninstallFilter(event_filter.filter_id)
 
     def stop_collect(self):
         self.stop_collect_events = True
