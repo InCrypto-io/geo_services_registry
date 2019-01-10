@@ -12,11 +12,11 @@ class EventCache:
         self.client = MongoClient(db_url)
         while True:
             try:
-                self.client.is_mongos()
-            except pymongo.errors.ServerSelectionTimeoutError:
-                print("Can't connect to mongo db:", db_url)
-            finally:
+                print("Check connection to mongodb server")
+                print(self.client.server_info())
                 break
+            except pymongo.errors.ServerSelectionTimeoutError:
+                print("Can't connect to mongodb:", db_url)
         self.db = self.client['events_rtre1']
         self.events_collection = self.db["events_collection"]
         # self.events_collection.create_index([
