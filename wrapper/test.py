@@ -77,6 +77,7 @@ class Test:
         #     time.sleep(5)
 
     def test_events_cache(self):
+        print("Test event cache")
         event_cache = EventCache(self.eth_connection, config.GEOSERVICEREGISTRY_ADDRESS, config.DB_URL, config.CONFIRMATION_COUNT)
         event_cache.collect()
 

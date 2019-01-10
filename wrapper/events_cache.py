@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 
+
 class EventCache:
     def __init__(self, connection, gsr_address, db_url, confirmation_count):
         self.connection = connection
