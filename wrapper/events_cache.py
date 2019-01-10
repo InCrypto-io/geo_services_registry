@@ -19,9 +19,12 @@ class EventCache:
         worker.start()
 
     def process_events(self):
-        event_filter = self.connection.get_web3().eth.filter({"address": self.gsr_address, "fromBlock": 0})
+        event_filter = self.connection.get_web3().eth.filter({
+            "address": self.gsr_address,
+        })
         print("created filter id", event_filter.filter_id)
         while not self.stop_collect_events:
+            print("check events")
             for event in event_filter.get_new_entries():
                 self.write_event(event)
             time.sleep(5)
@@ -31,7 +34,7 @@ class EventCache:
 
     def write_event(self, event):
         print("write event", event)
-        self.events_collection.insert_one(event)
+        # self.events_collection.insert_one(event)
 
     def erase_all(self, from_block_number=0):
         pass

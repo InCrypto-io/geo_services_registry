@@ -84,7 +84,9 @@ class Test:
         accounts = self.eth_connection.get_accounts()
         owner = accounts[0]
         user1 = accounts[1]
-        while True:
+        for _ in range(20):
             print("push new event, vote_service_lockup")
-            self.gsr.vote_service_lockup("provider", [owner, user1], [5000, 5000])
+            self.gsr.set_sender(user1)
+            tx = self.gsr.vote_service_lockup("provider", [owner, user1], [5000, 5000])
+            print("tx", str(tx))
             time.sleep(10)
