@@ -4,7 +4,7 @@ from threading import Thread
 
 
 class EventCache:
-    def __init__(self, connection, gsr_address, db_url, confirmation_count):
+    def __init__(self, connection, gsr_address, db_url, confirmation_count, gsr):
         self.connection = connection
         self.gsr_address = gsr_address
         self.confirmation_count = confirmation_count
@@ -13,6 +13,8 @@ class EventCache:
         self.events_collection = self.db["events"]
         self.stop_collect_events = True
 
+        self.gsr = gsr
+
     def collect(self):
         self.stop_collect_events = False
         worker = Thread(target=self.process_events, daemon=True)
@@ -20,9 +22,26 @@ class EventCache:
 
     def process_events(self):
         event_filter = self.connection.get_web3().eth.filter({
+            "fromBlock": 0,
+            'toBlock': 1000100000000,
             "address": self.gsr_address,
         })
+
+        # event_filter = self.gsr.contract.events.Vote.createFilter(fromBlock=0)
+        # event_filter = self.connection.get_web3().eth.getFilterLogs(event_filter.filter_id)
+
+        filter_ = self.connection.get_web3().eth.filter({})
+
+        # logs = self.connection.get_web3().eth.getFilterLogs(filter_.filter_id)
+        # for log in logs:
+        #     print("log", log)
+
         print("created filter id", event_filter.filter_id)
+
+        event_filterdfghdfgd = self.gsr.contract.eventFilter("Vote", {'fromBlock': 3660400, 'toBlock': 3660500})
+        print("created filter id", event_filterdfghdfgd.filter_id)
+        event_logs = event_filterdfghdfgd.get_all_entries()
+        print("event_logs", event_logs)
 
         while not self.stop_collect_events:
             print("check events")

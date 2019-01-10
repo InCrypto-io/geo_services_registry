@@ -78,7 +78,7 @@ class Test:
 
     def test_events_cache(self):
         print("Test event cache")
-        event_cache = EventCache(self.eth_connection, config.GEOSERVICEREGISTRY_ADDRESS, config.DB_URL, config.CONFIRMATION_COUNT)
+        event_cache = EventCache(self.eth_connection, config.GEOSERVICEREGISTRY_ADDRESS, config.DB_URL, config.CONFIRMATION_COUNT, self.gsr)
         event_cache.collect()
 
         accounts = self.eth_connection.get_accounts()
@@ -87,6 +87,7 @@ class Test:
         for _ in range(20):
             print("push new event, vote_service_lockup")
             self.gsr.set_sender(user1)
-            tx = self.gsr.vote_service_lockup("provider", [owner, user1], [5000, 5000])
-            print("tx", str(tx))
+            self.gsr.vote_service_lockup("provider", [owner, user1], [5000, 5000])
             time.sleep(10)
+
+        event_cache.stop_collect()
