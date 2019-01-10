@@ -10,12 +10,12 @@ class EventCache:
         self.gsr = gsr
         self.confirmation_count = confirmation_count
         self.client = MongoClient(db_url)
-        self.db = self.client['events']
-        self.events_collection = self.db["events"]
-        self.events_collection.create_index([
-            ("blockNumber", pymongo.ASCENDING),
-            ("logIndex", pymongo.ASCENDING)
-        ], unique=True)
+        self.db = self.client['events_123']
+        self.events_collection = self.db["events_collections"]
+        # self.events_collection.create_index([
+        #     ("blockNumber", pymongo.ASCENDING),
+        #     ("logIndex", pymongo.ASCENDING)
+        # ], unique=True)
         self.stop_collect_events = True
 
         self.last_processed_block = gsr_created_at_block
@@ -31,12 +31,24 @@ class EventCache:
         worker.start()
 
     def process_events(self):
-        event_filter = self.gsr.contract.eventFilter("Vote", {'fromBlock': 3660400, 'toBlock': 3660500})
-        print("created filter id", event_filter.filter_id)
-        event_logs = event_filter.get_all_entries()
-        print("event_logs", event_logs)
+        new_block_filter = self.connection.get_web3().eth.filter('latest')
+        while not self.stop_collect_events:
+            for _ in new_block_filter.get_new_entries():
+                last_block_number = self.connection.get_web3().eth.blockNumber
+                print("exist new block", last_block_number)
+                while self.last_processed_block + self.confirmation_count <= last_block_number:
+                    print("try get event for block:", self.last_processed_block + 1)
+                    # todo for all events in contract.events
+                    event_filter = self.gsr.contract.eventFilter("Vote", {'fromBlock': self.last_processed_block + 1,
+                                                                          'toBlock': self.last_processed_block + 1})
+                    event_logs = event_filter.get_all_entries()
+                    for event in event_logs:
+                        self.write_event(event)
+                    self.connection.get_web3().eth.uninstallFilter(event_filter.filter_id)
+                    self.last_processed_block = self.last_processed_block + 1
+            time.sleep(10)
 
-        self.connection.get_web3().eth.uninstallFilter(event_filter.filter_id)
+        self.connection.get_web3().eth.uninstallFilter(new_block_filter.filter_id)
 
     def stop_collect(self):
         self.stop_collect_events = True
