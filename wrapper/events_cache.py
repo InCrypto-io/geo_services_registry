@@ -10,7 +10,7 @@ class EventCache:
         self.gsr = gsr
         self.confirmation_count = confirmation_count
         self.client = MongoClient(db_url)
-        self.db = self.client['events_1']
+        self.db = self.client['events_2']
         self.events_collection = self.db["events_collection"]
         self.check_and_wait_connection_to_db()
         self.events_collection.create_index([
@@ -22,7 +22,7 @@ class EventCache:
         self.last_processed_block = gsr_created_at_block
         if self.get_events_count():
             try:
-                self.last_processed_block = int(self.get_event(self.get_events_count() - 1)["blockNumber"])
+                self.last_processed_block = int(self.get_event(self.get_events_count() - 1)["blockNumber"]) - 1
             except:
                 print("Can't determinate last processed block")
 
@@ -69,7 +69,10 @@ class EventCache:
             'blockHash': event['blockHash'],
             'blockNumber': event['blockNumber']
         }
-        self.events_collection.insert_one(data)
+        try:
+            self.events_collection.insert_one(data)
+        except pymongo.errors.DuplicateKeyError:
+            pass
 
     def erase_all(self, from_block_number=0):
         pass
@@ -78,7 +81,11 @@ class EventCache:
         return self.events_collection.count()
 
     def get_event(self, index):
-        return self.events_collection.find().sort(["blockNumber", "logIndex"]).skip(index).limit(1)
+        cursor = self.events_collection.find({}).sort(
+            [("blockNumber", pymongo.ASCENDING), ("logIndex", pymongo.ASCENDING)]).skip(index).limit(1)
+        if cursor.count():
+            return cursor[0]
+        return {}
 
     def get_events_in_range(self, block_start, block_end):
         pass
