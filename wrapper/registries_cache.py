@@ -8,9 +8,13 @@ class RegistriesCache:
         self.event_cache = event_cache
         self.gsr_created_at_block = gsr_created_at_block
 
+        self.collection_name_prefix = "registry_"
+        self.temp_collection_name_prefix = "reg_temp_"
+        self.interval_for_preprocessed_blocks = 1000
+
         self.client = MongoClient(db_url)
         self.db = self.client['geo']
-        self.collection_name_prefix = "registry_"
+
         self.__remove_uncompleted_blocks()
 
     def update(self, wait_for_block_number=0):
@@ -21,9 +25,11 @@ class RegistriesCache:
 
         count_blocks = (self.event_cache.last_processed_block - self.gsr_created_at_block)
         last_processed_block = self.get_last_processed_block()
+        if last_processed_block < self.interval_for_preprocessed_blocks:
+            last_processed_block = self.interval_for_preprocessed_blocks
         while last_processed_block < count_blocks:
-            self.prepare(self.gsr_created_at_block + last_processed_block + 1000)
-            last_processed_block = last_processed_block + 1000
+            self.prepare(self.gsr_created_at_block + last_processed_block + self.interval_for_preprocessed_blocks)
+            last_processed_block = last_processed_block + self.interval_for_preprocessed_blocks
 
     def prepare(self, block_number):
         pass
@@ -45,12 +51,14 @@ class RegistriesCache:
 
     def get_last_processed_block(self):
         result = 0
-        for e in self.db.collection_names():
-            if self.collection_name_prefix in e:
-                number = int(e[len(self.collection_name_prefix)::])
+        for element in self.db.collection_names():
+            if self.collection_name_prefix in element:
+                number = int(element[len(self.collection_name_prefix)::])
                 if result < number:
                     result = number
         return result
 
     def __remove_uncompleted_blocks(self):
-        pass
+        for element in self.db.collection_names():
+            if self.temp_collection_name_prefix in element:
+                self.db[element].drop()
