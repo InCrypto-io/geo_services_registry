@@ -1,9 +1,27 @@
-class RegistriesCache:
-    def __init__(self):
-        pass
+import time
+import pymongo
+from pymongo import MongoClient
 
-    def update(self):
-        pass
+
+class RegistriesCache:
+    def __init__(self, event_cache, gsr_created_at_block, db_url):
+        self.event_cache = event_cache
+        self.gsr_created_at_block = gsr_created_at_block
+
+        self.client = MongoClient(db_url)
+        self.db = self.client['events_b6']
+
+    def update(self, wait_for_block_number=0):
+
+        if wait_for_block_number > 0:
+            while wait_for_block_number >= self.event_cache.last_processed_block:
+                time.sleep(10)
+
+        count_blocks = (self.event_cache.last_processed_block - self.gsr_created_at_block)
+        last_processed_block = 0
+        while last_processed_block < count_blocks:
+            self.prepare(self.gsr_created_at_block + last_processed_block + 1000)
+            last_processed_block = last_processed_block + 1000
 
     def prepare(self, block_number):
         pass

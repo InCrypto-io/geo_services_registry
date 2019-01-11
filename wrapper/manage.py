@@ -10,6 +10,7 @@ if __name__ == "__main__":
 
     test = Test()
     # test.test()
-    test.test_events_cache()
+    # test.test_events_cache()
+    test.test_registries_cache()
 
     print("+++++++++Done!+++++++++++++++++++")

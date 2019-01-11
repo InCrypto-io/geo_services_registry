@@ -4,6 +4,7 @@ from geo_service_registry import GeoServiceRegistry
 from geo_token import GEOToken
 from events_cache import EventCache
 import time
+from registries_cache import RegistriesCache
 
 
 class Test:
@@ -92,7 +93,22 @@ class Test:
         for _ in range(40):
             print("push new event, vote_service_lockup")
             self.gsr.set_sender(user1)
-            self.gsr.vote_service_lockup("provider", [owner, user1], [5000, 5000])
+            self.gsr.vote_service_lockup("provider", [owner, user1], [4000, 6000])
             time.sleep(10)
+
+        event_cache.stop_collect()
+
+    def test_registries_cache(self):
+        print("Test registries cache")
+        event_cache = EventCache(
+            self.eth_connection,
+            self.gsr,
+            config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK,
+            config.DB_URL,
+            config.CONFIRMATION_COUNT)
+        event_cache.collect()
+
+        registries_cache = RegistriesCache(event_cache, config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK, config.DB_URL)
+        registries_cache.update(event_cache.last_processed_block + 5)
 
         event_cache.stop_collect()
