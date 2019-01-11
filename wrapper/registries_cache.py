@@ -4,13 +4,13 @@ from pymongo import MongoClient
 
 
 class RegistriesCache:
-    def __init__(self, event_cache, gsr_created_at_block, db_url):
+    def __init__(self, event_cache, gsr_created_at_block, db_url, interval_for_preprocessed_blocks):
         self.event_cache = event_cache
         self.gsr_created_at_block = gsr_created_at_block
 
         self.collection_name_prefix = "registry_"
         self.temp_collection_name_prefix = "reg_temp_"
-        self.interval_for_preprocessed_blocks = 10
+        self.interval_for_preprocessed_blocks = interval_for_preprocessed_blocks
 
         self.client = MongoClient(db_url)
         self.db = self.client['db_geo_registries']
