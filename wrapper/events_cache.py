@@ -10,8 +10,8 @@ class EventCache:
         self.gsr = gsr
         self.confirmation_count = confirmation_count
         self.client = MongoClient(db_url)
-        self.db = self.client['events_b6']
-        self.events_collection = self.db["events_collection"]
+        self.db = self.client['geo']
+        self.events_collection = self.db["events"]
         self.check_and_wait_connection_to_db()
         self.events_collection.create_index([
             ("blockNumber", pymongo.ASCENDING),

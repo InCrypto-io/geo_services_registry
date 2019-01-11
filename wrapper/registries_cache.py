@@ -9,7 +9,9 @@ class RegistriesCache:
         self.gsr_created_at_block = gsr_created_at_block
 
         self.client = MongoClient(db_url)
-        self.db = self.client['events_b6']
+        self.db = self.client['geo']
+        self.collection_name_prefix = "registry_"
+        self.__remove_uncompleted_blocks()
 
     def update(self, wait_for_block_number=0):
 
@@ -18,7 +20,7 @@ class RegistriesCache:
                 time.sleep(10)
 
         count_blocks = (self.event_cache.last_processed_block - self.gsr_created_at_block)
-        last_processed_block = 0
+        last_processed_block = self.get_last_processed_block()
         while last_processed_block < count_blocks:
             self.prepare(self.gsr_created_at_block + last_processed_block + 1000)
             last_processed_block = last_processed_block + 1000
@@ -39,4 +41,16 @@ class RegistriesCache:
         pass
 
     def get_winners_list(self, registry_name, block_number):
+        pass
+
+    def get_last_processed_block(self):
+        result = 0
+        for e in self.db.collection_names():
+            if self.collection_name_prefix in e:
+                number = int(e[len(self.collection_name_prefix)::])
+                if result < number:
+                    result = number
+        return result
+
+    def __remove_uncompleted_blocks(self):
         pass
