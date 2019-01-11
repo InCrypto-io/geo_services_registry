@@ -10,7 +10,7 @@ class EventCache:
         self.gsr = gsr
         self.confirmation_count = confirmation_count
         self.client = MongoClient(db_url)
-        self.db = self.client['events_2']
+        self.db = self.client['events_a6']
         self.events_collection = self.db["events_collection"]
         self.check_and_wait_connection_to_db()
         self.events_collection.create_index([
@@ -19,7 +19,7 @@ class EventCache:
         ], unique=True)
         self.stop_collect_events = True
 
-        self.last_processed_block = gsr_created_at_block
+        self.last_processed_block = gsr_created_at_block - 1
         if self.get_events_count():
             try:
                 self.last_processed_block = int(self.get_event(self.get_events_count() - 1)["blockNumber"]) - 1
@@ -55,20 +55,18 @@ class EventCache:
         self.stop_collect_events = True
 
     def write_event(self, event):
-        print("write event", event)
+        print("write_event", event)
         for f in ["event", "logIndex", "transactionIndex", "transactionHash", "address", "blockHash", "blockNumber"]:
             if f not in event:
                 print("Event not contains expected fields")
                 break
-        data = {
-            'event': event['event'],
-            'logIndex': event['logIndex'],
-            'transactionIndex': event['transactionIndex'],
-            'transactionHash': event['transactionHash'],
-            'address': event['address'],
-            'blockHash': event['blockHash'],
-            'blockNumber': event['blockNumber']
-        }
+        data = {}
+        for key in event:
+            if key in ["args"]:
+                continue
+            data[key] = event[key]
+        for key in event["args"]:
+            data[key] = event["args"][key]
         try:
             self.events_collection.insert_one(data)
         except pymongo.errors.DuplicateKeyError:
