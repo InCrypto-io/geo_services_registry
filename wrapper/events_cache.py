@@ -86,7 +86,9 @@ class EventCache:
         return {}
 
     def get_events_in_range(self, block_start, block_end):
-        pass
+        assert block_start <= block_end
+        return self.events_collection.find({"blockNumber": {'$gte': block_start, '$lte': block_end}}).sort(
+            [("blockNumber", pymongo.ASCENDING), ("logIndex", pymongo.ASCENDING)])
 
     def check_and_wait_connection_to_db(self):
         while True:
