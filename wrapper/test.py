@@ -111,4 +111,4 @@ class Test:
         registries_cache = RegistriesCache(event_cache, config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK, config.DB_URL)
         registries_cache.update(event_cache.last_processed_block + 5)
 
-        event_cache.stop_collect()
+        # event_cache.stop_collect()

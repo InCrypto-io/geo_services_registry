@@ -10,7 +10,7 @@ class EventCache:
         self.gsr = gsr
         self.confirmation_count = confirmation_count
         self.client = MongoClient(db_url)
-        self.db = self.client['geo']
+        self.db = self.client['db_geo_events']
         self.events_collection = self.db["events"]
         self.check_and_wait_connection_to_db()
         self.events_collection.create_index([
@@ -38,7 +38,7 @@ class EventCache:
                 last_block_number = self.connection.get_web3().eth.blockNumber
                 print("exist new block", last_block_number)
                 while self.last_processed_block + self.confirmation_count < last_block_number:
-                    print("try get event for block:", self.last_processed_block + 1)
+                    print("get events for block:", self.last_processed_block + 1)
                     for event_name in self.gsr.get_events_list():
                         event_filter = self.gsr.contract.eventFilter(event_name,
                                                                      {'fromBlock': self.last_processed_block + 1,

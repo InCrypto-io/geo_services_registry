@@ -10,15 +10,14 @@ class RegistriesCache:
 
         self.collection_name_prefix = "registry_"
         self.temp_collection_name_prefix = "reg_temp_"
-        self.interval_for_preprocessed_blocks = 1000
+        self.interval_for_preprocessed_blocks = 10
 
         self.client = MongoClient(db_url)
-        self.db = self.client['geo']
+        self.db = self.client['db_geo_registries']
 
         self.__remove_uncompleted_blocks()
 
     def update(self, wait_for_block_number=0):
-
         if wait_for_block_number > 0:
             while wait_for_block_number >= self.event_cache.last_processed_block:
                 time.sleep(10)
@@ -32,8 +31,20 @@ class RegistriesCache:
             last_processed_block = last_processed_block + self.interval_for_preprocessed_blocks
 
     def prepare(self, block_number):
-        assert block_number < self.get_last_processed_block()
+        assert block_number > self.get_last_processed_block()
+        assert (block_number - self.gsr_created_at_block) % self.interval_for_preprocessed_blocks == 0
         collection = self.db[self.temp_collection_name_prefix + str(block_number)]
+
+        previous_block = (((block_number - self.gsr_created_at_block) // self.interval_for_preprocessed_blocks)
+                          * self.interval_for_preprocessed_blocks) - self.interval_for_preprocessed_blocks
+        if previous_block < 0:
+            previous_block = 0
+        # if previous_block > 1:
+        #     self.db[self.collection_name_prefix + str(previous_block)].copyTo(collection)
+
+        events = self.event_cache.get_events_in_range(previous_block, block_number)
+
+        print("events", events)
 
         collection.rename(self.collection_name_prefix + str(block_number))
 
