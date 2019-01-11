@@ -2,7 +2,9 @@ import config
 from eth_connection import EthConnection
 from geo_service_registry import GeoServiceRegistry
 from geo_token import GEOToken
+from events_cache import EventCache
 import time
+
 
 class Test:
     def __init__(self):
@@ -14,9 +16,6 @@ class Test:
         self.test_gsr()
 
     def test_gsr(self):
-
-        event_filter = self.gsr.contract.events.Vote.createFilter(fromBlock="latest")
-
         print("Test gsr isRegistryExist")
         reg_name = "provider"
         print("isRegistryExist {} - {}".format(reg_name, self.gsr.is_registry_exist(reg_name)))
@@ -71,7 +70,29 @@ class Test:
         events_list = self.gsr.contract.events.Vote().processReceipt(tx_receipt)
         print("\tlogs", events_list)
 
-        while True:
-            for event in event_filter.get_new_entries():
-                print(event)
-            time.sleep(5)
+        # event_filter = self.gsr.contract.events.Vote.createFilter(fromBlock=0)
+        # while True:
+        #     for event in event_filter.get_new_entries():
+        #         print(event)
+        #     time.sleep(5)
+
+    def test_events_cache(self):
+        print("Test event cache")
+        event_cache = EventCache(
+            self.eth_connection,
+            self.gsr,
+            config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK,
+            config.DB_URL,
+            config.CONFIRMATION_COUNT)
+        event_cache.collect()
+
+        accounts = self.eth_connection.get_accounts()
+        owner = accounts[0]
+        user1 = accounts[1]
+        for _ in range(40):
+            print("push new event, vote_service_lockup")
+            self.gsr.set_sender(user1)
+            self.gsr.vote_service_lockup("provider", [owner, user1], [5000, 5000])
+            time.sleep(10)
+
+        event_cache.stop_collect()

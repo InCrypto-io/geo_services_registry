@@ -9,6 +9,7 @@ if __name__ == "__main__":
     print("GEOTOKEN_ADDRESS", config.GEOTOKEN_ADDRESS)
 
     test = Test()
-    test.test()
+    # test.test()
+    test.test_events_cache()
 
     print("+++++++++Done!+++++++++++++++++++")

@@ -1,6 +1,15 @@
 version: '3.1'
 
 services:
+  mongdb:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+
   gsr:
     build: .
     command: python3 ./wrapper/manage.py
+    depends_on:
+      - mongdb
+    links:
+      - mongdb:mongdb

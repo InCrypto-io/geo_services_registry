@@ -69,3 +69,7 @@ class GeoServiceRegistry:
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
         return self.connection.signAndSendTransaction(self.address, raw_transaction)
+
+    @staticmethod
+    def get_events_list():
+        return ["Deposit", "NewRegistry", "Vote", "Withdrawal"]
