@@ -73,7 +73,7 @@ class EventCache:
             pass
 
     def erase_all(self, from_block_number=0):
-        pass
+        self.events_collection.remove({"blockNumber": {'$gte': from_block_number}})
 
     def get_events_count(self):
         return self.events_collection.count()
