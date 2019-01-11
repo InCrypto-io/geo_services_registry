@@ -32,7 +32,10 @@ class RegistriesCache:
             last_processed_block = last_processed_block + self.interval_for_preprocessed_blocks
 
     def prepare(self, block_number):
-        pass
+        assert block_number < self.get_last_processed_block()
+        collection = self.db[self.temp_collection_name_prefix + str(block_number)]
+
+        collection.rename(self.collection_name_prefix + str(block_number))
 
     def erase(self, block_number=0):
         '''
