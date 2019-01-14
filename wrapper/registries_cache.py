@@ -68,15 +68,18 @@ class RegistriesCache:
                 weights[event["_voter"]] = weights[event["_voter"]] - event["_amountWithdraw"]
                 assert weights[event["_voter"]] >= 0
                 if weights[event["_voter"]] == 0:
-                    votes[event["_name"]][event["_voter"]] = {}
+                    for reg_name in registries:
+                        if event["_voter"] in votes[reg_name]:
+                            del votes[reg_name][event["_voter"]]
             elif event["event"] == "Vote":
                 votes[event["_name"]][event["_voter"]] = {}
                 votes[event["_name"]][event["_voter"]][event["_candidate"]] = event["_candidate"]
 
-        for key in weights.keys():
-            if weights[key] == 0:
-                pass
-                # del weights[key]
+        # reg name -> candidate -> total tokens
+        participants = {}
+
+        # reg name -> position -> candidate -> total tokens
+        winners = []
 
         # collection.rename(self.collection_name_prefix + str(block_number))
 
