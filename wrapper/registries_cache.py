@@ -125,7 +125,7 @@ class RegistriesCache:
                             del votes[reg_name][event["_voter"]]
             elif event["event"] == "Vote":
                 votes[event["_name"]][event["_voter"]] = {}
-                votes[event["_name"]][event["_voter"]][event["_candidate"]] = event["_candidate"]
+                votes[event["_name"]][event["_voter"]][event["_candidate"]] = event["_amount"]
             elif event["event"] == "NewRegistry":
                 registries.append(event["_name"])
                 votes[event["_name"]] = {}
@@ -141,7 +141,8 @@ class RegistriesCache:
                         participants[reg_name][candidate] = 0
                     else:
                         participants[reg_name][candidate] = participants[reg_name][candidate] \
-                                                            + (votes[reg_name][voter][candidate] * weights[voter])
+                                                            + (votes[reg_name][voter][candidate]
+                                                               * weights[voter] / 10000)
 
         for reg_name in registries:
             winners[reg_name] = []
