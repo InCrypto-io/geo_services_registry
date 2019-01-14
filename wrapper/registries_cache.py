@@ -9,15 +9,12 @@ class RegistriesCache:
         self.gsr_created_at_block = gsr_created_at_block
 
         self.collection_name_prefix = "registry_"
-        self.temp_collection_name_prefix = "reg_temp_"
         self.interval_for_preprocessed_blocks = interval_for_preprocessed_blocks
 
         self.client = MongoClient(db_url)
         self.db = self.client['db_geo_registries']
 
         self.__remove_uncompleted_blocks()
-
-        # self.db.command("copyTo", [self.db["bbbbbb"], self.db["a"]])
 
     def update(self, wait_for_block_number=0):
         if wait_for_block_number > 0:
@@ -47,18 +44,32 @@ class RegistriesCache:
         weights = {}
         # names
         registries = []
+        # reg name -> sorted array -> [candidate, total tokens]
+        winners = {}
 
-        if previous_block < 0:
-            previous_block = 0
-        if previous_block > 1:
-            previous_votes = self.db[self.collection_name_prefix + "votes_" + str(block_number)]
-            previous_weights = self.db[self.collection_name_prefix + "weights_" + str(block_number)]
-            previous_registries = self.db[self.collection_name_prefix + "registries_" + str(block_number)]
+        assert previous_block > 0
+        if previous_block > self.gsr_created_at_block + self.interval_for_preprocessed_blocks:
+            self.__load_from_db(votes, weights, registries, winners, previous_block)
 
-        # events = self.event_cache.get_events_in_range(previous_block, block_number)
-        events = self.event_cache.get_events_in_range(self.gsr_created_at_block, block_number)
+        self.__apply_events(votes, weights, registries, winners, self.gsr_created_at_block, block_number)
 
-        print("events", events.count())
+        self.__save_to_db(votes, weights, registries, winners, block_number)
+
+        for reg_name in winners.keys():
+            for i in range(0, len(winners[reg_name])):
+                print(reg_name, i, winners[i][1])
+
+    def __load_from_db(self, votes, weights, registries, winners, block_number):
+        previous_votes = self.db[self.collection_name_prefix + "votes_" + str(block_number)]
+        previous_weights = self.db[self.collection_name_prefix + "weights_" + str(block_number)]
+        previous_registries = self.db[self.collection_name_prefix + "registries_" + str(block_number)]
+
+    def __save_to_db(self, votes, weights, registries, winners, block_number):
+        pass
+
+    def __apply_events(self, votes, weights, registries, winners, from_block_number, to_block_number):
+        del winners[:]
+        events = self.event_cache.get_events_in_range(from_block_number, to_block_number)
 
         for event in events:
             if event["event"] == "Deposit":
@@ -90,24 +101,16 @@ class RegistriesCache:
                         participants[reg_name][candidate] = participants[reg_name][candidate] \
                                                             + (votes[reg_name][voter][candidate] * weights[voter])
 
-        # reg name -> sorted array -> [candidate, total tokens]
-        candidates = {}
         for reg_name in registries:
-            candidates[reg_name] = []
+            winners[reg_name] = []
             for candidate in participants[reg_name].keys():
-                candidates[reg_name].append([candidate, participants[reg_name][candidate]])
-            candidates[reg_name].sort(key=lambda candidate_and_total: candidate_and_total[1])
+                winners[reg_name].append([candidate, participants[reg_name][candidate]])
+            winners[reg_name].sort(key=lambda candidate_and_total: candidate_and_total[1])
 
-        for reg_name in candidates.keys():
-            for i in range(0, len(candidates[reg_name])):
-                if candidates[i][1] == 0:
-                    del candidates[i]
-
-        for reg_name in candidates.keys():
-            for i in range(0, len(candidates[reg_name])):
-                print(reg_name, i, candidates[i][1])
-
-        # collection.rename(self.collection_name_prefix + str(block_number))
+        for reg_name in winners.keys():
+            for i in range(0, len(winners[reg_name])):
+                if winners[i][1] == 0:
+                    del winners[i]
 
     def erase(self, block_number=0):
         '''
