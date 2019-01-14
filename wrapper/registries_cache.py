@@ -43,7 +43,9 @@ class RegistriesCache:
 
         # reg name -> voter -> candidate -> amount in percent
         votes = {}
+        # voter -> amount
         weights = {}
+        # names
         registries = []
 
         if previous_block < 0:
@@ -59,10 +61,7 @@ class RegistriesCache:
         print("events", events.count())
 
         for event in events:
-            if event["event"] == "NewRegistry":
-                registries.append(event["_name"])
-                votes[event["_name"]] = {}
-            elif event["event"] == "Deposit":
+            if event["event"] == "Deposit":
                 weights[event["_voter"]] = event["_fullSize"]
             elif event["event"] == "Withdrawal":
                 weights[event["_voter"]] = weights[event["_voter"]] - event["_amountWithdraw"]
@@ -74,12 +73,32 @@ class RegistriesCache:
             elif event["event"] == "Vote":
                 votes[event["_name"]][event["_voter"]] = {}
                 votes[event["_name"]][event["_voter"]][event["_candidate"]] = event["_candidate"]
+            elif event["event"] == "NewRegistry":
+                registries.append(event["_name"])
+                votes[event["_name"]] = {}
 
         # reg name -> candidate -> total tokens
         participants = {}
 
-        # reg name -> position -> candidate -> total tokens
+        for reg_name in registries:
+            participants[reg_name] = {}
+            for voter in votes[reg_name].keys():
+                for candidate in votes[reg_name][voter].keys():
+                    if candidate not in participants[reg_name].keys():
+                        participants[reg_name][candidate] = 0
+                    else:
+                        participants[reg_name][candidate] = participants[reg_name][candidate] \
+                                                            + (votes[reg_name][voter][candidate] * weights[voter])
+
+        # reg name -> sorted array -> [candidate, total tokens]
         winners = []
+        for reg_name in registries:
+            winners[reg_name] = []
+            for candidate in participants[reg_name].keys():
+                winners[reg_name].append([candidate, participants[reg_name][candidate]])
+            winners[reg_name].sort(key=lambda candidate_and_total: candidate_and_total[1])
+
+        print(winners)
 
         # collection.rename(self.collection_name_prefix + str(block_number))
 
