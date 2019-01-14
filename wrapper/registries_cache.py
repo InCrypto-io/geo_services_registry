@@ -48,6 +48,7 @@ class RegistriesCache:
         if previous_block > self.gsr_created_at_block + self.interval_for_preprocessed_blocks:
             self.__load_from_db(votes, weights, registries, winners, previous_block)
 
+        winners = {}
         # todo previous_block
         self.__apply_events(votes, weights, registries, winners, self.gsr_created_at_block, block_number)
 
@@ -58,9 +59,23 @@ class RegistriesCache:
                 print(reg_name, i, winners[i])
 
     def __load_from_db(self, votes, weights, registries, winners, block_number):
-        previous_votes = self.db[self.collection_name_prefix + "votes_" + str(block_number)]
-        previous_weights = self.db[self.collection_name_prefix + "weights_" + str(block_number)]
-        previous_registries = self.db[self.collection_name_prefix + "registries_" + str(block_number)]
+        assert len(votes) == 0
+        assert len(weights) == 0
+        assert len(registries) == 0
+        assert len(winners) == 0
+        collection_votes = self.db[self.collection_name_prefix + "votes_" + str(block_number)]
+        collection_weights = self.db[self.collection_name_prefix + "weights_" + str(block_number)]
+        collection_registries = self.db[self.collection_name_prefix + "registries_" + str(block_number)]
+        collection_winners = self.db[self.collection_name_prefix + "winners_" + str(block_number)]
+
+        for reg_name in collection_registries.find():
+            registries.append(reg_name)
+            votes[reg_name] = {}
+
+        for document in collection_votes.find():
+            if document["voter"] not in votes[document["registry_name"]].keys():
+                votes[document["registry_name"]][document["voter"]] = {}
+            votes[document["registry_name"]][document["voter"]][document["candidate"]] = document["percentage_amount"]
 
     def __save_to_db(self, votes, weights, registries, winners, block_number):
         collection_votes = self.db[self.collection_name_prefix + "votes_" + str(block_number)]
