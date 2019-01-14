@@ -17,36 +17,61 @@ class RegistriesCache:
 
         self.__remove_uncompleted_blocks()
 
+        # self.db.command("copyTo", [self.db["bbbbbb"], self.db["a"]])
+
     def update(self, wait_for_block_number=0):
         if wait_for_block_number > 0:
             while wait_for_block_number >= self.event_cache.last_processed_block:
                 time.sleep(10)
 
-        count_blocks = (self.event_cache.last_processed_block - self.gsr_created_at_block)
         last_processed_block = self.get_last_processed_block()
-        if last_processed_block < self.interval_for_preprocessed_blocks:
-            last_processed_block = self.interval_for_preprocessed_blocks
-        while last_processed_block < count_blocks:
-            self.prepare(self.gsr_created_at_block + last_processed_block + self.interval_for_preprocessed_blocks)
+        if last_processed_block < self.gsr_created_at_block:
+            last_processed_block = self.gsr_created_at_block
+        while last_processed_block < self.event_cache.last_processed_block:
+            self.prepare(last_processed_block + self.interval_for_preprocessed_blocks)
             last_processed_block = last_processed_block + self.interval_for_preprocessed_blocks
 
     def prepare(self, block_number):
+        print("prepare", block_number)
         assert block_number > self.get_last_processed_block()
         assert (block_number - self.gsr_created_at_block) % self.interval_for_preprocessed_blocks == 0
-        collection = self.db[self.temp_collection_name_prefix + str(block_number)]
 
         previous_block = (((block_number - self.gsr_created_at_block) // self.interval_for_preprocessed_blocks)
                           * self.interval_for_preprocessed_blocks) - self.interval_for_preprocessed_blocks
+
+        votes = {}
+        weights = {}
+        registries = []
+
         if previous_block < 0:
             previous_block = 0
-        # if previous_block > 1:
-        #     self.db[self.collection_name_prefix + str(previous_block)].copyTo(collection)
+        if previous_block > 1:
+            previous_votes = self.db[self.collection_name_prefix + "votes_" + str(block_number)]
+            previous_weights = self.db[self.collection_name_prefix + "weights_" + str(block_number)]
+            previous_registries = self.db[self.collection_name_prefix + "registries_" + str(block_number)]
 
-        events = self.event_cache.get_events_in_range(previous_block, block_number)
+        # events = self.event_cache.get_events_in_range(previous_block, block_number)
+        events = self.event_cache.get_events_in_range(self.gsr_created_at_block, block_number)
 
-        print("events", events)
+        print("events", events.count())
 
-        collection.rename(self.collection_name_prefix + str(block_number))
+        for event in events:
+            if event["event"] == "NewRegistry":
+                registries.append(event["_name"])
+            elif event["event"] == "Deposit":
+                weights[event["_voter"]] = event["_fullSize"]
+            elif event["event"] == "Withdrawal":
+                weights[event["_voter"]] = weights[event["_voter"]] - event["_amountWithdraw"]
+                assert weights[event["_voter"]] >= 0
+            elif event["event"] == "Vote":
+                pass
+
+        for key in weights.keys():
+            if weights[key] == 0:
+                pass
+                # del weights[key]
+
+        # collection.rename(self.collection_name_prefix + str(block_number))
 
     def erase(self, block_number=0):
         '''
