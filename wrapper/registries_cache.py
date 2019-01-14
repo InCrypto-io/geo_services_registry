@@ -14,8 +14,6 @@ class RegistriesCache:
         self.client = MongoClient(db_url)
         self.db = self.client['db_geo_registries']
 
-        self.__remove_uncompleted_blocks()
-
     def update(self, wait_for_block_number=0):
         if wait_for_block_number > 0:
             while wait_for_block_number >= self.event_cache.last_processed_block:
@@ -56,7 +54,7 @@ class RegistriesCache:
         self.__save_to_db(votes, weights, registries, winners, block_number)
 
         for reg_name in winners.keys():
-            for i in range(0, len(winners[reg_name])):
+            for i in range(0, len(winners[reg_name]) - 1):
                 print(reg_name, i, winners[i])
 
     def __load_from_db(self, votes, weights, registries, winners, block_number):
@@ -69,6 +67,15 @@ class RegistriesCache:
         collection_weights = self.db[self.collection_name_prefix + "weights_" + str(block_number)]
         collection_registries = self.db[self.collection_name_prefix + "registries_" + str(block_number)]
         collection_winners = self.db[self.collection_name_prefix + "winners_" + str(block_number)]
+
+        if collection_votes.find({}).count():
+            collection_votes.remove({})
+        if collection_weights.find({}).count():
+            collection_weights.remove({})
+        if collection_registries.find({}).count():
+            collection_registries.remove({})
+        if collection_winners.find({}).count():
+            collection_winners.remove({})
 
         for reg_name in votes.keys():
             for voter in votes[reg_name].keys():
@@ -92,13 +99,15 @@ class RegistriesCache:
             })
 
         for reg_name in winners.keys():
-            for i in range(0, len(winners[reg_name])):
+            for i in range(0, len(winners[reg_name]) - 1):
                 collection_winners.insert_one({
                     "registry_name": reg_name,
                     "candidate": winners[i][0],
                     "amount": winners[i][1],
                     "position": i
                 })
+
+        self.set_last_processed_block(block_number)
 
     def __apply_events(self, votes, weights, registries, winners, from_block_number, to_block_number):
         assert len(winners) == 0
@@ -141,7 +150,7 @@ class RegistriesCache:
             winners[reg_name].sort(key=lambda candidate_and_total: candidate_and_total[1])
 
         for reg_name in winners.keys():
-            for i in range(0, len(winners[reg_name])):
+            for i in range(0, len(winners[reg_name]) - 1):
                 if winners[i][1] == 0:
                     del winners[i]
 
@@ -162,14 +171,17 @@ class RegistriesCache:
 
     def get_last_processed_block(self):
         result = 0
-        for element in self.db.collection_names():
-            if self.collection_name_prefix in element:
-                number = int(element[len(self.collection_name_prefix)::])
-                if result < number:
-                    result = number
+        if self.db["settings"].find_one({"name": "get_last_processed_block"}) is not None:
+            result = int(self.db["settings"].find_one({"name": "get_last_processed_block"})["value"])
         return result
 
-    def __remove_uncompleted_blocks(self):
-        for element in self.db.collection_names():
-            if self.temp_collection_name_prefix in element:
-                self.db[element].drop()
+    def set_last_processed_block(self, value):
+        setting = self.db["settings"].find_one({"name": "get_last_processed_block"})
+        if setting is not None:
+            setting['value'] = value
+            self.db["settings"].save(setting)
+        else:
+            self.db["settings"].insert_one({
+                "name": "get_last_processed_block",
+                "value": value
+            })
