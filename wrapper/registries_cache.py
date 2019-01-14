@@ -31,6 +31,8 @@ class RegistriesCache:
             self.prepare(last_processed_block + self.interval_for_preprocessed_blocks)
             last_processed_block = last_processed_block + self.interval_for_preprocessed_blocks
 
+        # todo for current
+
     def prepare(self, block_number):
         print("prepare", block_number)
         assert block_number > self.get_last_processed_block()
@@ -39,6 +41,7 @@ class RegistriesCache:
         previous_block = (((block_number - self.gsr_created_at_block) // self.interval_for_preprocessed_blocks)
                           * self.interval_for_preprocessed_blocks) - self.interval_for_preprocessed_blocks
 
+        # reg name -> voter -> candidate -> amount in percent
         votes = {}
         weights = {}
         registries = []
@@ -58,13 +61,17 @@ class RegistriesCache:
         for event in events:
             if event["event"] == "NewRegistry":
                 registries.append(event["_name"])
+                votes[event["_name"]] = {}
             elif event["event"] == "Deposit":
                 weights[event["_voter"]] = event["_fullSize"]
             elif event["event"] == "Withdrawal":
                 weights[event["_voter"]] = weights[event["_voter"]] - event["_amountWithdraw"]
                 assert weights[event["_voter"]] >= 0
+                if weights[event["_voter"]] == 0:
+                    votes[event["_name"]][event["_voter"]] = {}
             elif event["event"] == "Vote":
-                pass
+                votes[event["_name"]][event["_voter"]] = {}
+                votes[event["_name"]][event["_voter"]][event["_candidate"]] = event["_candidate"]
 
         for key in weights.keys():
             if weights[key] == 0:
