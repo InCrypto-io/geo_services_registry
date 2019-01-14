@@ -47,17 +47,17 @@ class RegistriesCache:
         # reg name -> sorted array -> [candidate, total tokens]
         winners = {}
 
-        assert previous_block > 0
         if previous_block > self.gsr_created_at_block + self.interval_for_preprocessed_blocks:
             self.__load_from_db(votes, weights, registries, winners, previous_block)
 
+        # todo previous_block
         self.__apply_events(votes, weights, registries, winners, self.gsr_created_at_block, block_number)
 
         self.__save_to_db(votes, weights, registries, winners, block_number)
 
         for reg_name in winners.keys():
             for i in range(0, len(winners[reg_name])):
-                print(reg_name, i, winners[i][1])
+                print(reg_name, i, winners[i])
 
     def __load_from_db(self, votes, weights, registries, winners, block_number):
         previous_votes = self.db[self.collection_name_prefix + "votes_" + str(block_number)]
@@ -65,10 +65,43 @@ class RegistriesCache:
         previous_registries = self.db[self.collection_name_prefix + "registries_" + str(block_number)]
 
     def __save_to_db(self, votes, weights, registries, winners, block_number):
-        pass
+        collection_votes = self.db[self.collection_name_prefix + "votes_" + str(block_number)]
+        collection_weights = self.db[self.collection_name_prefix + "weights_" + str(block_number)]
+        collection_registries = self.db[self.collection_name_prefix + "registries_" + str(block_number)]
+        collection_winners = self.db[self.collection_name_prefix + "winners_" + str(block_number)]
+
+        for reg_name in votes.keys():
+            for voter in votes[reg_name].keys():
+                for candidate in votes[reg_name][voter].keys():
+                    collection_votes.insert_one({
+                        "registry_name": reg_name,
+                        "voter": voter,
+                        "candidate": candidate,
+                        "percentage_amount": votes[reg_name][voter][candidate]
+                    })
+
+        for voter in weights.keys():
+            collection_weights.insert_one({
+                "voter": voter,
+                "amount": weights[voter]
+            })
+
+        for reg_name in registries:
+            collection_registries.insert_one({
+                "name": reg_name
+            })
+
+        for reg_name in winners.keys():
+            for i in range(0, len(winners[reg_name])):
+                collection_winners.insert_one({
+                    "registry_name": reg_name,
+                    "candidate": winners[i][0],
+                    "amount": winners[i][1],
+                    "position": i
+                })
 
     def __apply_events(self, votes, weights, registries, winners, from_block_number, to_block_number):
-        del winners[:]
+        assert len(winners) == 0
         events = self.event_cache.get_events_in_range(from_block_number, to_block_number)
 
         for event in events:
