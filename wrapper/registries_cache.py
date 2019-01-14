@@ -91,14 +91,21 @@ class RegistriesCache:
                                                             + (votes[reg_name][voter][candidate] * weights[voter])
 
         # reg name -> sorted array -> [candidate, total tokens]
-        winners = []
+        candidates = {}
         for reg_name in registries:
-            winners[reg_name] = []
+            candidates[reg_name] = []
             for candidate in participants[reg_name].keys():
-                winners[reg_name].append([candidate, participants[reg_name][candidate]])
-            winners[reg_name].sort(key=lambda candidate_and_total: candidate_and_total[1])
+                candidates[reg_name].append([candidate, participants[reg_name][candidate]])
+            candidates[reg_name].sort(key=lambda candidate_and_total: candidate_and_total[1])
 
-        print(winners)
+        for reg_name in candidates.keys():
+            for i in range(0, len(candidates[reg_name])):
+                if candidates[i][1] == 0:
+                    del candidates[i]
+
+        for reg_name in candidates.keys():
+            for i in range(0, len(candidates[reg_name])):
+                print(reg_name, i, candidates[i][1])
 
         # collection.rename(self.collection_name_prefix + str(block_number))
 
