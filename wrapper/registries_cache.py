@@ -24,6 +24,7 @@ class RegistriesCache:
             last_processed_block_number = last_processed_block_number + self.interval_for_preprocessed_blocks
             self.__set_last_preprocessed_block_number(last_processed_block_number)
 
+    def update_current_block(self):
         current_preprocessed_block_number = self.__get_current_preprocessed_block_number()
         if current_preprocessed_block_number < self.gsr_created_at_block:
             return

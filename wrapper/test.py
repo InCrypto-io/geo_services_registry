@@ -117,6 +117,7 @@ class Test:
                                            config.INTERVAL_FOR_PREPROCESSED_BLOCKS, settings)
         while True:
             registries_cache.update()
-            time.sleep(10)
+            registries_cache.update_current_block()
+            time.sleep(1)
 
         # event_cache.stop_collect()
