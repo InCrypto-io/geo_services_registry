@@ -118,6 +118,8 @@ class Test:
         while True:
             registries_cache.update()
             registries_cache.update_current_block()
+            # print("get_winners_list",
+            #       registries_cache.get_winners_list("provider", config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 100))
             time.sleep(1)
 
         # event_cache.stop_collect()
