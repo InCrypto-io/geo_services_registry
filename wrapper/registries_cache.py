@@ -151,8 +151,9 @@ class RegistriesCache:
                     votes[event["_name"]][event["_voter"]] = {}
                 votes[event["_name"]][event["_voter"]][event["_candidate"]] = event["_amount"]
             elif event["event"] == "NewRegistry":
-                registries.append(event["_name"])
-                votes[event["_name"]] = {}
+                if event["_name"] not in registries:
+                    registries.append(event["_name"])
+                    votes[event["_name"]] = {}
 
         # reg name -> candidate -> total tokens
         participants = {}
