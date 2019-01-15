@@ -40,7 +40,7 @@ class RegistriesCache:
             self.__set_current_preprocessed_block_number(self.event_cache.get_last_processed_block_number())
 
     def __preprocess_block(self, block_number, save_to_db=True):
-        print("prepare", block_number)
+        print("__preprocess_block", block_number)
         assert block_number >= self.gsr_created_at_block
 
         previous_block = self.__determine_previous_preprocessed_block(block_number)
@@ -195,7 +195,10 @@ class RegistriesCache:
         pass
 
     def is_registry_exist(self, registry_name, block_number):
-        pass
+        if block_number > self.__get_current_preprocessed_block_number():
+            return False
+        prepared_block_data = self.__preprocess_block(block_number, False)
+        return registry_name in prepared_block_data[2]
 
     def get_total_votes_for_candidate(self, candidate_address, registry_name, block_number):
         if block_number > self.__get_current_preprocessed_block_number():

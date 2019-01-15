@@ -130,6 +130,10 @@ class Test:
             #       registries_cache.get_total_votes_for_candidate(accounts[3],
             #                                                      "provider",
             #                                                      config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 20))
+            # print("is_registry_exist", registries_cache
+            #       .is_registry_exist("created_registry_0", config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 1))
+            # print("is_registry_exist", registries_cache
+            #       .is_registry_exist("created_registry_0", config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 20))
             time.sleep(1)
 
         # event_cache.stop_collect()
