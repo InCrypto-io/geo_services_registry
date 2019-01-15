@@ -33,8 +33,10 @@ class RegistriesCache:
         assert block_number > self.get_last_processed_block()
         assert (block_number - self.gsr_created_at_block) % self.interval_for_preprocessed_blocks == 0
 
-        previous_block = (((block_number - self.gsr_created_at_block) // self.interval_for_preprocessed_blocks)
-                          * self.interval_for_preprocessed_blocks) - self.interval_for_preprocessed_blocks
+        previous_block = self.gsr_created_at_block
+        if block_number >= self.gsr_created_at_block + self.interval_for_preprocessed_blocks + 1:
+            previous_block = (((block_number - self.gsr_created_at_block) // self.interval_for_preprocessed_blocks - 1)
+                              * self.interval_for_preprocessed_blocks) + self.interval_for_preprocessed_blocks
 
         # reg name -> voter -> candidate -> amount in percent
         votes = {}
@@ -49,8 +51,7 @@ class RegistriesCache:
             self.__load_from_db(votes, weights, registries, winners, previous_block)
 
         winners = {}
-        # todo previous_block
-        self.__apply_events(votes, weights, registries, winners, self.gsr_created_at_block, block_number)
+        self.__apply_events(votes, weights, registries, winners, previous_block, block_number)
 
         self.__save_to_db(votes, weights, registries, winners, block_number)
 
@@ -71,11 +72,18 @@ class RegistriesCache:
         for reg_name in collection_registries.find():
             registries.append(reg_name)
             votes[reg_name] = {}
+            winners[reg_name] = {}
 
         for document in collection_votes.find():
             if document["voter"] not in votes[document["registry_name"]].keys():
                 votes[document["registry_name"]][document["voter"]] = {}
             votes[document["registry_name"]][document["voter"]][document["candidate"]] = document["percentage_amount"]
+
+        for document in collection_weights.find():
+            weights[document["voter"]] = document["amount"]
+
+        for document in collection_winners.find().sort(["position", pymongo.ASCENDING]):
+            winners[document["registry_name"]].append([document["candidate"], document["amount"]])
 
     def __save_to_db(self, votes, weights, registries, winners, block_number):
         collection_votes = self.db[self.collection_name_prefix + "votes_" + str(block_number)]
