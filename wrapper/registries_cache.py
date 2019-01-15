@@ -56,8 +56,8 @@ class RegistriesCache:
         self.__save_to_db(votes, weights, registries, winners, block_number)
 
         for reg_name in winners.keys():
-            for i in range(0, len(winners[reg_name]) - 1):
-                print(reg_name, i, winners[i])
+            for i in range(0, len(winners[reg_name])):
+                print(reg_name, i, winners[reg_name][i])
 
     def __load_from_db(self, votes, weights, registries, winners, block_number):
         assert len(votes) == 0
@@ -122,11 +122,11 @@ class RegistriesCache:
             })
 
         for reg_name in winners.keys():
-            for i in range(0, len(winners[reg_name]) - 1):
+            for i in range(0, len(winners[reg_name])):
                 collection_winners.insert_one({
                     "registry_name": reg_name,
-                    "candidate": winners[i][0],
-                    "amount": winners[i][1],
+                    "candidate": winners[reg_name][i][0],
+                    "amount": winners[reg_name][i][1],
                     "position": i
                 })
 
@@ -172,9 +172,9 @@ class RegistriesCache:
             winners[reg_name].sort(key=lambda candidate_and_total: candidate_and_total[1])
 
         for reg_name in winners.keys():
-            for i in range(0, len(winners[reg_name]) - 1):
-                if winners[i][1] == 0:
-                    del winners[i]
+            for i in range(0, len(winners[reg_name])):
+                if winners[reg_name][i][1] == 0:
+                    del winners[reg_name][i]
 
     def erase(self, block_number=0):
         '''
