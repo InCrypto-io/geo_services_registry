@@ -38,7 +38,7 @@ class Test:
 
         print("Request for set vote size")
         self.gsr.set_sender(user1)
-        self.gsr.set_vote_weight_in_lockup_period(10000)
+        self.gsr.set_vote_weight_in_lockup_period(77000)
 
         print("Create registry")
         reg_name = "created_registry_"

@@ -147,7 +147,8 @@ class RegistriesCache:
                         if event["_voter"] in votes[reg_name]:
                             del votes[reg_name][event["_voter"]]
             elif event["event"] == "Vote":
-                votes[event["_name"]][event["_voter"]] = {}
+                if event["_voter"] not in votes[event["_name"]].keys():
+                    votes[event["_name"]][event["_voter"]] = {}
                 votes[event["_name"]][event["_voter"]][event["_candidate"]] = event["_amount"]
             elif event["event"] == "NewRegistry":
                 registries.append(event["_name"])
