@@ -5,7 +5,7 @@ from threading import Thread
 
 
 class EventCache:
-    def __init__(self, connection, gsr, gsr_created_at_block, db_url, confirmation_count):
+    def __init__(self, connection, gsr, gsr_created_at_block, db_url, confirmation_count, settings):
         self.connection = connection
         self.gsr = gsr
         self.confirmation_count = confirmation_count
@@ -18,6 +18,7 @@ class EventCache:
             ("logIndex", pymongo.ASCENDING)
         ], unique=True)
         self.stop_collect_events = True
+        self.settings = settings
 
         self.last_processed_block = gsr_created_at_block - 1
         if self.get_events_count():

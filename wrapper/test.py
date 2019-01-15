@@ -5,6 +5,7 @@ from geo_token import GEOToken
 from events_cache import EventCache
 import time
 from registries_cache import RegistriesCache
+from settings import Settings
 
 
 class Test:
@@ -100,16 +101,20 @@ class Test:
 
     def test_registries_cache(self):
         print("Test registries cache")
+
+        settings = Settings(config.DB_URL)
+
         event_cache = EventCache(
             self.eth_connection,
             self.gsr,
             config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK,
             config.DB_URL,
-            config.CONFIRMATION_COUNT)
+            config.CONFIRMATION_COUNT,
+            settings)
         event_cache.collect()
 
         registries_cache = RegistriesCache(event_cache, config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK, config.DB_URL,
-                                           config.INTERVAL_FOR_PREPROCESSED_BLOCKS)
+                                           config.INTERVAL_FOR_PREPROCESSED_BLOCKS, settings)
         while True:
             registries_cache.update()
             time.sleep(10)

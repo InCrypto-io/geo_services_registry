@@ -1,12 +1,12 @@
-import time
 import pymongo
 from pymongo import MongoClient
 
 
 class RegistriesCache:
-    def __init__(self, event_cache, gsr_created_at_block, db_url, interval_for_preprocessed_blocks):
+    def __init__(self, event_cache, gsr_created_at_block, db_url, interval_for_preprocessed_blocks, settings):
         self.event_cache = event_cache
         self.gsr_created_at_block = gsr_created_at_block
+        self.settings = settings
 
         self.collection_name_prefix = "registry_"
         self.interval_for_preprocessed_blocks = interval_for_preprocessed_blocks
@@ -183,21 +183,13 @@ class RegistriesCache:
         pass
 
     def get_last_processed_block(self):
-        result = 0
-        if self.db["settings"].find_one({"name": "get_last_processed_block"}) is not None:
-            result = int(self.db["settings"].find_one({"name": "get_last_processed_block"})["value"])
+        result = self.settings.get_value("get_last_processed_block")
+        if not result:
+            result = 0
         return result
 
     def set_last_processed_block(self, value):
-        setting = self.db["settings"].find_one({"name": "get_last_processed_block"})
-        if setting is not None:
-            setting['value'] = value
-            self.db["settings"].save(setting)
-        else:
-            self.db["settings"].insert_one({
-                "name": "get_last_processed_block",
-                "value": value
-            })
+        self.settings.set_value("get_last_processed_block", value)
 
     def determine_previous_preprocessed_block(self, block_number):
         previous_block = self.gsr_created_at_block
