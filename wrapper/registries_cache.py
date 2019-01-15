@@ -189,10 +189,22 @@ class RegistriesCache:
                     del winners[reg_name][i]
 
     def erase(self, block_number=0):
-        '''
-        :param block_number: if 0 erase all
-        '''
-        pass
+        if block_number == 0:
+            block_number = self.gsr_created_at_block
+        if block_number > self.__get_last_preprocessed_block_number():
+            return
+
+        if self.__get_current_preprocessed_block_number() != self.__get_last_preprocessed_block_number() \
+                and self.__get_current_preprocessed_block_number() >= block_number:
+            self.__remove_dbs_for_block_number(self.__get_current_preprocessed_block_number())
+            self.__set_current_preprocessed_block_number(self.__get_last_preprocessed_block_number())
+
+        while block_number <= self.__get_last_preprocessed_block_number():
+            self.__remove_dbs_for_block_number(self.__get_last_preprocessed_block_number())
+            self.__set_last_preprocessed_block_number(self.__get_last_preprocessed_block_number()
+                                                      - self.interval_for_preprocessed_blocks)
+
+        self.__set_current_preprocessed_block_number(self.__get_last_preprocessed_block_number())
 
     def is_registry_exist(self, registry_name, block_number):
         if block_number > self.__get_current_preprocessed_block_number():

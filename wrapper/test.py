@@ -115,6 +115,9 @@ class Test:
 
         registries_cache = RegistriesCache(event_cache, config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK, config.DB_URL,
                                            config.INTERVAL_FOR_PREPROCESSED_BLOCKS, settings)
+
+        # registries_cache.erase(config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 20)
+
         while True:
             registries_cache.update()
             # registries_cache.update_current_block()
