@@ -20,13 +20,13 @@ class RegistriesCache:
             return
         while last_processed_block_number + self.interval_for_preprocessed_blocks \
                 < self.event_cache.get_last_processed_block_number():
-            if last_processed_block_number < self.gsr_created_at_block:
-                continue
             self.prepare(last_processed_block_number + self.interval_for_preprocessed_blocks)
             last_processed_block_number = last_processed_block_number + self.interval_for_preprocessed_blocks
             self.__set_last_preprocessed_block_number(last_processed_block_number)
 
         current_preprocessed_block_number = self.__get_current_preprocessed_block_number()
+        if current_preprocessed_block_number >= self.gsr_created_at_block:
+            return
         if current_preprocessed_block_number < self.event_cache.get_last_processed_block_number():
             if current_preprocessed_block_number != self.__determine_previous_preprocessed_block(
                     self.event_cache.get_last_processed_block_number()):
@@ -51,7 +51,7 @@ class RegistriesCache:
         # reg name -> sorted array -> [candidate, total tokens]
         winners = {}
 
-        if previous_block > self.gsr_created_at_block + self.interval_for_preprocessed_blocks:
+        if previous_block > self.gsr_created_at_block:
             self.__load_from_db(votes, weights, registries, winners, previous_block)
 
         winners = {}
@@ -69,10 +69,10 @@ class RegistriesCache:
         collection_registries = self.db[self.collection_name_prefix + "registries_" + str(block_number)]
         collection_winners = self.db[self.collection_name_prefix + "winners_" + str(block_number)]
 
-        for reg_name in collection_registries.find():
-            registries.append(reg_name)
-            votes[reg_name] = {}
-            winners[reg_name] = {}
+        for document in collection_registries.find():
+            registries.append(document["name"])
+            votes[document["name"]] = {}
+            winners[document["name"]] = []
 
         for document in collection_votes.find():
             if document["voter"] not in votes[document["registry_name"]].keys():
@@ -82,7 +82,7 @@ class RegistriesCache:
         for document in collection_weights.find():
             weights[document["voter"]] = document["amount"]
 
-        for document in collection_winners.find().sort(["position", pymongo.ASCENDING]):
+        for document in collection_winners.find().sort([("position", pymongo.ASCENDING)]):
             winners[document["registry_name"]].append([document["candidate"], document["amount"]])
 
     def __save_to_db(self, votes, weights, registries, winners, block_number):
@@ -202,13 +202,13 @@ class RegistriesCache:
         if block_number >= self.gsr_created_at_block + self.interval_for_preprocessed_blocks + 1:
             previous_block = (((block_number - self.gsr_created_at_block) // self.interval_for_preprocessed_blocks - 1)
                               * self.interval_for_preprocessed_blocks) \
-                             + self.interval_for_preprocessed_blocks + self.gsr_created_at_block
+                             + self.gsr_created_at_block
         return previous_block
 
     def __get_last_preprocessed_block_number(self):
         result = self.settings.get_value("last_preprocessed_block_number")
         if not result:
-            result = self.gsr_created_at_block -1
+            result = self.gsr_created_at_block
         return result
 
     def __set_last_preprocessed_block_number(self, value):
