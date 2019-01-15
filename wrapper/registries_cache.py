@@ -28,6 +28,9 @@ class RegistriesCache:
         current_preprocessed_block_number = self.__get_current_preprocessed_block_number()
         if self.event_cache.get_last_processed_block_number() < self.gsr_created_at_block:
             return
+        if self.event_cache.get_last_processed_block_number() < \
+                self.__get_last_preprocessed_block_number() + self.interval_for_preprocessed_blocks:
+            return
         if current_preprocessed_block_number < self.event_cache.get_last_processed_block_number():
             if current_preprocessed_block_number != self.__determine_previous_preprocessed_block(
                     self.event_cache.get_last_processed_block_number()):
@@ -195,6 +198,8 @@ class RegistriesCache:
         pass
 
     def get_total_votes_for_candidate(self, candidate_address, registry_name, block_number):
+        if block_number > self.__get_current_preprocessed_block_number():
+            return 0
         winners = self.get_winners_list(registry_name, block_number)
         if len(winners):
             for candidate in winners:
@@ -203,6 +208,8 @@ class RegistriesCache:
         return 0
 
     def get_winners_list(self, registry_name, block_number):
+        if block_number > self.__get_current_preprocessed_block_number():
+            return []
         prepared_block_data = self.__preprocess_block(block_number, False)
         if registry_name in prepared_block_data[3].keys():
             return prepared_block_data[3][registry_name]
