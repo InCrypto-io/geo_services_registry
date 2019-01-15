@@ -25,7 +25,7 @@ class RegistriesCache:
             self.__set_last_preprocessed_block_number(last_processed_block_number)
 
         current_preprocessed_block_number = self.__get_current_preprocessed_block_number()
-        if current_preprocessed_block_number >= self.gsr_created_at_block:
+        if current_preprocessed_block_number < self.gsr_created_at_block:
             return
         if current_preprocessed_block_number < self.event_cache.get_last_processed_block_number():
             if current_preprocessed_block_number != self.__determine_previous_preprocessed_block(
