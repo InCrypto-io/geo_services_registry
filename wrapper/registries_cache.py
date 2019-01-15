@@ -199,7 +199,8 @@ class RegistriesCache:
         previous_block = self.gsr_created_at_block
         if block_number >= self.gsr_created_at_block + self.interval_for_preprocessed_blocks + 1:
             previous_block = (((block_number - self.gsr_created_at_block) // self.interval_for_preprocessed_blocks - 1)
-                              * self.interval_for_preprocessed_blocks) + self.interval_for_preprocessed_blocks
+                              * self.interval_for_preprocessed_blocks) \
+                             + self.interval_for_preprocessed_blocks + self.gsr_created_at_block
         return previous_block
 
     def __get_last_preprocessed_block_number(self):
