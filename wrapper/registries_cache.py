@@ -178,7 +178,7 @@ class RegistriesCache:
             winners[reg_name] = []
             for candidate in participants[reg_name].keys():
                 winners[reg_name].append([candidate, participants[reg_name][candidate]])
-            winners[reg_name].sort(key=lambda candidate_and_total: candidate_and_total[1])
+            winners[reg_name].sort(key=lambda candidate_and_total: candidate_and_total[1], reverse=True)
 
         for reg_name in winners.keys():
             for i in range(0, len(winners[reg_name])):
@@ -195,7 +195,12 @@ class RegistriesCache:
         pass
 
     def get_total_votes_for_candidate(self, candidate_address, registry_name, block_number):
-        pass
+        winners = self.get_winners_list(registry_name, block_number)
+        if len(winners):
+            for candidate in winners:
+                if candidate[0] == candidate_address:
+                    return candidate[1]
+        return 0
 
     def get_winners_list(self, registry_name, block_number):
         prepared_block_data = self.__preprocess_block(block_number, False)

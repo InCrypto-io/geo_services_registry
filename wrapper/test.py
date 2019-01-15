@@ -118,8 +118,18 @@ class Test:
         while True:
             registries_cache.update()
             registries_cache.update_current_block()
-            # print("get_winners_list",
-            #       registries_cache.get_winners_list("provider", config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 100))
+            print("get_winners_list",
+                  registries_cache.get_winners_list("provider", config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 100))
+
+            accounts = self.eth_connection.get_accounts()
+            print("get_total_votes_for_candidate",
+                  registries_cache.get_total_votes_for_candidate(accounts[0],
+                                                                 "provider",
+                                                                 config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 20))
+            print("get_total_votes_for_candidate",
+                  registries_cache.get_total_votes_for_candidate(accounts[3],
+                                                                 "provider",
+                                                                 config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 20))
             time.sleep(1)
 
         # event_cache.stop_collect()
