@@ -36,7 +36,7 @@ class RegistriesCache:
     def prepare(self, block_number):
         print("prepare", block_number)
         assert block_number > self.__get_last_preprocessed_block_number()
-        assert (block_number - self.gsr_created_at_block) % self.interval_for_preprocessed_blocks == 0
+        assert block_number >= self.gsr_created_at_block
 
         previous_block = self.__determine_previous_preprocessed_block(block_number)
 
