@@ -7,4 +7,5 @@ GEOToken_Address = "0xcd99d3da679db4f1a605076028ddfd9b79433918"
 MNEMONIC = "swear picture category mystery together baby off pass shallow one math trophy"
 DB_URL = "mongodb://mongdb:27017/"
 CONFIRMATION_COUNT = 5
+INTERVAL_FOR_PREPROCESSED_BLOCKS = 1000
 
