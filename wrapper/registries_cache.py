@@ -16,22 +16,24 @@ class RegistriesCache:
 
     def update(self):
         last_processed_block_number = self.__get_last_preprocessed_block_number()
-        if last_processed_block_number < self.gsr_created_at_block:
-            last_processed_block_number = self.gsr_created_at_block
+        if self.event_cache.get_last_processed_block_number() < self.gsr_created_at_block:
+            return
         while last_processed_block_number + self.interval_for_preprocessed_blocks \
-                < self.event_cache.last_processed_block:
+                < self.event_cache.get_last_processed_block_number():
+            if last_processed_block_number < self.gsr_created_at_block:
+                continue
             self.prepare(last_processed_block_number + self.interval_for_preprocessed_blocks)
             last_processed_block_number = last_processed_block_number + self.interval_for_preprocessed_blocks
             self.__set_last_preprocessed_block_number(last_processed_block_number)
 
         current_preprocessed_block_number = self.__get_current_preprocessed_block_number()
-        if current_preprocessed_block_number < self.event_cache.last_processed_block:
+        if current_preprocessed_block_number < self.event_cache.get_last_processed_block_number():
             if current_preprocessed_block_number != self.__determine_previous_preprocessed_block(
-                    self.event_cache.last_processed_block):
+                    self.event_cache.get_last_processed_block_number()):
                 self.__remove_dbs_for_block_number(current_preprocessed_block_number)
-            if self.event_cache.last_processed_block != self.__get_last_preprocessed_block_number():
-                self.prepare(self.event_cache.last_processed_block)
-            self.__set_current_preprocessed_block_number(self.event_cache.last_processed_block)
+            if self.event_cache.get_last_processed_block_number() != self.__get_last_preprocessed_block_number():
+                self.prepare(self.event_cache.get_last_processed_block_number())
+            self.__set_current_preprocessed_block_number(self.event_cache.get_last_processed_block_number())
 
     def prepare(self, block_number):
         print("prepare", block_number)
@@ -138,6 +140,9 @@ class RegistriesCache:
         assert len(winners) == 0
         events = self.event_cache.get_events_in_range(from_block_number, to_block_number)
 
+        if len(events) == 0:
+            return
+
         for event in events:
             if event["event"] == "Deposit":
                 weights[event["_voter"]] = event["_fullSize"]
@@ -206,7 +211,7 @@ class RegistriesCache:
     def __get_last_preprocessed_block_number(self):
         result = self.settings.get_value("last_preprocessed_block_number")
         if not result:
-            result = 0
+            result = self.gsr_created_at_block -1
         return result
 
     def __set_last_preprocessed_block_number(self, value):
