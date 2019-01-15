@@ -140,9 +140,6 @@ class RegistriesCache:
         assert len(winners) == 0
         events = self.event_cache.get_events_in_range(from_block_number, to_block_number)
 
-        if len(events) == 0:
-            return
-
         for event in events:
             if event["event"] == "Deposit":
                 weights[event["_voter"]] = event["_fullSize"]
