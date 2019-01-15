@@ -162,10 +162,8 @@ class RegistriesCache:
                 for candidate in votes[reg_name][voter].keys():
                     if candidate not in participants[reg_name].keys():
                         participants[reg_name][candidate] = 0
-                    else:
-                        participants[reg_name][candidate] = participants[reg_name][candidate] \
-                                                            + (votes[reg_name][voter][candidate]
-                                                               * weights[voter] / 10000)
+                    weight_in_tokens = (votes[reg_name][voter][candidate] * weights[voter] / 10000)
+                    participants[reg_name][candidate] = participants[reg_name][candidate] + weight_in_tokens
 
         for reg_name in registries:
             winners[reg_name] = []
