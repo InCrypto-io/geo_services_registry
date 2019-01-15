@@ -15,21 +15,30 @@ class RegistriesCache:
         self.db = self.client['db_geo_registries']
 
     def update(self):
-        last_processed_block = self.get_last_processed_block()
-        if last_processed_block < self.gsr_created_at_block:
-            last_processed_block = self.gsr_created_at_block
-        while last_processed_block + self.interval_for_preprocessed_blocks < self.event_cache.last_processed_block:
-            self.prepare(last_processed_block + self.interval_for_preprocessed_blocks)
-            last_processed_block = last_processed_block + self.interval_for_preprocessed_blocks
+        last_processed_block_number = self.__get_last_preprocessed_block_number()
+        if last_processed_block_number < self.gsr_created_at_block:
+            last_processed_block_number = self.gsr_created_at_block
+        while last_processed_block_number + self.interval_for_preprocessed_blocks \
+                < self.event_cache.last_processed_block:
+            self.prepare(last_processed_block_number + self.interval_for_preprocessed_blocks)
+            last_processed_block_number = last_processed_block_number + self.interval_for_preprocessed_blocks
+            self.__set_last_preprocessed_block_number(last_processed_block_number)
 
-        # todo for current
+        current_preprocessed_block_number = self.__get_current_preprocessed_block_number()
+        if current_preprocessed_block_number < self.event_cache.last_processed_block:
+            if current_preprocessed_block_number != self.__determine_previous_preprocessed_block(
+                    self.event_cache.last_processed_block):
+                self.__remove_dbs_for_block_number(current_preprocessed_block_number)
+            if self.event_cache.last_processed_block != self.__get_last_preprocessed_block_number():
+                self.prepare(self.event_cache.last_processed_block)
+            self.__set_current_preprocessed_block_number(self.event_cache.last_processed_block)
 
     def prepare(self, block_number):
         print("prepare", block_number)
-        assert block_number > self.get_last_processed_block()
+        assert block_number > self.__get_last_preprocessed_block_number()
         assert (block_number - self.gsr_created_at_block) % self.interval_for_preprocessed_blocks == 0
 
-        previous_block = self.determine_previous_preprocessed_block(block_number)
+        previous_block = self.__determine_previous_preprocessed_block(block_number)
 
         # reg name -> voter -> candidate -> amount in percent
         votes = {}
@@ -47,8 +56,6 @@ class RegistriesCache:
         self.__apply_events(votes, weights, registries, winners, previous_block, block_number)
 
         self.__save_to_db(votes, weights, registries, winners, block_number)
-
-        self.set_last_processed_block(block_number)
 
     def __load_from_db(self, votes, weights, registries, winners, block_number):
         assert len(votes) == 0
@@ -121,6 +128,12 @@ class RegistriesCache:
                     "position": i
                 })
 
+    def __remove_dbs_for_block_number(self, block_number):
+        self.db[self.collection_name_prefix + "votes_" + str(block_number)].command("dropDatabase")
+        self.db[self.collection_name_prefix + "weights_" + str(block_number)].command("dropDatabase")
+        self.db[self.collection_name_prefix + "registries_" + str(block_number)].command("dropDatabase")
+        self.db[self.collection_name_prefix + "winners_" + str(block_number)].command("dropDatabase")
+
     def __apply_events(self, votes, weights, registries, winners, from_block_number, to_block_number):
         assert len(winners) == 0
         events = self.event_cache.get_events_in_range(from_block_number, to_block_number)
@@ -182,18 +195,27 @@ class RegistriesCache:
     def get_winners_list(self, registry_name, block_number):
         pass
 
-    def get_last_processed_block(self):
-        result = self.settings.get_value("get_last_processed_block")
-        if not result:
-            result = 0
-        return result
-
-    def set_last_processed_block(self, value):
-        self.settings.set_value("get_last_processed_block", value)
-
-    def determine_previous_preprocessed_block(self, block_number):
+    def __determine_previous_preprocessed_block(self, block_number):
         previous_block = self.gsr_created_at_block
         if block_number >= self.gsr_created_at_block + self.interval_for_preprocessed_blocks + 1:
             previous_block = (((block_number - self.gsr_created_at_block) // self.interval_for_preprocessed_blocks - 1)
                               * self.interval_for_preprocessed_blocks) + self.interval_for_preprocessed_blocks
         return previous_block
+
+    def __get_last_preprocessed_block_number(self):
+        result = self.settings.get_value("last_preprocessed_block_number")
+        if not result:
+            result = 0
+        return result
+
+    def __set_last_preprocessed_block_number(self, value):
+        self.settings.set_value("last_preprocessed_block_number", value)
+
+    def __get_current_preprocessed_block_number(self):
+        result = self.settings.get_value("current_preprocessed_block_number")
+        if not result:
+            result = 0
+        return result
+
+    def __set_current_preprocessed_block_number(self, value):
+        self.settings.set_value("current_preprocessed_block_number", value)
