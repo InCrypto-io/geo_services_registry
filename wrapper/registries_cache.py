@@ -129,10 +129,10 @@ class RegistriesCache:
                 })
 
     def __remove_dbs_for_block_number(self, block_number):
-        self.db[self.collection_name_prefix + "votes_" + str(block_number)].command("dropDatabase")
-        self.db[self.collection_name_prefix + "weights_" + str(block_number)].command("dropDatabase")
-        self.db[self.collection_name_prefix + "registries_" + str(block_number)].command("dropDatabase")
-        self.db[self.collection_name_prefix + "winners_" + str(block_number)].command("dropDatabase")
+        self.client.drop_database(self.collection_name_prefix + "votes_" + str(block_number))
+        self.client.drop_database(self.collection_name_prefix + "weights_" + str(block_number))
+        self.client.drop_database(self.collection_name_prefix + "registries_" + str(block_number))
+        self.client.drop_database(self.collection_name_prefix + "winners_" + str(block_number))
 
     def __apply_events(self, votes, weights, registries, winners, from_block_number, to_block_number):
         assert len(winners) == 0
