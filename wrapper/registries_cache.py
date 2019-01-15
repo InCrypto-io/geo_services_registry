@@ -14,15 +14,11 @@ class RegistriesCache:
         self.client = MongoClient(db_url)
         self.db = self.client['db_geo_registries']
 
-    def update(self, wait_for_block_number=0):
-        if wait_for_block_number > 0:
-            while wait_for_block_number >= self.event_cache.last_processed_block:
-                time.sleep(10)
-
+    def update(self):
         last_processed_block = self.get_last_processed_block()
         if last_processed_block < self.gsr_created_at_block:
             last_processed_block = self.gsr_created_at_block
-        while last_processed_block < self.event_cache.last_processed_block:
+        while last_processed_block + self.interval_for_preprocessed_blocks < self.event_cache.last_processed_block:
             self.prepare(last_processed_block + self.interval_for_preprocessed_blocks)
             last_processed_block = last_processed_block + self.interval_for_preprocessed_blocks
 
@@ -52,9 +48,7 @@ class RegistriesCache:
 
         self.__save_to_db(votes, weights, registries, winners, block_number)
 
-        for reg_name in winners.keys():
-            for i in range(0, len(winners[reg_name])):
-                print(reg_name, i, winners[reg_name][i])
+        self.set_last_processed_block(block_number)
 
     def __load_from_db(self, votes, weights, registries, winners, block_number):
         assert len(votes) == 0
@@ -126,8 +120,6 @@ class RegistriesCache:
                     "amount": winners[reg_name][i][1],
                     "position": i
                 })
-
-        self.set_last_processed_block(block_number)
 
     def __apply_events(self, votes, weights, registries, winners, from_block_number, to_block_number):
         assert len(winners) == 0
