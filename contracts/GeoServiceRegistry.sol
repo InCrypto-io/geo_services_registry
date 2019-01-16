@@ -26,7 +26,7 @@ contract GeoServiceRegistry {
 
     event Deposit(address _voter, uint256 _fullSize);
     event NewRegistry(string _name);
-    event Vote(string _name, address _voter, address _candidate, uint256 _amount);
+    event Vote(string _name, address _voter, address[] _candidates, uint256[] _amounts);
     event Withdrawal(address _voter, uint256 _amountWithdraw);
 
     /* MODIFIERS
@@ -87,9 +87,7 @@ contract GeoServiceRegistry {
     {
         require(_candidates.length <= 20 && _candidates.length == _amounts.length);
         require(sumOfArray(_amounts) == 10000);
-        for (uint256 n = 0; n < _candidates.length; n++) {
-            emit Vote(_registryName, msg.sender, _candidates[n], _amounts[n]);
-        }
+        emit Vote(_registryName, msg.sender, _candidates, _amounts);
     }
 
     /**
