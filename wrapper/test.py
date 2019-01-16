@@ -140,8 +140,11 @@ class Test:
         range_block_number_for_print = range(3699799, 3699803)
         if event_cache.get_last_processed_block_number() >= range_block_number_for_print[-1]:
             for block_number in range_block_number_for_print:
-                print("get_winners_list", block_number,
-                      registries_cache.get_winners_list("provider", block_number))
+                print("block_number", block_number)
+                registries = registries_cache.get_registry_list(block_number)
+                for registry in registries:
+                    print("winners list for {}[{}]".format(registry, block_number),
+                          registries_cache.get_winners_list(registry, block_number))
 
         while True:
             registries_cache.update()
