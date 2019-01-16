@@ -147,11 +147,12 @@ class RegistriesCache:
         events = self.event_cache.get_events_in_range(from_block_number, to_block_number)
 
         for event in events:
-            if event["event"] == "Deposit":
-                weights[event["_voter"]] = event["_fullSize"]
-            elif event["event"] == "Withdrawal":
-                weights[event["_voter"]] = weights[event["_voter"]] - event["_amountWithdraw"]
-                assert weights[event["_voter"]] >= 0
+            if event["event"] == "Deposit" or event["event"] == "Withdrawal":
+                if event["event"] == "Deposit":
+                    weights[event["_voter"]] = event["_fullSize"]
+                elif event["event"] == "Withdrawal":
+                    weights[event["_voter"]] = weights[event["_voter"]] - event["_amountWithdraw"]
+                    assert weights[event["_voter"]] >= 0
                 if weights[event["_voter"]] == 0:
                     for reg_name in registries:
                         if event["_voter"] in votes[reg_name].keys():
