@@ -9,6 +9,8 @@ services:
   gsr:
     build: .
     command: python3 ./wrapper/manage.py
+    ports:
+      - '8080:8080'
     depends_on:
       - mongdb
     links:
