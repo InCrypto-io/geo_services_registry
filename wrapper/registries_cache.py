@@ -184,9 +184,7 @@ class RegistriesCache:
             winners[reg_name].sort(key=lambda candidate_and_total: candidate_and_total[1], reverse=True)
 
         for reg_name in winners.keys():
-            for i in range(0, len(winners[reg_name])):
-                if winners[reg_name][i][1] == 0:
-                    del winners[reg_name][i]
+            winners[reg_name] = list(filter(lambda item: item[1] > 0, winners[reg_name]))
 
     def erase(self, block_number=0):
         if block_number == 0:
