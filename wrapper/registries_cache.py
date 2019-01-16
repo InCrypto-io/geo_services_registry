@@ -3,10 +3,12 @@ from pymongo import MongoClient
 
 
 class RegistriesCache:
-    def __init__(self, event_cache, gsr_created_at_block, db_url, interval_for_preprocessed_blocks, settings):
+    def __init__(self, event_cache, gsr_created_at_block, db_url, interval_for_preprocessed_blocks, settings,
+                 votes_round_to_number_of_digit):
         self.event_cache = event_cache
         self.gsr_created_at_block = gsr_created_at_block
         self.settings = settings
+        self.votes_round_to_number_of_digit = votes_round_to_number_of_digit
 
         self.collection_name_prefix = "registry_"
         self.interval_for_preprocessed_blocks = interval_for_preprocessed_blocks
@@ -175,7 +177,8 @@ class RegistriesCache:
                 for candidate in votes[reg_name][voter].keys():
                     if candidate not in participants[reg_name].keys():
                         participants[reg_name][candidate] = 0
-                    weight_in_tokens = (votes[reg_name][voter][candidate] * weights[voter] / 10000)
+                    weight_in_tokens = round(votes[reg_name][voter][candidate] * weights[voter] / 10000,
+                                             self.votes_round_to_number_of_digit)
                     participants[reg_name][candidate] = participants[reg_name][candidate] + weight_in_tokens
 
         for reg_name in registries:

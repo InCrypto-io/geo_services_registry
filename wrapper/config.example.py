@@ -8,4 +8,4 @@ MNEMONIC = "swear picture category mystery together baby off pass shallow one ma
 DB_URL = "mongodb://mongdb:27017/"
 CONFIRMATION_COUNT = 5
 INTERVAL_FOR_PREPROCESSED_BLOCKS = 1000
-
+VOTES_ROUND_TO_NUMBER_OF_DIGIT = 1
