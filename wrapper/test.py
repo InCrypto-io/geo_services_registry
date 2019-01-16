@@ -72,8 +72,17 @@ class Test:
         events_list = self.gsr.contract.events.Vote().processReceipt(tx_receipt)
         print("\tlogs", events_list)
 
-        amounts = [186, 363, 545, 727, 909, 1090, 1272, 1454, 1636, 1818]
+        self.gsr.set_sender(user1)
+        # withdraw in lockup period
+        tx_hash = self.gsr.set_vote_weight_in_lockup_period(0)
+        print("interval blockNumber",
+              self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)["blockNumber"])
+        self.gsr.set_sender(user2)
+        tx_hash = self.gsr.set_vote_weight_in_lockup_period(0)
+        self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)
 
+        reg_name = "observer"
+        amounts = [186, 363, 545, 727, 909, 1090, 1272, 1454, 1636, 1818]
         self.gsr.set_sender(user1)
         self.gsr.set_vote_weight_in_lockup_period(77000)
         self.gsr.vote_service_lockup("hub", accounts, amounts)
@@ -86,7 +95,19 @@ class Test:
         print("interval blockNumber",
               self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)["blockNumber"])
         self.gsr.set_sender(user1)
+        tx_hash = self.gsr.set_vote_weight_in_lockup_period(0)
+        print("interval blockNumber",
+              self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)["blockNumber"])
         self.gsr.set_vote_weight_in_lockup_period(55000)
+        tx_hash = self.gsr.vote_service_lockup(reg_name, accounts, amounts)
+        print("interval blockNumber",
+              self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)["blockNumber"])
+        tx_hash = self.gsr.vote_service_lockup(reg_name, accounts, amounts)
+        print("interval blockNumber",
+              self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)["blockNumber"])
+        tx_hash = self.gsr.vote_service_lockup(reg_name, accounts, amounts)
+        print("interval blockNumber",
+              self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)["blockNumber"])
         tx_hash = self.gsr.vote_service_lockup(reg_name, accounts, amounts)
         print("interval blockNumber",
               self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)["blockNumber"])
@@ -137,10 +158,10 @@ class Test:
 
         # registries_cache.erase(config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 20)
 
-        range_block_number_for_print = range(3699799, 3699803)
+        # range_block_number_for_print = range(3700385, 3700394)
+        range_block_number_for_print = range(3700452, 3700462)
         if event_cache.get_last_processed_block_number() >= range_block_number_for_print[-1]:
             for block_number in range_block_number_for_print:
-                print("block_number", block_number)
                 registries = registries_cache.get_registry_list(block_number)
                 for registry in registries:
                     print("winners list for {}[{}]".format(registry, block_number),
@@ -165,6 +186,6 @@ class Test:
             #       .is_registry_exist("created_registry_0", config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 1))
             # print("is_registry_exist", registries_cache
             #       .is_registry_exist("created_registry_0", config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 20))
-            time.sleep(10)
+            time.sleep(1)
 
         # event_cache.stop_collect()
