@@ -154,7 +154,7 @@ class RegistriesCache:
                 assert weights[event["_voter"]] >= 0
                 if weights[event["_voter"]] == 0:
                     for reg_name in registries:
-                        if event["_voter"] in votes[reg_name]:
+                        if event["_voter"] in votes[reg_name].keys():
                             del votes[reg_name][event["_voter"]]
             elif event["event"] == "Vote":
                 if event["_voter"] not in votes[event["_name"]].keys():

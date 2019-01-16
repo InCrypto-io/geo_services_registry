@@ -137,6 +137,6 @@ class Test:
             #       .is_registry_exist("created_registry_0", config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 1))
             # print("is_registry_exist", registries_cache
             #       .is_registry_exist("created_registry_0", config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK + 20))
-            time.sleep(1)
+            time.sleep(10)
 
         # event_cache.stop_collect()
