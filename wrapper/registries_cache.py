@@ -154,12 +154,12 @@ class RegistriesCache:
                 assert weights[event["_voter"]] >= 0
                 if weights[event["_voter"]] == 0:
                     for reg_name in registries:
-                        if event["_voter"] in votes[reg_name]:
+                        if event["_voter"] in votes[reg_name].keys():
                             del votes[reg_name][event["_voter"]]
             elif event["event"] == "Vote":
-                if event["_voter"] not in votes[event["_name"]].keys():
-                    votes[event["_name"]][event["_voter"]] = {}
-                votes[event["_name"]][event["_voter"]][event["_candidate"]] = event["_amount"]
+                votes[event["_name"]][event["_voter"]] = {}
+                for i in range(0, len(event["_candidates"])):
+                    votes[event["_name"]][event["_voter"]][event["_candidates"][i]] = event["_amounts"][i]
             elif event["event"] == "NewRegistry":
                 if event["_name"] not in registries:
                     registries.append(event["_name"])
