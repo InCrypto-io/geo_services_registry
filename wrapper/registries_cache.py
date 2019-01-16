@@ -212,6 +212,12 @@ class RegistriesCache:
         prepared_block_data = self.__preprocess_block(block_number, False)
         return registry_name in prepared_block_data[2]
 
+    def get_registry_list(self, block_number):
+        if block_number > self.__get_current_preprocessed_block_number():
+            return []
+        prepared_block_data = self.__preprocess_block(block_number, False)
+        return prepared_block_data[2]
+
     def get_total_votes_for_candidate(self, candidate_address, registry_name, block_number):
         if block_number > self.__get_current_preprocessed_block_number():
             return 0
