@@ -147,11 +147,12 @@ class RegistriesCache:
         events = self.event_cache.get_events_in_range(from_block_number, to_block_number)
 
         for event in events:
-            if event["event"] == "Deposit":
-                weights[event["_voter"]] = event["_fullSize"]
-            elif event["event"] == "Withdrawal":
-                weights[event["_voter"]] = weights[event["_voter"]] - event["_amountWithdraw"]
-                assert weights[event["_voter"]] >= 0
+            if event["event"] == "Deposit" or event["event"] == "Withdrawal":
+                if event["event"] == "Deposit":
+                    weights[event["_voter"]] = event["_fullSize"]
+                elif event["event"] == "Withdrawal":
+                    weights[event["_voter"]] = weights[event["_voter"]] - event["_amountWithdraw"]
+                    assert weights[event["_voter"]] >= 0
                 if weights[event["_voter"]] == 0:
                     for reg_name in registries:
                         if event["_voter"] in votes[reg_name].keys():
@@ -184,9 +185,7 @@ class RegistriesCache:
             winners[reg_name].sort(key=lambda candidate_and_total: candidate_and_total[1], reverse=True)
 
         for reg_name in winners.keys():
-            for i in range(0, len(winners[reg_name])):
-                if winners[reg_name][i][1] == 0:
-                    del winners[reg_name][i]
+            winners[reg_name] = list(filter(lambda item: item[1] > 0, winners[reg_name]))
 
     def erase(self, block_number=0):
         if block_number == 0:
@@ -211,6 +210,12 @@ class RegistriesCache:
             return False
         prepared_block_data = self.__preprocess_block(block_number, False)
         return registry_name in prepared_block_data[2]
+
+    def get_registry_list(self, block_number):
+        if block_number > self.__get_current_preprocessed_block_number():
+            return []
+        prepared_block_data = self.__preprocess_block(block_number, False)
+        return prepared_block_data[2]
 
     def get_total_votes_for_candidate(self, candidate_address, registry_name, block_number):
         if block_number > self.__get_current_preprocessed_block_number():
