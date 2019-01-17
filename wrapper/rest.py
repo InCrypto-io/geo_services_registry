@@ -95,7 +95,25 @@ class REST:
             return web.Response(status=400)
 
     def get_vote_for_candidate(self, request):
-        pass
+        if "address" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "registryName" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "blockNumber" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            address = str(request.rel_url.query["address"])
+            registry_name = str(request.rel_url.query["registryName"])
+            block_number = int(request.rel_url.query["blockNumber"])
+            text = json.dumps({
+                "registry": registry_name,
+                "address": address,
+                "tokens": self.registries_cache.get_total_votes_for_candidate(address, registry_name, block_number),
+                "blockNumber": block_number
+            })
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
 
     def process_events(self):
         while self.allow_process_events:
