@@ -123,6 +123,10 @@ class REST:
         except ValueError:
             return web.Response(status=400)
 
+    def get_gas_price(self, request):
+        text = str(self.eth_connection.get_gas_price())
+        return web.Response(text=text)
+
     def process_events(self):
         while self.allow_process_events:
             self.registries_cache.update()
@@ -136,7 +140,8 @@ class REST:
                         web.get('/registries/list', self.get_registries),
                         web.get('/registries/exist', self.is_registry_exist),
                         web.get('/votes/list', self.get_winners_list),
-                        web.get('/votes/candidate', self.get_vote_for_candidate)
+                        web.get('/votes/candidate', self.get_vote_for_candidate),
+                        web.get('/eth/gasPrice', self.get_gas_price),
                         ])
 
         self.allow_process_events = True
