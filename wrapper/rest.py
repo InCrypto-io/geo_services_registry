@@ -127,6 +127,12 @@ class REST:
         text = str(self.eth_connection.get_gas_price())
         return web.Response(text=text)
 
+    def get_ethereum_accounts(self, request):
+        text = json.dumps({
+            "addresses": self.eth_connection.get_accounts()
+        })
+        return web.Response(text=text)
+
     def process_events(self):
         while self.allow_process_events:
             self.registries_cache.update()
@@ -142,6 +148,7 @@ class REST:
                         web.get('/votes/list', self.get_winners_list),
                         web.get('/votes/candidate', self.get_vote_for_candidate),
                         web.get('/eth/gasPrice', self.get_gas_price),
+                        web.get('/eth/accounts', self.get_ethereum_accounts),
                         ])
 
         self.allow_process_events = True
