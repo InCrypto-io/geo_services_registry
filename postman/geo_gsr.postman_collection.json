@@ -116,6 +116,62 @@
 				"description": "check registry existfor chosen block number"
 			},
 			"response": []
+		},
+		{
+			"name": "get winners list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/blocks/currentBlock",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"blocks",
+						"currentBlock"
+					]
+				},
+				"description": "get sorted winners list for chosen block number and registry"
+			},
+			"response": []
+		},
+		{
+			"name": "get total votes for one candidate",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/blocks/currentBlock",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"blocks",
+						"currentBlock"
+					]
+				},
+				"description": "get amount of vote for one candidate for chosen block number and registry"
+			},
+			"response": []
 		}
 	]
 }
