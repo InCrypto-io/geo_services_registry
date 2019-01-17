@@ -77,8 +77,22 @@ class REST:
         except ValueError:
             return web.Response(status=400)
 
-    def get_votes_list(self, request):
-        pass
+    def get_winners_list(self, request):
+        if "registryName" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "blockNumber" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            registry_name = str(request.rel_url.query["registryName"])
+            block_number = int(request.rel_url.query["blockNumber"])
+            text = json.dumps({
+                "registry": registry_name,
+                "winners": self.registries_cache.get_winners_list(registry_name, block_number),
+                "blockNumber": block_number
+            })
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
 
     def get_vote_for_candidate(self, request):
         pass
@@ -96,7 +110,7 @@ class REST:
                         web.get('/blocks/currentBlock', self.get_current_block_number),
                         web.get('/registries/list', self.get_registries),
                         web.get('/registries/exist', self.is_registry_exist),
-                        web.get('/votes/list', self.is_registry_exist),
+                        web.get('/votes/list', self.get_winners_list),
                         web.get('/votes/candidate', self.get_vote_for_candidate),
                         web.get('/{request}', self.handle)])
 

@@ -29,7 +29,7 @@
 						"currentBlock"
 					]
 				},
-				"description": "get first procces block number"
+				"description": "get first process block number"
 			},
 			"response": []
 		},
@@ -57,7 +57,7 @@
 						"currentBlock"
 					]
 				},
-				"description": "get last procces block number"
+				"description": "get last process block number"
 			},
 			"response": []
 		},
@@ -85,7 +85,35 @@
 						"currentBlock"
 					]
 				},
-				"description": "get last procces block number"
+				"description": "get registries list for chosen block number"
+			},
+			"response": []
+		},
+		{
+			"name": "registry exist",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/blocks/currentBlock",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"blocks",
+						"currentBlock"
+					]
+				},
+				"description": "check registry existfor chosen block number"
 			},
 			"response": []
 		}
