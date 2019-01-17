@@ -48,6 +48,9 @@ class REST:
             return web.Response(status=400)
         try:
             block_number = int(request.rel_url.query["blockNumber"])
+            if block_number < config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK \
+                    or block_number > self.registries_cache.get_current_preprocessed_block_number():
+                return web.Response(status=404)
             text = json.dumps({
                 "registries": self.registries_cache.get_registry_list(block_number),
                 "blockNumber": block_number
@@ -64,6 +67,9 @@ class REST:
         try:
             registry_name = str(request.rel_url.query["registryName"])
             block_number = int(request.rel_url.query["blockNumber"])
+            if block_number < config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK \
+                    or block_number > self.registries_cache.get_current_preprocessed_block_number():
+                return web.Response(status=404)
             text = json.dumps({
                 "registry": registry_name,
                 "exist": self.registries_cache.is_registry_exist(registry_name, block_number),
@@ -81,6 +87,9 @@ class REST:
         try:
             registry_name = str(request.rel_url.query["registryName"])
             block_number = int(request.rel_url.query["blockNumber"])
+            if block_number < config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK \
+                    or block_number > self.registries_cache.get_current_preprocessed_block_number():
+                return web.Response(status=404)
             text = json.dumps({
                 "registry": registry_name,
                 "winners": self.registries_cache.get_winners_list(registry_name, block_number),
@@ -101,6 +110,9 @@ class REST:
             address = str(request.rel_url.query["address"])
             registry_name = str(request.rel_url.query["registryName"])
             block_number = int(request.rel_url.query["blockNumber"])
+            if block_number < config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK \
+                    or block_number > self.registries_cache.get_current_preprocessed_block_number():
+                return web.Response(status=404)
             text = json.dumps({
                 "registry": registry_name,
                 "address": address,
