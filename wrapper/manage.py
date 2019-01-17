@@ -12,7 +12,7 @@ from settings import Settings
 if __name__ == "__main__":
     if "TEST" in config.COMMAND_ARGS:
         test = Test()
-        # test.test()
+        test.test()
         # test.test_events_cache()
         test.test_registries_cache()
     elif "REST" in config.COMMAND_ARGS:
