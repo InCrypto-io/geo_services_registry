@@ -8,6 +8,7 @@ import time
 from registries_cache import RegistriesCache
 from settings import Settings
 from threading import Thread
+import json
 
 
 class REST:
@@ -51,13 +52,30 @@ class REST:
             return web.Response(status=400)
         try:
             block_number = int(request.rel_url.query["blockNumber"])
-            text = str(self.registries_cache.get_registry_list(block_number))
+            text = json.dumps({
+                "registries": self.registries_cache.get_registry_list(block_number),
+                "blockNumber": block_number
+            })
             return web.Response(text=text)
         except ValueError:
             return web.Response(status=400)
 
     def is_registry_exist(self, request):
-        pass
+        if "registryName" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "blockNumber" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            registry_name = str(request.rel_url.query["registryName"])
+            block_number = int(request.rel_url.query["blockNumber"])
+            text = json.dumps({
+                "registry": registry_name,
+                "exist": self.registries_cache.is_registry_exist(registry_name, block_number),
+                "blockNumber": block_number
+            })
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
 
     def get_votes_list(self, request):
         pass
