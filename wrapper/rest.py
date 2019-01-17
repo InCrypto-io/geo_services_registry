@@ -46,11 +46,15 @@ class REST:
         text = str(self.registries_cache.get_current_preprocessed_block_number())
         return web.Response(text=text)
 
-    def erase(self, request):
-        pass
-
     def get_registries(self, request):
-        pass
+        if "blockNumber" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            block_number = int(request.rel_url.query["blockNumber"])
+            text = str(self.registries_cache.get_registry_list(block_number))
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
 
     def is_registry_exist(self, request):
         pass
@@ -72,7 +76,6 @@ class REST:
         app.add_routes([web.get('/', self.handle),
                         web.get('/blocks/firstBlock', self.get_first_block_number),
                         web.get('/blocks/currentBlock', self.get_current_block_number),
-                        web.get('/blocks/erase', self.erase),
                         web.get('/registries/list', self.get_registries),
                         web.get('/registries/exist', self.is_registry_exist),
                         web.get('/votes/list', self.is_registry_exist),
