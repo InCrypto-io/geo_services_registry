@@ -10,7 +10,7 @@ from settings import Settings
 
 class Test:
     def __init__(self):
-        self.eth_connection = EthConnection(config.WEB3_PROVIDER, config.MNEMONIC)
+        self.eth_connection = EthConnection(config.WEB3_PROVIDER, config.MNEMONIC, config.DB_URL)
         self.gsr = GeoServiceRegistry(self.eth_connection, config.GEOSERVICEREGISTRY_ADDRESS)
         self.geo = GEOToken(self.eth_connection, config.GEOTOKEN_ADDRESS)
 
@@ -112,11 +112,17 @@ class Test:
         print("interval blockNumber",
               self.eth_connection.get_web3().eth.waitForTransactionReceipt(tx_hash)["blockNumber"])
 
+        tx_hash = self.gsr.vote_service_lockup(reg_name, accounts, amounts)
+        print("resend, old transaction hash", tx_hash.hex())
+        print("transaction with new nonce", self.gsr.vote_service_lockup(reg_name, accounts, amounts).hex())
+        tx_hash = self.eth_connection.resend(tx_hash, self.eth_connection.get_gas_price()*2)
+        print("resend, new transaction hash", tx_hash.hex())
+
         # event_filter = self.gsr.contract.events.Vote.createFilter(fromBlock=0)
         # while True:
         #     for event in event_filter.get_new_entries():
         #         print(event)
-        #     time.sleep(5)
+        #     time.sleep(5)https://en.bitcoin.it/wiki/List_of_address_prefixes
 
     def test_events_cache(self):
         print("Test event cache")
