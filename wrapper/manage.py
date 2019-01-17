@@ -2,22 +2,39 @@
 import config
 from test import Test
 from rest import REST
+import sys
+from eth_connection import EthConnection
+from events_cache import EventCache
+from registries_cache import RegistriesCache
+from geo_service_registry import GeoServiceRegistry
+from settings import Settings
 
 if __name__ == "__main__":
-    print("+++++++++++Manage++++++++++++")
-    print("WEB3_PROVIDER", config.WEB3_PROVIDER)
-    print("GEOSERVICEREGISTRY_ADDRESS", config.GEOSERVICEREGISTRY_ADDRESS)
-    print("GEOTOKEN_ADDRESS", config.GEOTOKEN_ADDRESS)
-    print("COMMAND_ARGS", config.COMMAND_ARGS)
-
     if "TEST" in config.COMMAND_ARGS:
         test = Test()
         # test.test()
         # test.test_events_cache()
         test.test_registries_cache()
-
-    if "REST" in config.COMMAND_ARGS:
+    elif "REST" in config.COMMAND_ARGS:
         rest = REST()
         rest.launch()
-
-    print("+++++++++Done!+++++++++++++++++++")
+    elif "CLEAR" in sys.argv:
+        eth_connection = EthConnection(config.WEB3_PROVIDER, config.MNEMONIC)
+        settings = Settings(config.DB_URL)
+        gsr = GeoServiceRegistry(eth_connection, config.GEOSERVICEREGISTRY_ADDRESS)
+        event_cache = EventCache(
+            eth_connection,
+            gsr,
+            config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK,
+            config.DB_URL,
+            config.CONFIRMATION_COUNT,
+            settings)
+        registries_cache = RegistriesCache(event_cache, config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK, config.DB_URL,
+                                           config.INTERVAL_FOR_PREPROCESSED_BLOCKS, settings,
+                                           config.VOTES_ROUND_TO_NUMBER_OF_DIGIT)
+        event_cache.erase_all(0)
+        registries_cache.erase(0)
+    else:
+        print("in config.COMMAND_ARGS: TEST - for testing")
+        print("in config.COMMAND_ARGS: REST - launch REST API service")
+        print("in cmd line: CLEAR - erase db")
