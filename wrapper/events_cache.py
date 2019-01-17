@@ -69,6 +69,7 @@ class EventCache:
 
     def erase_all(self, from_block_number=0):
         self.events_collection.remove({"blockNumber": {'$gte': from_block_number}})
+        self.set_last_processed_block_number(from_block_number - 1)
 
     def get_events_count(self):
         return self.events_collection.count()
