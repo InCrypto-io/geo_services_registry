@@ -34,26 +34,31 @@ class REST:
 
         self.allow_process_events = False
 
-    async def handle(self, request):
+    def handle(self, request):
         text = "/" + request.match_info.get('request') + "\n" + str(request.rel_url.query)
         return web.Response(text=text)
 
-    async def get_current_block_number(self, request):
+    def get_first_block_number(self, request):
+        text = str(config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK)
+        return web.Response(text=text)
+
+    def get_current_block_number(self, request):
+        text = str(self.registries_cache.get_current_preprocessed_block_number())
+        return web.Response(text=text)
+
+    def erase(self, request):
         pass
 
-    async def erase(self, request):
+    def get_registries(self, request):
         pass
 
-    async def get_registries(self, request):
+    def is_registry_exist(self, request):
         pass
 
-    async def is_registry_exist(self, request):
+    def get_votes_list(self, request):
         pass
 
-    async def get_votes_list(self, request):
-        pass
-
-    async def get_vote_for_candidate(self, request):
+    def get_vote_for_candidate(self, request):
         pass
 
     def process_events(self):
@@ -65,6 +70,7 @@ class REST:
     def launch(self):
         app = web.Application()
         app.add_routes([web.get('/', self.handle),
+                        web.get('/blocks/firstBlock', self.get_first_block_number),
                         web.get('/blocks/currentBlock', self.get_current_block_number),
                         web.get('/blocks/erase', self.erase),
                         web.get('/registries/list', self.get_registries),

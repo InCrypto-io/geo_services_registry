@@ -27,7 +27,7 @@ class RegistriesCache:
             self.__set_last_preprocessed_block_number(last_processed_block_number)
 
     def update_current_block(self):
-        current_preprocessed_block_number = self.__get_current_preprocessed_block_number()
+        current_preprocessed_block_number = self.get_current_preprocessed_block_number()
         if self.event_cache.get_last_processed_block_number() < self.gsr_created_at_block:
             return
         if self.event_cache.get_last_processed_block_number() < \
@@ -196,9 +196,9 @@ class RegistriesCache:
         if block_number > self.__get_last_preprocessed_block_number():
             return
 
-        if self.__get_current_preprocessed_block_number() != self.__get_last_preprocessed_block_number() \
-                and self.__get_current_preprocessed_block_number() >= block_number:
-            self.__remove_dbs_for_block_number(self.__get_current_preprocessed_block_number())
+        if self.get_current_preprocessed_block_number() != self.__get_last_preprocessed_block_number() \
+                and self.get_current_preprocessed_block_number() >= block_number:
+            self.__remove_dbs_for_block_number(self.get_current_preprocessed_block_number())
             self.__set_current_preprocessed_block_number(self.__get_last_preprocessed_block_number())
 
         while block_number <= self.__get_last_preprocessed_block_number():
@@ -209,19 +209,19 @@ class RegistriesCache:
         self.__set_current_preprocessed_block_number(self.__get_last_preprocessed_block_number())
 
     def is_registry_exist(self, registry_name, block_number):
-        if block_number > self.__get_current_preprocessed_block_number():
+        if block_number > self.get_current_preprocessed_block_number():
             return False
         prepared_block_data = self.__preprocess_block(block_number, False)
         return registry_name in prepared_block_data[2]
 
     def get_registry_list(self, block_number):
-        if block_number > self.__get_current_preprocessed_block_number():
+        if block_number > self.get_current_preprocessed_block_number():
             return []
         prepared_block_data = self.__preprocess_block(block_number, False)
         return prepared_block_data[2]
 
     def get_total_votes_for_candidate(self, candidate_address, registry_name, block_number):
-        if block_number > self.__get_current_preprocessed_block_number():
+        if block_number > self.get_current_preprocessed_block_number():
             return 0
         winners = self.get_winners_list(registry_name, block_number)
         if len(winners):
@@ -231,7 +231,7 @@ class RegistriesCache:
         return 0
 
     def get_winners_list(self, registry_name, block_number):
-        if block_number > self.__get_current_preprocessed_block_number():
+        if block_number > self.get_current_preprocessed_block_number():
             return []
         prepared_block_data = self.__preprocess_block(block_number, False)
         if registry_name in prepared_block_data[3].keys():
@@ -258,7 +258,7 @@ class RegistriesCache:
     def __set_last_preprocessed_block_number(self, value):
         self.settings.set_value("last_preprocessed_block_number", value)
 
-    def __get_current_preprocessed_block_number(self):
+    def get_current_preprocessed_block_number(self):
         result = self.settings.get_value("current_preprocessed_block_number")
         if not result:
             result = 0
