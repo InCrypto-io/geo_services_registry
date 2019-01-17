@@ -2,6 +2,7 @@ import pymongo
 from pymongo import MongoClient
 import time
 from threading import Thread
+import concurrent.futures
 
 
 class EventCache:
@@ -29,20 +30,23 @@ class EventCache:
     def process_events(self):
         new_block_filter = self.connection.get_web3().eth.filter('latest')
         while not self.stop_collect_events:
-            for _ in new_block_filter.get_new_entries():
-                last_block_number = self.connection.get_web3().eth.blockNumber
-                print("exist new block", last_block_number)
-                while self.get_last_processed_block_number() + self.confirmation_count < last_block_number:
-                    print("get events for block:", self.get_last_processed_block_number() + 1)
-                    for event_name in self.gsr.get_events_list():
-                        event_filter = self.gsr.contract.eventFilter(event_name,
-                                                                     {'fromBlock': self.get_last_processed_block_number() + 1,
-                                                                      'toBlock': self.get_last_processed_block_number() + 1})
-                        for event in event_filter.get_all_entries():
-                            self.write_event(event)
-                        self.connection.get_web3().eth.uninstallFilter(event_filter.filter_id)
-                    self.set_last_processed_block_number(self.get_last_processed_block_number() + 1)
-            time.sleep(10)
+            try:
+                for _ in new_block_filter.get_new_entries():
+                    last_block_number = self.connection.get_web3().eth.blockNumber
+                    print("exist new block", last_block_number)
+                    while self.get_last_processed_block_number() + self.confirmation_count < last_block_number:
+                        print("get events for block:", self.get_last_processed_block_number() + 1)
+                        for event_name in self.gsr.get_events_list():
+                            event_filter = self.gsr.contract.eventFilter(event_name,
+                                                                         {'fromBlock': self.get_last_processed_block_number() + 1,
+                                                                          'toBlock': self.get_last_processed_block_number() + 1})
+                            for event in event_filter.get_all_entries():
+                                self.write_event(event)
+                            self.connection.get_web3().eth.uninstallFilter(event_filter.filter_id)
+                        self.set_last_processed_block_number(self.get_last_processed_block_number() + 1)
+                time.sleep(10)
+            except concurrent.futures._base.TimeoutError:
+                new_block_filter = self.connection.get_web3().eth.filter('latest')
 
         self.connection.get_web3().eth.uninstallFilter(new_block_filter.filter_id)
 
