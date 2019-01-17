@@ -35,10 +35,6 @@ class REST:
 
         self.allow_process_events = False
 
-    def handle(self, request):
-        text = "/" + request.match_info.get('request') + "\n" + str(request.rel_url.query)
-        return web.Response(text=text)
-
     def get_first_block_number(self, request):
         text = str(config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK)
         return web.Response(text=text)
@@ -123,14 +119,13 @@ class REST:
 
     def launch(self):
         app = web.Application()
-        app.add_routes([web.get('/', self.handle),
-                        web.get('/blocks/firstBlock', self.get_first_block_number),
+        app.add_routes([web.get('/blocks/firstBlock', self.get_first_block_number),
                         web.get('/blocks/currentBlock', self.get_current_block_number),
                         web.get('/registries/list', self.get_registries),
                         web.get('/registries/exist', self.is_registry_exist),
                         web.get('/votes/list', self.get_winners_list),
-                        web.get('/votes/candidate', self.get_vote_for_candidate),
-                        web.get('/{request}', self.handle)])
+                        web.get('/votes/candidate', self.get_vote_for_candidate)
+                        ])
 
         self.allow_process_events = True
         self.event_cache.collect()
