@@ -1,12 +1,17 @@
 from web3 import Web3
 from libs.ethBIP44.ethLib import HDPrivateKey, HDKey
+from pymongo import MongoClient
 
 
 class EthConnection:
-    def __init__(self, provider, mnemonic):
+    def __init__(self, provider, mnemonic, db_url):
         print("selected provider is {}".format(provider))
 
         assert len(provider) > 0
+
+        self.client = MongoClient(db_url)
+        self.db = self.client['db_geo_transactions']
+        self.transactions_collection = self.db["transactions"]
 
         self.w3 = Web3(Web3.WebsocketProvider(provider))
 
@@ -46,11 +51,36 @@ class EthConnection:
         self.nonces[address] = self.w3.eth.getTransactionCount(address, "pending")
         return self.nonces[address]
 
-    def signAndSendTransaction(self, address, raw_transaction):
+    def sign_and_send_transaction(self, address, raw_transaction):
         assert address in self.get_accounts()
         private_key = self.private_keys[self.get_accounts().index(address)]
         signed_transaction = self.w3.eth.account.signTransaction(raw_transaction, private_key)
-        return self.w3.eth.sendRawTransaction(signed_transaction.rawTransaction)
+        tx_hash = self.w3.eth.sendRawTransaction(signed_transaction.rawTransaction)
+        self.__store_raw_transaction(address, raw_transaction, tx_hash)
+        return tx_hash
 
     def get_gas_price(self):
         return int(self.w3.eth.gasPrice)
+
+    def __store_raw_transaction(self, address, raw_transaction, tx_hash):
+        self.transactions_collection.insert_one({
+            "from": address,
+            "raw_transaction": raw_transaction,
+            "hash": tx_hash
+        })
+
+    def __get_stored_raw_transaction(self, tx_hash):
+        return self.transactions_collection.find_one({
+            "hash": tx_hash
+        })
+
+    def erase(self):
+        self.transactions_collection.remove({})
+
+    def resend(self, tx_hash, new_gas_price=0):
+        previous = self.__get_stored_raw_transaction(tx_hash)
+        if new_gas_price == 0:
+            new_gas_price = self.get_gas_price()
+        previous["raw_transaction"]["gasPrice"] = new_gas_price
+        return self.sign_and_send_transaction(previous["from"],
+                                              previous["raw_transaction"])

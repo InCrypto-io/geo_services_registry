@@ -19,7 +19,7 @@ if __name__ == "__main__":
         rest = REST()
         rest.launch()
     elif "CLEAR" in sys.argv:
-        eth_connection = EthConnection(config.WEB3_PROVIDER, config.MNEMONIC)
+        eth_connection = EthConnection(config.WEB3_PROVIDER, config.MNEMONIC, config.DB_URL)
         settings = Settings(config.DB_URL)
         gsr = GeoServiceRegistry(eth_connection, config.GEOSERVICEREGISTRY_ADDRESS)
         event_cache = EventCache(
@@ -34,6 +34,7 @@ if __name__ == "__main__":
                                            config.VOTES_ROUND_TO_NUMBER_OF_DIGIT)
         event_cache.erase_all(0)
         registries_cache.erase(0)
+        eth_connection.erase()
     else:
         print("in config.COMMAND_ARGS: TEST - for testing")
         print("in config.COMMAND_ARGS: REST - launch REST API service")

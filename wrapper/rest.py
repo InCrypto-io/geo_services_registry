@@ -13,7 +13,7 @@ import json
 
 class REST:
     def __init__(self):
-        self.eth_connection = EthConnection(config.WEB3_PROVIDER, config.MNEMONIC)
+        self.eth_connection = EthConnection(config.WEB3_PROVIDER, config.MNEMONIC, config.DB_URL)
 
         self.gsr = GeoServiceRegistry(self.eth_connection, config.GEOSERVICEREGISTRY_ADDRESS)
         self.geo = GEOToken(self.eth_connection, config.GEOTOKEN_ADDRESS)

@@ -29,13 +29,13 @@ class GEOToken:
         raw_transaction = self.contract.functions.transferFrom(sender, receiver, value) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
-        return self.connection.signAndSendTransaction(self.address, raw_transaction)
+        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def transfer(self, receiver, value):
         raw_transaction = self.contract.functions.transfer(receiver, value) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
-        return self.connection.signAndSendTransaction(self.address, raw_transaction)
+        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def total_supply(self):
         return self.contract.functions.totalSupply().call()
@@ -44,19 +44,19 @@ class GEOToken:
         raw_transaction = self.contract.functions.setIndividualLockupExpireTime(who, time) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
-        return self.connection.signAndSendTransaction(self.address, raw_transaction)
+        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def deny_transfer_in_lockup_period(self, who):
         raw_transaction = self.contract.functions.denyTransferInLockupPeriod(who) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
-        return self.connection.signAndSendTransaction(self.address, raw_transaction)
+        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def allow_transfer_in_lockup_period(self, who):
         raw_transaction = self.contract.functions.allowTransferInLockupPeriod(who) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
-        return self.connection.signAndSendTransaction(self.address, raw_transaction)
+        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def is_lockup_expired(self, _who):
         return self.contract.functions.isLockupExpired(_who).call()
@@ -65,25 +65,25 @@ class GEOToken:
         raw_transaction = self.contract.functions.spender(spender, added_value) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
-        return self.connection.signAndSendTransaction(self.address, raw_transaction)
+        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def decrease_allowance(self, spender, subtracted_value):
         raw_transaction = self.contract.functions.spender(spender, subtracted_value) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
-        return self.connection.signAndSendTransaction(self.address, raw_transaction)
+        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def burn(self, account, value):
         raw_transaction = self.contract.functions.burn(account, value) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
-        return self.connection.signAndSendTransaction(self.address, raw_transaction)
+        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def mint(self, account, value):
         raw_transaction = self.contract.functions.mint(account, value) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
-        return self.connection.signAndSendTransaction(self.address, raw_transaction)
+        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def balance_of(self, owner):
         return self.contract.functions.balanceOf(owner).call()
@@ -92,10 +92,10 @@ class GEOToken:
         raw_transaction = self.contract.functions.approve(spender, value) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
-        return self.connection.signAndSendTransaction(self.address, raw_transaction)
+        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def allowance(self, owner, spender):
         raw_transaction = self.contract.functions.allowance(owner, spender) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
-        return self.connection.signAndSendTransaction(self.address, raw_transaction)
+        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
