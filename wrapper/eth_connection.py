@@ -1,5 +1,6 @@
 from web3 import Web3
 from libs.ethBIP44.ethLib import HDPrivateKey, HDKey
+import pymongo
 from pymongo import MongoClient
 
 
@@ -48,7 +49,12 @@ class EthConnection:
         if address in self.nonces.keys():
             self.nonces[address] = self.nonces[address] + 1
             return self.nonces[address]
-        self.nonces[address] = self.w3.eth.getTransactionCount(address, "pending")
+        last_stored_nonce = self.get_last_stored_nonce(address)
+        transaction_count = self.w3.eth.getTransactionCount(address, "pending")
+        if last_stored_nonce + 1 > transaction_count:
+            self.nonces[address] = last_stored_nonce + 1
+        else:
+            self.nonces[address] = transaction_count
         return self.nonces[address]
 
     def sign_and_send_transaction(self, address, raw_transaction):
@@ -85,3 +91,9 @@ class EthConnection:
         previous["raw_transaction"]["gasPrice"] = new_gas_price
         return self.sign_and_send_transaction(previous["from"],
                                               previous["raw_transaction"])
+
+    def get_last_stored_nonce(self, address):
+        if self.transactions_collection.find({"from": address}).count() == 0:
+            return 0
+        return self.transactions_collection.find({"from": address}).sort([("nonce", pymongo.DESCENDING)])\
+            .limit(1)[0]["nonce"]
