@@ -358,8 +358,21 @@ class REST:
             return web.Response(status=406)
 
     def token_approve(self, request):
-        # spender, value):
-        pass
+        if "spenderAddress" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "value" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+            spender = str(request.rel_url.query["spenderAddress"])
+            value = int(request.rel_url.query["value"])
+            text = str(self.geo.approve(spender, value).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_balance_of(self, request):
         # owner):
