@@ -212,6 +212,8 @@ class REST:
             return web.Response(text=text)
         except ValueError:
             return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def gsr_vote_service(self, request):
         if "registry_name" not in request.rel_url.query.keys():
@@ -228,9 +230,19 @@ class REST:
         pass
 
     def gsr_make_deposit(self, request):
-        if "addition_amount" not in request.rel_url.query.keys():
+        if "additionAmount" not in request.rel_url.query.keys():
             return web.Response(status=400)
-        pass
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+            addition_amount = int(request.rel_url.query["additionAmount"])
+            text = str(self.gsr.make_deposit(addition_amount).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
+
 
     def gsr_is_registry_exist(self, request):
         if "registryName" not in request.rel_url.query.keys():
@@ -244,6 +256,8 @@ class REST:
             return web.Response(text=text)
         except ValueError:
             return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def launch(self):
         app = web.Application()
