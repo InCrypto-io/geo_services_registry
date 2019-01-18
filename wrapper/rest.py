@@ -395,8 +395,21 @@ class REST:
         pass
 
     def token_set_individual_lockup_expire_time(self, request):
-        # who, time):
-        pass
+        if "address" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "time" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+            address = str(request.rel_url.query["address"])
+            expired_time = int(request.rel_url.query["time"])
+            text = str(self.geo.set_individual_lockup_expire_time(address, expired_time).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_set_sender(self, request):
         # address):
