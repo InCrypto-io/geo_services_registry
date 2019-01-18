@@ -168,6 +168,8 @@ class REST:
             return web.Response(text=text)
         except ValueError:
             return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def process_events(self):
         while self.allow_process_events:
@@ -200,15 +202,31 @@ class REST:
             return web.Response(text=text)
         except ValueError:
             return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
-    def gsr_vote_service_lockup(self, request):
-        if "registry_name" not in request.rel_url.query.keys():
+    async def gsr_vote_service_lockup(self, request):
+        data = await request.post()
+        if "registryName" not in data.keys():
             return web.Response(status=400)
-        if "candidates" not in request.rel_url.query.keys():
+        if "list" not in data.keys():
             return web.Response(status=400)
-        if "amounts" not in request.rel_url.query.keys():
+        try:
+            if "sender" in data.keys():
+                self.gsr.set_sender(str(data["sender"]))
+            registry_name = str(data["registryName"])
+            candidates = []
+            amounts = []
+            array = json.loads(str(data["list"]))
+            for key in array.keys():
+                candidates.append(key)
+                amounts.append(int(array[key]))
+            text = str(self.gsr.vote_service_lockup(registry_name, candidates, amounts).hex())
+            return web.Response(text=text)
+        except ValueError:
             return web.Response(status=400)
-        pass
+        except AssertionError:
+            return web.Response(status=406)
 
     def gsr_vote_service_for_new_registry(self, request):
         if "registryName" not in request.rel_url.query.keys():
@@ -224,14 +242,28 @@ class REST:
         except AssertionError:
             return web.Response(status=406)
 
-    def gsr_vote_service(self, request):
-        if "registry_name" not in request.rel_url.query.keys():
+    async def gsr_vote_service(self, request):
+        data = await request.post()
+        if "registryName" not in data.keys():
             return web.Response(status=400)
-        if "candidates" not in request.rel_url.query.keys():
+        if "list" not in data.keys():
             return web.Response(status=400)
-        if "amounts" not in request.rel_url.query.keys():
+        try:
+            if "sender" in data.keys():
+                self.gsr.set_sender(str(data["sender"]))
+            registry_name = str(data["registryName"])
+            candidates = []
+            amounts = []
+            array = json.loads(str(data["list"]))
+            for key in array.keys():
+                candidates.append(key)
+                amounts.append(int(array[key]))
+            text = str(self.gsr.vote_service(registry_name, candidates, amounts).hex())
+            return web.Response(text=text)
+        except ValueError:
             return web.Response(status=400)
-        pass
+        except AssertionError:
+            return web.Response(status=406)
 
     def gsr_set_vote_weight_in_lockup_period(self, request):
         if "newAmount" not in request.rel_url.query.keys():
@@ -309,8 +341,8 @@ class REST:
 
                         web.get('/gsr/registry/exist', self.gsr_is_registry_exist),
                         web.get('/gsr/registry/vote', self.gsr_vote_service_for_new_registry),
-                        web.get('/gsr/vote', self.gsr_vote_service),
-                        web.get('/gsr/lockupPeriod/vote', self.gsr_vote_service_lockup),
+                        web.post('/gsr/vote', self.gsr_vote_service),
+                        web.post('/gsr/lockupPeriod/vote', self.gsr_vote_service_lockup),
                         web.get('/gsr/lockupPeriod/registry/vote', self.gsr_vote_service_lockup_for_new_registry),
                         web.get('/gsr/lockupPeriod/weight/set', self.gsr_set_vote_weight_in_lockup_period),
                         web.get('/gsr/weight/makeDeposit', self.gsr_make_deposit),

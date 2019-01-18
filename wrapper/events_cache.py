@@ -45,7 +45,7 @@ class EventCache:
                             self.connection.get_web3().eth.uninstallFilter(event_filter.filter_id)
                         self.set_last_processed_block_number(self.get_last_processed_block_number() + 1)
                 time.sleep(10)
-            except concurrent.futures._base.TimeoutError:
+            except concurrent.futures._base.TimeoutError or ValueError:
                 new_block_filter = self.connection.get_web3().eth.filter('latest')
 
         self.connection.get_web3().eth.uninstallFilter(new_block_filter.filter_id)
