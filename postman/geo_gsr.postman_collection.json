@@ -891,6 +891,122 @@
 				"description": "token get allowance for spender"
 			},
 			"response": []
+		},
+		{
+			"name": "token decrease allowance",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/allowance/decrease?spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&subtractedValue=541",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"allowance",
+						"decrease"
+					],
+					"query": [
+						{
+							"key": "spenderAddress",
+							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						},
+						{
+							"key": "subtractedValue",
+							"value": "541"
+						}
+					]
+				},
+				"description": "token decrease allowance"
+			},
+			"response": []
+		},
+		{
+			"name": "token increase allowance",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/allowance/increase?spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&addedValue=541",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"allowance",
+						"increase"
+					],
+					"query": [
+						{
+							"key": "spenderAddress",
+							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						},
+						{
+							"key": "addedValue",
+							"value": "541"
+						}
+					]
+				},
+				"description": "token increase allowance"
+			},
+			"response": []
+		},
+		{
+			"name": "token approve",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/approve?spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&value=541",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"approve"
+					],
+					"query": [
+						{
+							"key": "spenderAddress",
+							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						},
+						{
+							"key": "value",
+							"value": "541"
+						}
+					]
+				},
+				"description": "token approve"
+			},
+			"response": []
 		}
 	]
 }
