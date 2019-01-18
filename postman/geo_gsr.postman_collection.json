@@ -1007,6 +1007,116 @@
 				"description": "token approve"
 			},
 			"response": []
+		},
+		{
+			"name": "token balance",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/balance?address=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"balance"
+					],
+					"query": [
+						{
+							"key": "address",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b"
+						}
+					]
+				},
+				"description": "get blance of address"
+			},
+			"response": []
+		},
+		{
+			"name": "token burn",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/burn?address=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&value=541",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"burn"
+					],
+					"query": [
+						{
+							"key": "address",
+							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						},
+						{
+							"key": "value",
+							"value": "541"
+						}
+					]
+				},
+				"description": "token burn"
+			},
+			"response": []
+		},
+		{
+			"name": "token mint",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/mint?address=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&value=541",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"mint"
+					],
+					"query": [
+						{
+							"key": "address",
+							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						},
+						{
+							"key": "value",
+							"value": "541"
+						}
+					]
+				},
+				"description": "token mint"
+			},
+			"response": []
 		}
 	]
 }

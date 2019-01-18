@@ -389,8 +389,21 @@ class REST:
             return web.Response(status=406)
 
     def token_burn(self, request):
-        # account, value):
-        pass
+        if "address" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "value" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+            address = str(request.rel_url.query["address"])
+            value = int(request.rel_url.query["value"])
+            text = str(self.geo.burn(address, value).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_decrease_allowance(self, request):
         if "spenderAddress" not in request.rel_url.query.keys():
@@ -456,8 +469,21 @@ class REST:
             return web.Response(status=406)
 
     def token_mint(self, request):
-        # account, value):
-        pass
+        if "address" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "value" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+            address = str(request.rel_url.query["address"])
+            value = int(request.rel_url.query["value"])
+            text = str(self.geo.mint(address, value).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_set_individual_lockup_expire_time(self, request):
         if "address" not in request.rel_url.query.keys():
