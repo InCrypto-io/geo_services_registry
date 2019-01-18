@@ -9,6 +9,14 @@ from registries_cache import RegistriesCache
 from settings import Settings
 from threading import Thread
 import json
+from hexbytes import HexBytes
+
+
+class HexJsonEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, HexBytes):
+            return obj.hex()
+        return super().default(obj)
 
 
 class REST:
@@ -133,6 +141,16 @@ class REST:
         })
         return web.Response(text=text)
 
+    def get_transaction_info(self, request):
+        if "hash" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            hash = str(request.rel_url.query["hash"])
+            text = json.dumps(dict(self.eth_connection.get_transaction_info(hash)), cls=HexJsonEncoder)
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+
     def process_events(self):
         while self.allow_process_events:
             self.registries_cache.update()
@@ -149,6 +167,7 @@ class REST:
                         web.get('/votes/candidate', self.get_vote_for_candidate),
                         web.get('/eth/gasPrice', self.get_gas_price),
                         web.get('/eth/accounts', self.get_ethereum_accounts),
+                        web.get('/eth/transaction_info', self.get_transaction_info),
                         ])
 
         self.allow_process_events = True

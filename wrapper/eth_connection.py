@@ -16,7 +16,7 @@ class EthConnection:
 
         self.w3 = Web3(Web3.WebsocketProvider(provider))
 
-        print("connected to {}: {}".format(provider, self.w3.isConnected()))
+        print("connected to {}: {}".format(provider, self.get_web3().isConnected()))
 
         if len(mnemonic):
             try:
@@ -30,7 +30,7 @@ class EthConnection:
                     priv_key = keys[-1]
                     pub_key = priv_key.public_key
                     address = pub_key.address()
-                    self.accounts.append(self.w3.toChecksumAddress(address))
+                    self.accounts.append(self.get_web3().toChecksumAddress(address))
                     self.private_keys.append("0x" + priv_key._key.to_hex())
             except Exception:
                 self.accounts = []
@@ -43,14 +43,14 @@ class EthConnection:
     def get_accounts(self):
         if len(self.accounts):
             return self.accounts
-        return self.w3.eth.accounts
+        return self.get_web3().eth.accounts
 
     def get_nonce(self, address):
         if address in self.nonces.keys():
             self.nonces[address] = self.nonces[address] + 1
             return self.nonces[address]
         last_stored_nonce = self.get_last_stored_nonce(address)
-        transaction_count = self.w3.eth.getTransactionCount(address, "pending")
+        transaction_count = self.get_web3().eth.getTransactionCount(address, "pending")
         if last_stored_nonce + 1 > transaction_count:
             self.nonces[address] = last_stored_nonce + 1
         else:
@@ -60,13 +60,13 @@ class EthConnection:
     def sign_and_send_transaction(self, address, raw_transaction):
         assert address in self.get_accounts()
         private_key = self.private_keys[self.get_accounts().index(address)]
-        signed_transaction = self.w3.eth.account.signTransaction(raw_transaction, private_key)
-        tx_hash = self.w3.eth.sendRawTransaction(signed_transaction.rawTransaction)
+        signed_transaction = self.get_web3().eth.account.signTransaction(raw_transaction, private_key)
+        tx_hash = self.get_web3().eth.sendRawTransaction(signed_transaction.rawTransaction)
         self.__store_raw_transaction(address, raw_transaction, tx_hash)
         return tx_hash
 
     def get_gas_price(self):
-        return int(self.w3.eth.gasPrice)
+        return int(self.get_web3().eth.gasPrice)
 
     def __store_raw_transaction(self, address, raw_transaction, tx_hash):
         self.transactions_collection.insert_one({
@@ -97,3 +97,6 @@ class EthConnection:
             return 0
         return self.transactions_collection.find({"from": address}).sort([("nonce", pymongo.DESCENDING)])\
             .limit(1)[0]["nonce"]
+
+    def get_transaction_info(self, tx_hash):
+        return self.get_web3().eth.getTransaction(tx_hash)
