@@ -86,6 +86,8 @@ class EthConnection:
 
     def resend(self, tx_hash, new_gas_price=0):
         previous = self.__get_stored_raw_transaction(tx_hash)
+        if previous is None:
+            return ""
         if new_gas_price == 0:
             new_gas_price = self.get_gas_price()
         previous["raw_transaction"]["gasPrice"] = new_gas_price

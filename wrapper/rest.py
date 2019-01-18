@@ -151,6 +151,24 @@ class REST:
         except ValueError:
             return web.Response(status=400)
 
+    def resend(self, request):
+        if "hash" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            hash = str(request.rel_url.query["hash"])
+            if "gasPrice" not in request.rel_url.query.keys():
+                gas_price = 0
+            else:
+                gas_price = str(request.rel_url.query["gasPrice"])
+            # if old transaction not found newHash will be empty
+            text = json.dumps({
+                "oldHash": hash,
+                "newHash": self.eth_connection.resend(hash, gas_price)
+            })
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+
     def process_events(self):
         while self.allow_process_events:
             self.registries_cache.update()
@@ -168,6 +186,7 @@ class REST:
                         web.get('/eth/gasPrice', self.get_gas_price),
                         web.get('/eth/accounts', self.get_ethereum_accounts),
                         web.get('/eth/transaction_info', self.get_transaction_info),
+                        web.get('/eth/resend', self.resend),
                         ])
 
         self.allow_process_events = True
