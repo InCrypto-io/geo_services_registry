@@ -401,8 +401,21 @@ class REST:
             return web.Response(status=406)
 
     def token_increase_allowance(self, request):
-        # spender, added_value):
-        pass
+        if "spenderAddress" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "addedValue" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+            spender = str(request.rel_url.query["spenderAddress"])
+            added_value = int(request.rel_url.query["addedValue"])
+            text = str(self.geo.increase_allowance(spender, added_value).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_is_lockup_expired(self, request):
         if "address" not in request.rel_url.query.keys():
