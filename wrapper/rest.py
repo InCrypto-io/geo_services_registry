@@ -175,18 +175,78 @@ class REST:
             self.registries_cache.update_current_block()
             time.sleep(1)
 
+    def gsr_withdraw(self, request):
+        if "amout" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        pass
+
+    def gsr_vote_service_lockup_for_new_registry(self, request):
+        if "registry_name" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        pass
+
+    def gsr_vote_service_lockup(self, request):
+        if "registry_name" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "candidates" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "amounts" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        pass
+
+    def gsr_vote_service_for_new_registry(self, request):
+        if "registry_name" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        pass
+
+    def gsr_vote_service(self, request):
+        if "registry_name" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "candidates" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "amounts" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        pass
+
+    def gsr_set_vote_weight_in_lockup_period(self, request):
+        if "new_amount" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        pass
+
+    def gsr_make_deposit(self, request):
+        if "addition_amount" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        pass
+
+    def gsr_is_registry_exist(self, request):
+        if "registry_name" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        pass
+
     def launch(self):
         app = web.Application()
         app.add_routes([web.get('/blocks/firstBlock', self.get_first_block_number),
                         web.get('/blocks/currentBlock', self.get_current_block_number),
+
                         web.get('/registries/list', self.get_registries),
                         web.get('/registries/exist', self.is_registry_exist),
+
                         web.get('/votes/list', self.get_winners_list),
                         web.get('/votes/candidate', self.get_vote_for_candidate),
+
                         web.get('/eth/gasPrice', self.get_gas_price),
                         web.get('/eth/accounts', self.get_ethereum_accounts),
                         web.get('/eth/transaction_info', self.get_transaction_info),
                         web.get('/eth/resend', self.resend),
+
+                        web.get('/gsr/registry/exist', self.gsr_is_registry_exist),
+                        web.get('/gsr/registry/vote', self.gsr_vote_service_for_new_registry),
+                        web.get('/gsr/vote', self.gsr_vote_service),
+                        web.get('/gsr/lockupPeriod/vote', self.gsr_vote_service_lockup),
+                        web.get('/gsr/lockupPeriod/registry/vote', self.gsr_vote_service_lockup_for_new_registry),
+                        web.get('/gsr/lockupPeriod/weight/set', self.gsr_set_vote_weight_in_lockup_period),
+                        web.get('/gsr/weight/makeDeposit', self.gsr_make_deposit),
+                        web.get('/gsr/weight/withdraw', self.gsr_withdraw),
                         ])
 
         self.allow_process_events = True
