@@ -178,7 +178,16 @@ class REST:
     def gsr_withdraw(self, request):
         if "amount" not in request.rel_url.query.keys():
             return web.Response(status=400)
-        pass
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+            amount = int(request.rel_url.query["amount"])
+            text = str(self.gsr.withdraw(amount).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def gsr_vote_service_lockup_for_new_registry(self, request):
         if "registryName" not in request.rel_url.query.keys():
@@ -242,7 +251,6 @@ class REST:
             return web.Response(status=400)
         except AssertionError:
             return web.Response(status=406)
-
 
     def gsr_is_registry_exist(self, request):
         if "registryName" not in request.rel_url.query.keys():
