@@ -358,8 +358,18 @@ class REST:
         pass
 
     def token_deny_transfer_in_lockup_period(self, request):
-        # who):
-        pass
+        if "address" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+            address = str(request.rel_url.query["address"])
+            text = str(self.geo.deny_transfer_in_lockup_period(address).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_increase_allowance(self, request):
         # spender, added_value):
