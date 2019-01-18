@@ -212,6 +212,251 @@
 				"description": "get amount of vote for one candidate for chosen block number and registry"
 			},
 			"response": []
+		},
+		{
+			"name": "get gas price",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/eth/gasPrice",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"eth",
+						"gasPrice"
+					]
+				},
+				"description": "get current gas price from node etherium"
+			},
+			"response": []
+		},
+		{
+			"name": "get accounts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/eth/gasPrice",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"eth",
+						"gasPrice"
+					]
+				},
+				"description": "get addresses for mnemonic from config"
+			},
+			"response": []
+		},
+		{
+			"name": "get transaction info",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/eth/transaction_info?hash=0x6e580135eef0c6d256f27c7a2c4547cf3065762842dcc27f8b5647d88f7c3b5c",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"eth",
+						"transaction_info"
+					],
+					"query": [
+						{
+							"key": "hash",
+							"value": "0x6e580135eef0c6d256f27c7a2c4547cf3065762842dcc27f8b5647d88f7c3b5c"
+						}
+					]
+				},
+				"description": "get transaction info, if have block number, then transaction is mined"
+			},
+			"response": []
+		},
+		{
+			"name": "resend",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/eth/resend?hash=0x6dabd0d9152cd8f8c5aed7fa7d9f3f9a63ff562ef8d93824839d7d44436441ef&gasPrice=5151515151515",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"eth",
+						"resend"
+					],
+					"query": [
+						{
+							"key": "hash",
+							"value": "0x6dabd0d9152cd8f8c5aed7fa7d9f3f9a63ff562ef8d93824839d7d44436441ef"
+						},
+						{
+							"key": "gasPrice",
+							"value": "5151515151515",
+							"description": "by default is current from network"
+						}
+					]
+				},
+				"description": "resend with other gas price"
+			},
+			"response": []
+		},
+		{
+			"name": "gsr registry exist",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/gsr/registry/exist?registryName=provider",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"gsr",
+						"registry",
+						"exist"
+					],
+					"query": [
+						{
+							"key": "registryName",
+							"value": "provider"
+						}
+					]
+				},
+				"description": "gsr method, check registry exist"
+			},
+			"response": []
+		},
+		{
+			"name": "gsr vote for new registry",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/gsr/registry/vote?registryName=provider&sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"gsr",
+						"registry",
+						"vote"
+					],
+					"query": [
+						{
+							"key": "registryName",
+							"value": "provider"
+						},
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+							"description": "by default it first address from mnemonic"
+						}
+					]
+				},
+				"description": "gsr vote for new registry, after lockup period"
+			},
+			"response": []
+		},
+		{
+			"name": "gsr vote for new registry Lockup",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/gsr/lockupPeriod/registry/vote?registryName=providerdfgdf&sender=0x1F2D5B4F89f4e613158D77BAf2B00f5645687b79",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"gsr",
+						"lockupPeriod",
+						"registry",
+						"vote"
+					],
+					"query": [
+						{
+							"key": "registryName",
+							"value": "providerdfgdf"
+						},
+						{
+							"key": "sender",
+							"value": "0x1F2D5B4F89f4e613158D77BAf2B00f5645687b79",
+							"description": "by default it first address from mnemonic"
+						}
+					]
+				},
+				"description": "gsr vote for new registry, in lockup period"
+			},
+			"response": []
 		}
 	]
 }
