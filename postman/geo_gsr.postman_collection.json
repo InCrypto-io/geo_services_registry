@@ -863,7 +863,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8080/token/allowance?ownerAddress=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b&spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6",
+					"raw": "http://127.0.0.1:8080/token/allowance?ownerAddress=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b&spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -885,6 +885,10 @@
 						{
 							"key": "spenderAddress",
 							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						},
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b"
 						}
 					]
 				},
@@ -902,7 +906,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8080/token/allowance/decrease?spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&subtractedValue=541",
+					"raw": "http://127.0.0.1:8080/token/allowance/decrease?spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&subtractedValue=541&sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -924,6 +928,10 @@
 						{
 							"key": "subtractedValue",
 							"value": "541"
+						},
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b"
 						}
 					]
 				},
@@ -941,7 +949,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8080/token/allowance/increase?spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&addedValue=541",
+					"raw": "http://127.0.0.1:8080/token/allowance/increase?spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&addedValue=541&sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -963,6 +971,10 @@
 						{
 							"key": "addedValue",
 							"value": "541"
+						},
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b"
 						}
 					]
 				},
@@ -980,7 +992,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8080/token/approve?spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&value=541",
+					"raw": "http://127.0.0.1:8080/token/approve?spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&value=541&sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1001,6 +1013,10 @@
 						{
 							"key": "value",
 							"value": "541"
+						},
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b"
 						}
 					]
 				},
@@ -1052,7 +1068,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8080/token/burn?address=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&value=541",
+					"raw": "http://127.0.0.1:8080/token/burn?address=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&value=541&sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1073,6 +1089,10 @@
 						{
 							"key": "value",
 							"value": "541"
+						},
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b"
 						}
 					]
 				},
@@ -1090,7 +1110,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8080/token/mint?address=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&value=541",
+					"raw": "http://127.0.0.1:8080/token/mint?address=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&value=541&sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1111,10 +1131,88 @@
 						{
 							"key": "value",
 							"value": "541"
+						},
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b"
 						}
 					]
 				},
 				"description": "token mint"
+			},
+			"response": []
+		},
+		{
+			"name": "token total suply",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/totalSupply",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"totalSupply"
+					]
+				},
+				"description": "token total suply"
+			},
+			"response": []
+		},
+		{
+			"name": "token transfer from",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/transferFrom?sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b&value=541&receiverAddress=0xACF2139DEDEB8255b9A07B2bdaC23C089acb6EB2&transferFromAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"transferFrom"
+					],
+					"query": [
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b"
+						},
+						{
+							"key": "value",
+							"value": "541"
+						},
+						{
+							"key": "receiverAddress",
+							"value": "0xACF2139DEDEB8255b9A07B2bdaC23C089acb6EB2"
+						},
+						{
+							"key": "transferFromAddress",
+							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						}
+					]
+				},
+				"description": "token transfer from"
 			},
 			"response": []
 		}

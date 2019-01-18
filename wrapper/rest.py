@@ -503,16 +503,37 @@ class REST:
             return web.Response(status=406)
 
     def token_total_supply(self, request):
-        # address):
-        pass
+        try:
+            text = str(self.geo.total_supply())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_transfer(self, request):
         # receiver, value):
         pass
 
     def token_transfer_from(self, request):
-        # sender, receiver, value):
-        pass
+        if "transferFromAddress" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "receiverAddress" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "value" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.geo.set_sender(str(request.rel_url.query["sender"]))
+            sender = str(request.rel_url.query["transferFromAddress"])
+            receiver = str(request.rel_url.query["receiverAddress"])
+            value = int(request.rel_url.query["value"])
+            text = str(self.geo.transfer_from(sender, receiver, value).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def launch(self):
         app = web.Application()
