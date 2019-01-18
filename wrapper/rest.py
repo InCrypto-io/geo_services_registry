@@ -339,7 +339,23 @@ class REST:
 
     def token_allowance(self, request):
         # owner, spender):
-        pass
+        if "ownerAddress" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "spenderAddress" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            owner_address = str(request.rel_url.query["ownerAddress"])
+            spender_address = str(request.rel_url.query["spenderAddress"])
+            text = json.dumps({
+                "ownerAddress": owner_address,
+                "spenderAddress": spender_address,
+                "allowance": self.geo.allowance(owner_address, spender_address)
+            })
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_approve(self, request):
         # spender, value):
@@ -458,12 +474,12 @@ class REST:
                         web.get('/token/lockupPeriod/expired', self.token_is_lockup_expired),
                         web.get('/token/lockupPeriod/set', self.token_set_individual_lockup_expire_time),
                         web.get('/token/allowance', self.token_allowance),
+                        web.get('/token/allowance/decrease', self.token_decrease_allowance),
+                        web.get('/token/allowance/increase', self.token_increase_allowance),
                         web.get('/token/approve', self.token_approve),
                         web.get('/token/balance', self.token_balance_of),
                         web.get('/token/burn', self.token_burn),
                         web.get('/token/mint', self.token_mint),
-                        web.get('/token/allowance/decrease', self.token_decrease_allowance),
-                        web.get('/token/allowance/increase', self.token_increase_allowance),
                         web.get('/token/totalSupply', self.token_total_supply),
                         web.get('/token/transfer', self.token_transfer),
                         web.get('/token/transferFrom', self.token_transfer_from),

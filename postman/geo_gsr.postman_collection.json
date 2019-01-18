@@ -669,7 +669,7 @@
 						},
 						{
 							"key": "list",
-							"value": "{\n\t\"0x47E6b00eD2DC8115728e48dAF34d8C8C34669e81\": \"4000\",\n\t\"0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b\": \"6000\"\n}",
+							"value": "{\n\t\"0x47E6b00eD2DC8115728e48dAF34d8C8C34669e81\": \"4500\",\n\t\"0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b\": \"5500\"\n}",
 							"type": "text"
 						}
 					]
@@ -691,6 +691,204 @@
 					]
 				},
 				"description": "gsr vote, max 20 candidates, in lockup period\ncandidates in JSON array \n\n{\n\t\"0x47E6b00eD2DC8115728e48dAF34d8C8C34669e81\": \"4000\",\n\t\"0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b\": \"6000\"\n}"
+			},
+			"response": []
+		},
+		{
+			"name": "token allow transfer in lockup period",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/lockupPeriod/allow?address=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"lockupPeriod",
+						"allow"
+					],
+					"query": [
+						{
+							"key": "address",
+							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						},
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+							"description": "by default it first address from mnemonic"
+						}
+					]
+				},
+				"description": "token allow to addres transfer in lockup period, can use only owner"
+			},
+			"response": []
+		},
+		{
+			"name": "token deny transfer in lockup period",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/lockupPeriod/deny?address=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"lockupPeriod",
+						"deny"
+					],
+					"query": [
+						{
+							"key": "address",
+							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						},
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+							"description": "by default it first address from mnemonic"
+						}
+					]
+				},
+				"description": "token deny to addres transfer in lockup period, can use only owner"
+			},
+			"response": []
+		},
+		{
+			"name": "token lockup is expired",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/lockupPeriod/expired?address=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"lockupPeriod",
+						"expired"
+					],
+					"query": [
+						{
+							"key": "address",
+							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						}
+					]
+				},
+				"description": "token deny to addres transfer in lockup period, can use only owner"
+			},
+			"response": []
+		},
+		{
+			"name": "token individual lockup time",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/lockupPeriod/set?sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b&address=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6&time=234234222",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"lockupPeriod",
+						"set"
+					],
+					"query": [
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+							"description": "by default it first address from mnemonic"
+						},
+						{
+							"key": "address",
+							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						},
+						{
+							"key": "time",
+							"value": "234234222"
+						}
+					]
+				},
+				"description": "token individual lockup time, can use only owner"
+			},
+			"response": []
+		},
+		{
+			"name": "token allowance",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/allowance?ownerAddress=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b&spenderAddress=0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"allowance"
+					],
+					"query": [
+						{
+							"key": "ownerAddress",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+							"description": "by default it first address from mnemonic"
+						},
+						{
+							"key": "spenderAddress",
+							"value": "0x7F16c260fEc7536aCff5D943A381C2bc93f0aEc6"
+						}
+					]
+				},
+				"description": "token get allowance for spender"
 			},
 			"response": []
 		}
