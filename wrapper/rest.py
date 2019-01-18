@@ -376,8 +376,19 @@ class REST:
         pass
 
     def token_is_lockup_expired(self, request):
-        # _who):
-        pass
+        if "address" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            address = str(request.rel_url.query["address"])
+            text = json.dumps({
+                "address": address,
+                "expired": self.geo.is_lockup_expired(address)
+            })
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_mint(self, request):
         # account, value):
