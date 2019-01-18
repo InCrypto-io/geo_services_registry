@@ -66,7 +66,8 @@ class EthConnection:
         self.transactions_collection.insert_one({
             "from": address,
             "raw_transaction": raw_transaction,
-            "hash": tx_hash
+            "hash": tx_hash,
+            "nonce": raw_transaction["nonce"]
         })
 
     def __get_stored_raw_transaction(self, tx_hash):
