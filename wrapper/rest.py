@@ -176,7 +176,7 @@ class REST:
             time.sleep(1)
 
     def gsr_withdraw(self, request):
-        if "amout" not in request.rel_url.query.keys():
+        if "amount" not in request.rel_url.query.keys():
             return web.Response(status=400)
         pass
 
@@ -219,9 +219,17 @@ class REST:
         pass
 
     def gsr_is_registry_exist(self, request):
-        if "registry_name" not in request.rel_url.query.keys():
+        if "registryName" not in request.rel_url.query.keys():
             return web.Response(status=400)
-        pass
+        try:
+            registry_name = str(request.rel_url.query["registryName"])
+            text = json.dumps({
+                "registry": registry_name,
+                "exist": self.gsr.is_registry_exist(registry_name)
+            })
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
 
     def launch(self):
         app = web.Application()
