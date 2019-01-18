@@ -62,13 +62,13 @@ class GEOToken:
         return self.contract.functions.isLockupExpired(_who).call()
 
     def increase_allowance(self, spender, added_value):
-        raw_transaction = self.contract.functions.spender(spender, added_value) \
+        raw_transaction = self.contract.functions.increaseAllowance(spender, added_value) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
         return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def decrease_allowance(self, spender, subtracted_value):
-        raw_transaction = self.contract.functions.spender(spender, subtracted_value) \
+        raw_transaction = self.contract.functions.decreaseAllowance(spender, subtracted_value) \
             .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
                                'gasPrice': self.connection.get_gas_price()})
         return self.connection.sign_and_send_transaction(self.address, raw_transaction)
@@ -95,7 +95,4 @@ class GEOToken:
         return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
     def allowance(self, owner, spender):
-        raw_transaction = self.contract.functions.allowance(owner, spender) \
-            .buildTransaction({'from': self.address, 'gas': 100000, 'nonce': self.connection.get_nonce(self.address),
-                               'gasPrice': self.connection.get_gas_price()})
-        return self.connection.sign_and_send_transaction(self.address, raw_transaction)
+        return self.contract.functions.allowance(owner, spender).call()

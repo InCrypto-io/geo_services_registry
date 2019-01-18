@@ -70,6 +70,9 @@ class GeoServiceRegistry:
                                'gasPrice': self.connection.get_gas_price()})
         return self.connection.sign_and_send_transaction(self.address, raw_transaction)
 
+    def deposit(self, address):
+        return self.contract.functions.deposit(address).call()
+
     @staticmethod
     def get_events_list():
         return ["Deposit", "NewRegistry", "Vote", "Withdrawal"]
