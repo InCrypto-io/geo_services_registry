@@ -328,7 +328,7 @@ class REST:
             return web.Response(status=400)
         try:
             if "sender" in request.rel_url.query.keys():
-                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+                self.geo.set_sender(str(request.rel_url.query["sender"]))
             address = str(request.rel_url.query["address"])
             text = str(self.geo.allow_transfer_in_lockup_period(address).hex())
             return web.Response(text=text)
@@ -363,7 +363,7 @@ class REST:
             return web.Response(status=400)
         try:
             if "sender" in request.rel_url.query.keys():
-                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+                self.geo.set_sender(str(request.rel_url.query["sender"]))
             spender = str(request.rel_url.query["spenderAddress"])
             value = int(request.rel_url.query["value"])
             text = str(self.geo.approve(spender, value).hex())
@@ -395,7 +395,7 @@ class REST:
             return web.Response(status=400)
         try:
             if "sender" in request.rel_url.query.keys():
-                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+                self.geo.set_sender(str(request.rel_url.query["sender"]))
             address = str(request.rel_url.query["address"])
             value = int(request.rel_url.query["value"])
             text = str(self.geo.burn(address, value).hex())
@@ -412,7 +412,7 @@ class REST:
             return web.Response(status=400)
         try:
             if "sender" in request.rel_url.query.keys():
-                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+                self.geo.set_sender(str(request.rel_url.query["sender"]))
             spender = str(request.rel_url.query["spenderAddress"])
             subtracted_value = int(request.rel_url.query["subtractedValue"])
             text = str(self.geo.decrease_allowance(spender, subtracted_value).hex())
@@ -427,7 +427,7 @@ class REST:
             return web.Response(status=400)
         try:
             if "sender" in request.rel_url.query.keys():
-                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+                self.geo.set_sender(str(request.rel_url.query["sender"]))
             address = str(request.rel_url.query["address"])
             text = str(self.geo.deny_transfer_in_lockup_period(address).hex())
             return web.Response(text=text)
@@ -443,7 +443,7 @@ class REST:
             return web.Response(status=400)
         try:
             if "sender" in request.rel_url.query.keys():
-                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+                self.geo.set_sender(str(request.rel_url.query["sender"]))
             spender = str(request.rel_url.query["spenderAddress"])
             added_value = int(request.rel_url.query["addedValue"])
             text = str(self.geo.increase_allowance(spender, added_value).hex())
@@ -475,7 +475,7 @@ class REST:
             return web.Response(status=400)
         try:
             if "sender" in request.rel_url.query.keys():
-                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+                self.geo.set_sender(str(request.rel_url.query["sender"]))
             address = str(request.rel_url.query["address"])
             value = int(request.rel_url.query["value"])
             text = str(self.geo.mint(address, value).hex())
@@ -492,7 +492,7 @@ class REST:
             return web.Response(status=400)
         try:
             if "sender" in request.rel_url.query.keys():
-                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+                self.geo.set_sender(str(request.rel_url.query["sender"]))
             address = str(request.rel_url.query["address"])
             expired_time = int(request.rel_url.query["time"])
             text = str(self.geo.set_individual_lockup_expire_time(address, expired_time).hex())
@@ -501,10 +501,6 @@ class REST:
             return web.Response(status=400)
         except AssertionError:
             return web.Response(status=406)
-
-    def token_set_sender(self, request):
-        # address):
-        pass
 
     def token_total_supply(self, request):
         # address):
