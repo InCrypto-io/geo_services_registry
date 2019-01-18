@@ -234,9 +234,18 @@ class REST:
         pass
 
     def gsr_set_vote_weight_in_lockup_period(self, request):
-        if "new_amount" not in request.rel_url.query.keys():
+        if "newAmount" not in request.rel_url.query.keys():
             return web.Response(status=400)
-        pass
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+            new_amount = int(request.rel_url.query["newAmount"])
+            text = str(self.gsr.set_vote_weight_in_lockup_period(new_amount).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def gsr_make_deposit(self, request):
         if "additionAmount" not in request.rel_url.query.keys():
@@ -260,6 +269,21 @@ class REST:
             text = json.dumps({
                 "registry": registry_name,
                 "exist": self.gsr.is_registry_exist(registry_name)
+            })
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
+
+    def gsr_deposit(self, request):
+        if "address" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            address = str(request.rel_url.query["address"])
+            text = json.dumps({
+                "address": address,
+                "deposit": self.gsr.deposit(address)
             })
             return web.Response(text=text)
         except ValueError:
@@ -291,6 +315,7 @@ class REST:
                         web.get('/gsr/lockupPeriod/weight/set', self.gsr_set_vote_weight_in_lockup_period),
                         web.get('/gsr/weight/makeDeposit', self.gsr_make_deposit),
                         web.get('/gsr/weight/withdraw', self.gsr_withdraw),
+                        web.get('/gsr/weight/size', self.gsr_deposit),
                         ])
 
         self.allow_process_events = True
