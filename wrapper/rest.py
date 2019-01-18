@@ -370,8 +370,21 @@ class REST:
         pass
 
     def token_decrease_allowance(self, request):
-        # spender, subtracted_value):
-        pass
+        if "spenderAddress" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "subtractedValue" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.gsr.set_sender(str(request.rel_url.query["sender"]))
+            spender = str(request.rel_url.query["spenderAddress"])
+            subtracted_value = int(request.rel_url.query["subtractedValue"])
+            text = str(self.geo.decrease_allowance(spender, subtracted_value).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_deny_transfer_in_lockup_period(self, request):
         if "address" not in request.rel_url.query.keys():
