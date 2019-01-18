@@ -338,7 +338,6 @@ class REST:
             return web.Response(status=406)
 
     def token_allowance(self, request):
-        # owner, spender):
         if "ownerAddress" not in request.rel_url.query.keys():
             return web.Response(status=400)
         if "spenderAddress" not in request.rel_url.query.keys():
@@ -375,8 +374,19 @@ class REST:
             return web.Response(status=406)
 
     def token_balance_of(self, request):
-        # owner):
-        pass
+        if "address" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            address = str(request.rel_url.query["address"])
+            text = json.dumps({
+                "address": address,
+                "balance": self.geo.balance_of(address)
+            })
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_burn(self, request):
         # account, value):
