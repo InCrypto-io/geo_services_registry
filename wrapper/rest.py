@@ -512,8 +512,21 @@ class REST:
             return web.Response(status=406)
 
     def token_transfer(self, request):
-        # receiver, value):
-        pass
+        if "receiverAddress" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "value" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            if "sender" in request.rel_url.query.keys():
+                self.geo.set_sender(str(request.rel_url.query["sender"]))
+            receiver = str(request.rel_url.query["receiverAddress"])
+            value = int(request.rel_url.query["value"])
+            text = str(self.geo.transfer(receiver, value).hex())
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+        except AssertionError:
+            return web.Response(status=406)
 
     def token_transfer_from(self, request):
         if "transferFromAddress" not in request.rel_url.query.keys():

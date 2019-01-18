@@ -1215,6 +1215,48 @@
 				"description": "token transfer from"
 			},
 			"response": []
+		},
+		{
+			"name": "token transfer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/token/transfer?sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b&value=541&receiverAddress=0xACF2139DEDEB8255b9A07B2bdaC23C089acb6EB2",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"token",
+						"transfer"
+					],
+					"query": [
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b"
+						},
+						{
+							"key": "value",
+							"value": "541"
+						},
+						{
+							"key": "receiverAddress",
+							"value": "0xACF2139DEDEB8255b9A07B2bdaC23C089acb6EB2"
+						}
+					]
+				},
+				"description": "token transfer"
+			},
+			"response": []
 		}
 	]
 }
