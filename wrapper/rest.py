@@ -323,6 +323,66 @@ class REST:
         except AssertionError:
             return web.Response(status=406)
 
+    def token_allow_transfer_in_lockup_period(self, request):
+        # who):
+        pass
+
+    def token_allowance(self, request):
+        # owner, spender):
+        pass
+
+    def token_approve(self, request):
+        # spender, value):
+        pass
+
+    def token_balance_of(self, request):
+        # owner):
+        pass
+
+    def token_burn(self, request):
+        # account, value):
+        pass
+
+    def token_decrease_allowance(self, request):
+        # spender, subtracted_value):
+        pass
+
+    def token_deny_transfer_in_lockup_period(self, request):
+        # who):
+        pass
+
+    def token_increase_allowance(self, request):
+        # spender, added_value):
+        pass
+
+    def token_is_lockup_expired(self, request):
+        # _who):
+        pass
+
+    def token_mint(self, request):
+        # account, value):
+        pass
+
+    def token_set_individual_lockup_expire_time(self, request):
+        # who, time):
+        pass
+
+    def token_set_sender(self, request):
+        # address):
+        pass
+
+    def token_total_supply(self, request):
+        # address):
+        pass
+
+    def token_transfer(self, request):
+        # receiver, value):
+        pass
+
+    def token_transfer_from(self, request):
+        # sender, receiver, value):
+        pass
+
     def launch(self):
         app = web.Application()
         app.add_routes([web.get('/blocks/firstBlock', self.get_first_block_number),
@@ -348,6 +408,21 @@ class REST:
                         web.get('/gsr/weight/makeDeposit', self.gsr_make_deposit),
                         web.get('/gsr/weight/withdraw', self.gsr_withdraw),
                         web.get('/gsr/weight/size', self.gsr_deposit),
+
+                        web.get('/token/lockupPeriod/allow', self.token_allow_transfer_in_lockup_period),
+                        web.get('/token/lockupPeriod/deny', self.token_deny_transfer_in_lockup_period),
+                        web.get('/token/lockupPeriod/expired', self.token_is_lockup_expired),
+                        web.get('/token/lockupPeriod/set', self.token_set_individual_lockup_expire_time),
+                        web.get('/token/allowance', self.token_allowance),
+                        web.get('/token/approve', self.token_approve),
+                        web.get('/token/balance', self.token_balance_of),
+                        web.get('/token/burn', self.token_burn),
+                        web.get('/token/mint', self.token_mint),
+                        web.get('/token/allowance/decrease', self.token_decrease_allowance),
+                        web.get('/token/allowance/increase', self.token_increase_allowance),
+                        web.get('/token/totalSupply', self.token_total_supply),
+                        web.get('/token/transfer', self.token_transfer),
+                        web.get('/token/transferFrom', self.token_transfer_from),
                         ])
 
         self.allow_process_events = True

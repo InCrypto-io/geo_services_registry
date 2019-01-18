@@ -457,6 +457,242 @@
 				"description": "gsr vote for new registry, in lockup period"
 			},
 			"response": []
+		},
+		{
+			"name": "gst make deposit",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/gsr/weight/makeDeposit?additionAmount=119&sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"gsr",
+						"weight",
+						"makeDeposit"
+					],
+					"query": [
+						{
+							"key": "additionAmount",
+							"value": "119"
+						},
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+							"description": "by default it first address from mnemonic"
+						}
+					]
+				},
+				"description": "make deposit, after lockup period"
+			},
+			"response": []
+		},
+		{
+			"name": "gsr set weight",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/gsr/lockupPeriod/weight/set?newAmount=777&sender=0x1F2D5B4F89f4e613158D77BAf2B00f5645687b79",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"gsr",
+						"lockupPeriod",
+						"weight",
+						"set"
+					],
+					"query": [
+						{
+							"key": "newAmount",
+							"value": "777"
+						},
+						{
+							"key": "sender",
+							"value": "0x1F2D5B4F89f4e613158D77BAf2B00f5645687b79",
+							"description": "by default it first address from mnemonic"
+						}
+					]
+				},
+				"description": "gsr set weight, in lockup period"
+			},
+			"response": []
+		},
+		{
+			"name": "gsr withdraw",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/gsr/weight/withdraw?amount=1&sender=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"gsr",
+						"weight",
+						"withdraw"
+					],
+					"query": [
+						{
+							"key": "amount",
+							"value": "1"
+						},
+						{
+							"key": "sender",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+							"description": "by default it first address from mnemonic"
+						}
+					]
+				},
+				"description": "withdraw, after lockup period"
+			},
+			"response": []
+		},
+		{
+			"name": "gsr deposit size",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/gsr/weight/size?address=0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"gsr",
+						"weight",
+						"size"
+					],
+					"query": [
+						{
+							"key": "address",
+							"value": "0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b"
+						}
+					]
+				},
+				"description": "get deposit size"
+			},
+			"response": []
+		},
+		{
+			"name": "gsr vote",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "registryName",
+							"value": "provider",
+							"type": "text"
+						},
+						{
+							"key": "list",
+							"value": "{\n\t\"0x47E6b00eD2DC8115728e48dAF34d8C8C34669e81\": \"4000\",\n\t\"0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b\": \"6000\"\n}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/gsr/lockupPeriod/vote",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"gsr",
+						"lockupPeriod",
+						"vote"
+					]
+				},
+				"description": "gsr vote, max 20 candidates\ncandidates in JSON array \n\n{\n\t\"0x47E6b00eD2DC8115728e48dAF34d8C8C34669e81\": \"4000\",\n\t\"0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b\": \"6000\"\n}"
+			},
+			"response": []
+		},
+		{
+			"name": "gsr vote Lockup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "registryName",
+							"value": "provider",
+							"type": "text"
+						},
+						{
+							"key": "list",
+							"value": "{\n\t\"0x47E6b00eD2DC8115728e48dAF34d8C8C34669e81\": \"4000\",\n\t\"0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b\": \"6000\"\n}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/gsr/lockupPeriod/vote",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"gsr",
+						"lockupPeriod",
+						"vote"
+					]
+				},
+				"description": "gsr vote, max 20 candidates, in lockup period\ncandidates in JSON array \n\n{\n\t\"0x47E6b00eD2DC8115728e48dAF34d8C8C34669e81\": \"4000\",\n\t\"0x53DDBAbB63f5Fd89b127458ef8cbb8DD40f6E68b\": \"6000\"\n}"
+			},
+			"response": []
 		}
 	]
 }
