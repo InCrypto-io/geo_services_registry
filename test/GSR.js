@@ -54,15 +54,12 @@ contract('GeoServiceRegistry', accounts => {
             assert.equal(await gsr.isRegistryExist(name), true, "Can't create new registry");
         });
 
-        return;
         it('Vote for registry, but exist registry', async () => {
-            const name = "registry0";//exist registry
-            const howMany = await geo.totalSupply() / 10;
-            await assertRevert(gsr.voteServiceLockupForNewRegistry(name, howMany, {from: bigHolder}));
-
-            assert.equal(await gsr.isRegistryExist(name), true, "Can't create new registry");
+            const name = "hub";//exist registry
+            await assertRevert(gsr.voteServiceLockupForNewRegistry(name, {from: user1}));
         });
 
+        return;
         it('Vote without tokens', async () => {
             const name = "new registry";
             await assertRevert(gsr.voteServiceLockup(name, candidatesList, amountForCandidatesList, {from: userEmptyBalance}));
