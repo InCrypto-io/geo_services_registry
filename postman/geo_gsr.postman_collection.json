@@ -288,7 +288,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8080/eth/gasPrice",
+					"raw": "http://127.0.0.1:8080/eth/accounts",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -299,7 +299,7 @@
 					"port": "8080",
 					"path": [
 						"eth",
-						"gasPrice"
+						"accounts"
 					]
 				},
 				"description": "get addresses for mnemonic from config"
