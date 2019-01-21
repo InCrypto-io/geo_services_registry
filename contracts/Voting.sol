@@ -5,7 +5,7 @@ import "./math/SafeMath8.sol";
 import "./math/SafeMath.sol";
 import "./math/SafeMath16.sol";
 
-contract GeoServiceRegistry {
+contract Voting {
     using SafeMath8 for uint8;
     using SafeMath16 for uint16;
     using SafeMath for uint256;
@@ -126,7 +126,7 @@ contract GeoServiceRegistry {
     public
     {
         require(!token.isLockupExpired(msg.sender));
-        require(token.balanceOf(msg.sender) >= 0);
+        require(token.balanceOf(msg.sender) > 0);
         _vote(_registryName, _candidates, _amounts);
     }
 
@@ -155,7 +155,7 @@ contract GeoServiceRegistry {
     public
     {
         require(!token.isLockupExpired(msg.sender));
-        require(token.balanceOf(msg.sender) >= 0);
+        require(token.balanceOf(msg.sender) > 0);
         _voteForNewRegistry(_registryName);
     }
 
