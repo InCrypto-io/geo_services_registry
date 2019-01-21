@@ -172,6 +172,43 @@
 			"response": []
 		},
 		{
+			"name": "get weight",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/weight?address=0x9a7107975BD53B63c792569aC0A10E6626cBb56A&blockNumber=3705866",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"weight"
+					],
+					"query": [
+						{
+							"key": "address",
+							"value": "0x9a7107975BD53B63c792569aC0A10E6626cBb56A"
+						},
+						{
+							"key": "blockNumber",
+							"value": "3705866"
+						}
+					]
+				},
+				"description": "get weight for chosen block number"
+			},
+			"response": []
+		},
+		{
 			"name": "get total votes for one candidate",
 			"request": {
 				"method": "GET",

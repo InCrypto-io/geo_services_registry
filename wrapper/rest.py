@@ -131,6 +131,26 @@ class REST:
         except ValueError:
             return web.Response(status=400)
 
+    def get_weight(self, request):
+        if "address" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        if "blockNumber" not in request.rel_url.query.keys():
+            return web.Response(status=400)
+        try:
+            address = str(request.rel_url.query["address"])
+            block_number = int(request.rel_url.query["blockNumber"])
+            if block_number < config.GEOSERVICEREGISTRY_CREATED_AT_BLOCK \
+                    or block_number > self.registries_cache.get_current_preprocessed_block_number():
+                return web.Response(status=404)
+            text = json.dumps({
+                "address": address,
+                "weight": self.registries_cache.get_weight(address, block_number),
+                "blockNumber": block_number
+            })
+            return web.Response(text=text)
+        except ValueError:
+            return web.Response(status=400)
+
     def get_gas_price(self, request):
         text = str(self.eth_connection.get_gas_price())
         return web.Response(text=text)
@@ -558,6 +578,8 @@ class REST:
 
                         web.get('/votes/list', self.get_winners_list),
                         web.get('/votes/candidate', self.get_vote_for_candidate),
+
+                        web.get('/weight', self.get_weight),
 
                         web.get('/eth/gasPrice', self.get_gas_price),
                         web.get('/eth/accounts', self.get_ethereum_accounts),

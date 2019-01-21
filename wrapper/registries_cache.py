@@ -238,6 +238,14 @@ class RegistriesCache:
             return prepared_block_data[3][registry_name]
         return []
 
+    def get_weight(self, voter, block_number):
+        if block_number > self.get_current_preprocessed_block_number():
+            return []
+        prepared_block_data = self.__preprocess_block(block_number, False)
+        if voter in prepared_block_data[1].keys():
+            return prepared_block_data[1][voter]
+        return 0
+
     def __determine_previous_preprocessed_block(self, block_number):
         previous_block = self.gsr_created_at_block
         if block_number >= self.gsr_created_at_block + self.interval_for_preprocessed_blocks + 1:
