@@ -26,7 +26,7 @@ module.exports = {
             host: 'localhost',
             port: 7545,
             network_id: '*',
-            gas: 76000000
+            gas: 6721975
         },
         rinkeby: {
             provider: () => {
@@ -37,5 +37,10 @@ module.exports = {
             gas: 3000000,
             gasPrice: 10000000000
         }
-    }
+    },
+    compilers: {
+        solc: {
+            version: "0.4.24",
+        },
+    },
 };
