@@ -1,0 +1,19 @@
+{
+  "name": "eth-contract-gsr",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "pify": "^4.0.1",
+    "truffle-hdwallet-provider": "^1.0.2"
+  }
+}
