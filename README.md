@@ -1,5 +1,5 @@
-# eth-contract-voting
-Ethereum implementation of Voting
+# eth-contract-gsr
+Ethereum implementation of GSR
 
 ### Requirements
 `truffle`
